@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+   <head>
+   </head>
+	
+   <body>
+		Client
+		
+		
+		<script type="module">
+		  // Import the functions you need from the SDKs you need
+		  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+		  import { getDatabase } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-database.js";
+		  import { getFirestore } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-firestore.js";
+
+		  // Your web app's Firebase configuration
+		  const firebaseConfig = {
+			apiKey: "AIzaSyBsyNvH0JlTzldg51uWzkadOnYLpewhYVs",
+			authDomain: "creativeproject-12185.firebaseapp.com",
+			databaseURL: "https://creativeproject-12185-default-rtdb.europe-west1.firebasedatabase.app",
+			projectId: "creativeproject-12185",
+			storageBucket: "creativeproject-12185.appspot.com",
+			messagingSenderId: "990833384121",
+			appId: "1:990833384121:web:72d1040a139abd74655968"
+		  };
+
+		  // Initialize Firebase
+		  const app = initializeApp(firebaseConfig);
+		  
+		  //var db = getDatabase(app);
+		  const db = getFirestore(app);
+		 
+		 console.log(db.collection);
+		</script>
+		   	<script type = "text/javascript" src = "client.js"></script>
+   </body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+   <head>
+   </head>
+	
+   <body>
+		Client for reading
+		
+		<script src=" https://cdn.jsdelivr.net/npm/osc-js@2.4.0/lib/osc.min.js "></script>
+		<script type="module">
+		  	// Import the functions you need from the SDKs you need
+		  	import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
+		  	import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-database.js";
+			import "https://cdn.jsdelivr.net/npm/osc-js@2.4.0/lib/osc.min.js";
+
+			// Initialize OSC
+
+		  	// Firebase configuration
+			const firebaseConfig = {
+				apiKey: "AIzaSyBsyNvH0JlTzldg51uWzkadOnYLpewhYVs",
+				authDomain: "creativeproject-12185.firebaseapp.com",
+				databaseURL: "https://creativeproject-12185-default-rtdb.europe-west1.firebasedatabase.app",
+				projectId: "creativeproject-12185",
+				storageBucket: "creativeproject-12185.appspot.com",
+				messagingSenderId: "990833384121",
+				appId: "1:990833384121:web:72d1040a139abd74655968"
+			};
+
+			// Initialize Firebase
+			const app = initializeApp(firebaseConfig);
+			
+			// Get database
+			const db = getDatabase(app);
+			
+			// Refer to entries inside "table"
+			const referColor = ref(db, 'table/color');
+			const referNumber = ref(db, 'table/number');
+			const referPosX = ref(db, 'table/posX');
+			const referPosY= ref(db, 'table/posY');
+
+			// Async calls on value changed for each entry
+			onValue(referColor, (snapshot) => {
+  				const valueColor = snapshot.val();
+  				console.log("Color: " + valueColor);
+  				//const messageColor = new OSC.Message('/test/color', valueColor);
+  				//osc.send(messageColor);
+				//console.log(messageColor);
+			});
+
+			onValue(referNumber, (snapshot) => {
+  				const valueNumber = snapshot.val();
+  				console.log("Number: " + valueNumber);
+				//const messageNumber = new OSC.Message('/test/number', valueNumber);
+  				//osc.send(messageNumber);
+				//console.log(messageNumber);
+			});
+			
+			onValue(referPosX, (snapshot) => {
+  				const valuePosX = snapshot.val();
+  				console.log("Pos X: " + valuePosX);
+			});
+			
+			onValue(referPosY, (snapshot) => {
+  				const valuePosY = snapshot.val();
+  				console.log("Pos Y: " + valuePosY);
+			});
+
+		</script>
+   </body>
+</html>
