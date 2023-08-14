@@ -52,7 +52,7 @@ class DrumMachine(Instrument):
         columns = self.number_of_notes
 
         # send dim to processing app
-        DM2_PATH =  'H:/Software/processing/processing-java --sketch="H:\Documenti\POLIMI\\2_1\CC\ProgettoCPC\ProgettoCPC\LoopStation\DM2" --run ' + str(columns)
+        DM2_PATH =  'H:/Software/processing/processing-java --sketch="H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\DM2" --run ' + str(columns)
         subprocess.Popen(DM2_PATH)
 
         for c in range(columns):

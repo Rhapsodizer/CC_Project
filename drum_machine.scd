@@ -10,7 +10,7 @@ SynthDef(\kick1, {
 }).add;
 )
 
-Synth(\kick1, [amp: 0.4]);
+Synth(\kick1, [amp: 0.8]);
 
 (
 SynthDef(\kick2, {
@@ -24,7 +24,7 @@ SynthDef(\kick2, {
 }).add;
 )
 
-Synth(\kick2, [amp: 0.4]);
+Synth(\kick2, [amp: 0.8]);
 
 (
 SynthDef(\kick3, {
@@ -39,8 +39,7 @@ SynthDef(\kick3, {
 }).add;
 )
 
-Synth(\kick3, [amp: 0.4]);
-
+Synth(\kick3, [amp: 0.8]);
 
 /*
 contributors so far: nathan ho
@@ -90,4 +89,5 @@ NetAddr("127.0.0.1",57120);
 OSCdef('kick',{Synth(\kick1, [amp: 0.7])},"/kick");
 OSCdef('hat',{Synth(\hat)},"/hat");
 OSCdef('snare',{Synth(\snare)},"/snare");
+OSCdef('collision',{Synth(\kick3)},"/collision");
 )
