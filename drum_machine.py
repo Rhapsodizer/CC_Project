@@ -3,6 +3,7 @@ import tkinter as tk
 from drum_piece import DrumPiece
 from instrument import Instrument
 import osc_bridge
+from pathlib import Path
 
 """
 This class defines the behavior of 
@@ -93,7 +94,7 @@ class DrumMachine(Instrument):
             osc_bridge.oscSC.send_message("/hat", 0)
 
         if self.snares[self.curr_note].color == "green":
-            osc_bridge.oscSC.send_message("/kick", 0)
+            osc_bridge.oscSC.send_message("/snare", 0)
 
         if self.kicks[self.curr_note].color == "green":
             osc_bridge.oscSC.send_message("/kick", 0)
