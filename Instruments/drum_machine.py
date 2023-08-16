@@ -1,7 +1,7 @@
 import subprocess
 import tkinter as tk
-from drum_piece import DrumPiece
-from instrument import Instrument
+from Instruments.drum_piece import DrumPiece
+from Instruments.instrument import Instrument
 from Utils import osc_bridge
 # from pathlib import Path
 
@@ -54,22 +54,39 @@ class DrumMachine(Instrument):
 
         # using static pde and processing
         # send dim to processing app
-        dm2_path = 'H:/Software/processing/processing-java --sketch="H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\DM2" --run ' + str(
-            columns)
-        subprocess.Popen(dm2_path)
+        # dm2_path = 'H:/Software/processing/processing-java --sketch="H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\DM2" --run ' + str(
+            # columns)
+         # subprocess.Popen(dm2_path)
 
+        # Path to the processing-java executable
+        processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+
+        # Path to the .pde file you want to compile and run
+        pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+
+        # Command to compile and run the Processing sketch
+        pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.number_of_notes)
+        print(pde_open)
+        # Create a Popen instance to run the Processing sketch
+        subprocess.Popen(pde_open, shell=True)
+
+        # Path to the sclang executable (change this to the correct path)
+        # sclang_path = "/usr/bin/sclang"
+        #
+        # # Path to the .scd file you want to run
+        # scd_file_path = "/home/silvio/Documenti/Poli/CC_Project/Instruments/drum_machine.scd"
+        # 
+        # # Command to run the SuperCollider script
+        # scd_open = sclang_path + " " + scd_file_path
+        #
+        # # Create a Popen instance to run the SuperCollider script
+        # subprocess.Popen(scd_open, shell=True)
         # using pde, "dynamic" path:
         """
         path_to_processing = str(Path.cwd() / <...> / 'processing-java')
         path_to_dm2 = str(Path.cwd() / 'DM2' / 'DM2.pde')
         dm2_path_string = path_to_processing + ' --sketch="' + path_to_dm2 + '" --run '
         dm2_path = dm2_path_string + str(columns)
-        """
-
-        # using the exe
-        """
-        executable_path = str(Path.cwd() / 'DM2' / 'linux-amd64' / 'DM2')
-        subprocess.run([executable_path, str(columns)], shell=True)
         """
 
         for c in range(columns):
@@ -106,7 +123,7 @@ class DrumMachine(Instrument):
 
     def play_and_move(self):
         print(self.curr_note)
-        step_size = 40
+        # step_size = 40
 
         if self.hats[self.curr_note].color == "green":
             osc_bridge.oscSC.send_message("/hat", 0)
