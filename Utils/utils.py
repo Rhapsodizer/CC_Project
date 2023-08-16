@@ -1,5 +1,5 @@
 import tkinter as tk
-from drum_machine import DrumMachine
+from Instruments.drum_machine import DrumMachine
 
 
 """

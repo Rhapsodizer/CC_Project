@@ -1,6 +1,4 @@
-import simpleaudio as sa
-import osc_bridge
-
+from Utils import osc_bridge
 
 """
 This class defines the single element of the
@@ -12,12 +10,12 @@ can be toggled red/green (inactive/active)
 
 
 class DrumPiece:
-    def __init__(self, pos_x, pos_y, dim, type, id, canvas):
+    def __init__(self, pos_x, pos_y, dim, dp_type, dp_id, canvas):
         self.pos_x = pos_x
         self.pos_y = pos_y
         self.dim = dim
-        self.id = id # array starts at 0
-        self.type = type
+        self.id = dp_id  # array starts at 0
+        self.type = dp_type
         self.color = "red"
         self.canvas = canvas
         self.note = self.canvas.create_rectangle(

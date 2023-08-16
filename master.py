@@ -1,4 +1,4 @@
-import loop_station_manager
+from LoopStation import loop_station_manager
 
 """
 to install tkinter:

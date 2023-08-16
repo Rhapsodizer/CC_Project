@@ -1,7 +1,7 @@
 import tkinter as tk
 from tkinter import ttk
 from track import add_new_track
-from error_manager import ErrorWindow
+from Utils.error_manager import ErrorWindow
 
 
 """

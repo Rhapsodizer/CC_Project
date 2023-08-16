@@ -1,6 +1,6 @@
-import utils
+from Utils import utils
 import tkinter as tk
-from error_manager import ErrorWindow
+from Utils.error_manager import ErrorWindow
 
 
 def add_new_track(window, canvas, tracks):
