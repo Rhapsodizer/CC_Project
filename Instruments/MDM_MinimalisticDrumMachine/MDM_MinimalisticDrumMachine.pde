@@ -2,22 +2,23 @@ import oscP5.*;
 import netP5.*;
   
 OscP5 osc;
-NetAddress address;
+NetAddress addressSC, addressLayer;
 
 // variables
-ArrayList<Step> bHat = new ArrayList<Step>();
-ArrayList<Step> bSnr = new ArrayList<Step>();
-ArrayList<Step> bKik = new ArrayList<Step>();
-
-boolean[] hatRow = new boolean[10];
-boolean[] snrRow = new boolean[10];
-boolean[] kikRow = new boolean[10];
-
 int bpm = 120;
+int nStep = 10;
 int curr;
 int textHeight = 20;
 int t;
 boolean play = false;
+
+ArrayList<Step> bHat = new ArrayList<Step>();
+ArrayList<Step> bSnr = new ArrayList<Step>();
+ArrayList<Step> bKik = new ArrayList<Step>();
+
+boolean[] hatRow = new boolean[nStep];
+boolean[] snrRow = new boolean[nStep];
+boolean[] kikRow = new boolean[nStep];
 
 
 class Step
@@ -66,7 +67,7 @@ class Step
   {
     if (isActive[id]){
       OscMessage msg = new OscMessage("/" + type);
-      osc.send(msg, address);
+      osc.send(msg, addressSC);
     }
   }
   
@@ -82,11 +83,16 @@ void setup()
   t = millis();
   
   // OSC
-  osc = new OscP5(this,12000);
-  address = new NetAddress("127.0.0.1",57120);
+  osc = new OscP5(this,12001);
+  addressSC = new NetAddress("127.0.0.1",57120);
+  addressLayer = new NetAddress("127.0.0.1",12000);
+  
+  OscMessage numSteps = new OscMessage("/nStep");
+  numSteps.add(nStep);
+  osc.send(numSteps, addressLayer);
   
   // construct grid
-  for (int i = 0; i < 10; i++)
+  for (int i = 0; i < nStep; i++)
   {
     bHat.add( new Step(100+i*50, 50, i, "hat", hatRow) );
     bSnr.add( new Step(100+i*50, 100, i, "snare", snrRow ) );
@@ -108,7 +114,7 @@ void draw()
   text("SNR", 20, 100 + textHeight/2);
   text("KIK", 20, 150 + textHeight/2);
   
-  for(int i = 0; i < 10; ++i)
+  for(int i = 0; i < nStep; ++i)
   {
     bHat.get(i).draw();
     bSnr.get(i).draw();
@@ -123,7 +129,7 @@ void draw()
     bKik.get(curr).sendOSC();
     // Move cursor one step
     curr++;
-    if (curr == 10){curr = 0;}
+    if (curr == nStep){curr = 0;}
     t=millis();
   }
     
@@ -134,7 +140,7 @@ void draw()
 
 void mousePressed()
 {
-  for(int i = 0; i < 10; ++i)
+  for(int i = 0; i < nStep; ++i)
   {
     bHat.get(i).mousePressed();
     bSnr.get(i).mousePressed();

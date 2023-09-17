@@ -3,6 +3,7 @@ from tkinter import ttk
 from LoopStation.track import add_new_track
 from Utils.error_manager import ErrorWindow
 from Utils import osc_bridge
+import subprocess
 
 
 """
@@ -123,3 +124,16 @@ def stop_all_tracks(tracks):
                 error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
             else:
                 t.instrument.stop() """
+
+
+# Open layer interaction sketch
+
+#processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+#pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+processing_java_path = "H:\Software\processing\processing-java"
+pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
+# ...
+# ...
+
+pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run "
+subprocess.Popen(pde_open, shell=True)
