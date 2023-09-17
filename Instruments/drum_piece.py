@@ -1,4 +1,4 @@
-from Utils import osc_bridge
+#from Utils import osc_bridge
 
 """
 This class defines the single element of the
@@ -28,11 +28,11 @@ class DrumPiece:
         self.canvas.itemconfig(self.note, fill=new_color)
         self.color = new_color
         #self.play_wav()
-        if self.color == "green":
-            osc_bridge.oscSC.send_message("/" + self.type, 0)
-            osc_bridge.oscPR.send_message("/" + self.type + "/on", self.id)
-        else:
-            osc_bridge.oscPR.send_message("/" + self.type + "/off", self.id)
+        #if self.color == "green":
+            #osc_bridge.oscSC.send_message("/" + self.type, 0)
+            #osc_bridge.oscPR.send_message("/" + self.type + "/on", self.id)
+        #else:
+            #osc_bridge.oscPR.send_message("/" + self.type + "/off", self.id)
     
     """
     def play_wav(self):

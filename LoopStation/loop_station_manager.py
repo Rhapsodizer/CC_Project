@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter import ttk
 from LoopStation.track import add_new_track
 from Utils.error_manager import ErrorWindow
+from Utils import osc_bridge
 
 
 """
@@ -88,6 +89,7 @@ def on_bpm_set(bpm_box_var, curr_bpm):
     read_bpm = bpm_box_var.get()
     curr_bpm.set(read_bpm)
     print("BPM: ", int(curr_bpm.get()))
+    osc_bridge.oscPR.send_message("/setBpm", int(curr_bpm.get()))
 
 
 def play_all_tracks(tracks, _bpm):
@@ -97,23 +99,27 @@ def play_all_tracks(tracks, _bpm):
     elif not tracks:
         error_window = ErrorWindow("Empty Tracks Error", "Error: No Tracks")
     else:
-        for t in tracks:
+        # Send broadcast START PLAY trigger
+        osc_bridge.oscPR.send_message("/play", 0)
+        """ for t in tracks:
             if not t.instrument:
                 error_window = ErrorWindow("No Instrument", "Error: No Instrument")
             elif not t.instrument.ready:
                 error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
             else:
-                t.instrument.play(bpm)
+                t.instrument.play(bpm) """
 
 
 def stop_all_tracks(tracks):
     if not tracks:
         error_window = ErrorWindow("Empty Tracks Error", "Error: No Tracks")
     else:
-        for t in tracks:
+        # Send broadcast STOP trigger
+        osc_bridge.oscPR.send_message("/stop", 0)
+        """ for t in tracks:
             if not t.instrument:
                 error_window = ErrorWindow("No Instrument", "Error: No Instrument")
             elif not t.instrument.ready:
                 error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
             else:
-                t.instrument.stop()
+                t.instrument.stop() """

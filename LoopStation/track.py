@@ -1,5 +1,6 @@
 from Utils import utils
 import tkinter as tk
+import subprocess
 from Utils.error_manager import ErrorWindow
 
 
@@ -116,9 +117,19 @@ class Track:
         if self.instr_name == "---":
             error_window = ErrorWindow("Track Error", "No instrument selected")
         else:
-            # if self.instrument_name == "Drum Machine":
+            """ # if self.instrument_name == "Drum Machine":
             # this case assumes "Drum Machine"
             parameters = [4, 4]
             self.instrument = utils.create_instrument(self.instr_name, parameters)
             self.instrument.ready = True
-            # print(self.instrument)
+            # print(self.instrument) """
+            if self.instr_name == "Drum Machine":
+                #processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+                #pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+                processing_java_path = "H:\Software\processing\processing-java"
+                pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\MDM_MinimalisticDrumMachine"
+                # ...
+                # ...
+
+                pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run "
+                subprocess.Popen(pde_open, shell=True)
