@@ -2,7 +2,7 @@ import oscP5.*;
 import netP5.*;
   
 OscP5 osc;
-NetAddress addressSC, addressLayer;
+NetAddress oscSC, oscLI;
 
 // variables
 int bpm = 120;
@@ -66,8 +66,18 @@ class Step
   public void sendOSC()
   {
     if (isActive[id]){
-      OscMessage msg = new OscMessage("/" + type);
-      osc.send(msg, addressSC);
+      // Trigger sound
+      OscMessage msg0 = new OscMessage("/" + type);
+      osc.send(msg0, oscSC);
+      // Manage balls [on]
+      OscMessage msg1 = new OscMessage("/" + type + "/on");
+      msg1.add(id + 1*nStep);
+      osc.send(msg1, oscLI);
+    } else {
+      // Manage balls [off]
+      OscMessage msg2 = new OscMessage("/" + type + "/off");
+      msg2.add(id + 2*nStep);
+      osc.send(msg2, oscLI);
     }
   }
   
@@ -84,12 +94,12 @@ void setup()
   
   // OSC
   osc = new OscP5(this,12001);
-  addressSC = new NetAddress("127.0.0.1",57120);
-  addressLayer = new NetAddress("127.0.0.1",12000);
+  oscSC = new NetAddress("127.0.0.1",57120);
+  oscLI = new NetAddress("127.0.0.1",12000);
   
   OscMessage numSteps = new OscMessage("/nStep");
   numSteps.add(nStep);
-  osc.send(numSteps, addressLayer);
+  osc.send(numSteps, oscLI);
   
   // construct grid
   for (int i = 0; i < nStep; i++)
@@ -133,11 +143,12 @@ void draw()
     t=millis();
   }
     
-  // beat marker
+  // Beat marker
   fill(180);
   triangle(100 + curr*50, 20, 90 + curr*50, 10, 110 + curr*50, 10);
 }
 
+// Toggle step
 void mousePressed()
 {
   for(int i = 0; i < nStep; ++i)
@@ -148,6 +159,7 @@ void mousePressed()
   }
 }
 
+// Receive OSC triggers
 void oscEvent(OscMessage trigger) {
   if(trigger.checkAddrPattern("/play")) {
     play = true;

@@ -90,7 +90,7 @@ def on_bpm_set(bpm_box_var, curr_bpm):
     read_bpm = bpm_box_var.get()
     curr_bpm.set(read_bpm)
     print("BPM: ", int(curr_bpm.get()))
-    osc_bridge.oscPR.send_message("/setBpm", int(curr_bpm.get()))
+    osc_bridge.oscDM.send_message("/setBpm", int(curr_bpm.get()))
 
 
 def play_all_tracks(tracks, _bpm):
@@ -101,7 +101,7 @@ def play_all_tracks(tracks, _bpm):
         error_window = ErrorWindow("Empty Tracks Error", "Error: No Tracks")
     else:
         # Send broadcast START PLAY trigger
-        osc_bridge.oscPR.send_message("/play", 0)
+        osc_bridge.oscDM.send_message("/play", 0)
         """ for t in tracks:
             if not t.instrument:
                 error_window = ErrorWindow("No Instrument", "Error: No Instrument")
@@ -116,7 +116,7 @@ def stop_all_tracks(tracks):
         error_window = ErrorWindow("Empty Tracks Error", "Error: No Tracks")
     else:
         # Send broadcast STOP trigger
-        osc_bridge.oscPR.send_message("/stop", 0)
+        osc_bridge.oscDM.send_message("/stop", 0)
         """ for t in tracks:
             if not t.instrument:
                 error_window = ErrorWindow("No Instrument", "Error: No Instrument")

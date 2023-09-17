@@ -6,7 +6,7 @@ NetAddress address;
 
 //PVector sizeApplet = new PVector(1000, 1000);
   
-int numBalls = 0;
+int numBalls = 30;
 PVector pos;
 PVector vel;
 PVector acc;
