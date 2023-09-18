@@ -11,13 +11,14 @@ def add_new_track(window, canvas, tracks):
     adds it to the list of tracks
     """
     track_height = 50
-    y_offset = len(tracks) * (track_height + 10)
 
-    if len(tracks) < 6:
+    if len(tracks) < 8:
+        y_offset = len(tracks) * (track_height + 10)
         tr = Track(window, canvas, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
+        tr.draw_track()
         tracks.append(tr)
     else:
-        error_window = ErrorWindow("Track Error", "Error: Max # of tracks")
+        ErrorWindow("Track Error", "Error: Max # of tracks")
 
 
 """
@@ -34,38 +35,24 @@ class Track:
         self.pos_y = pos_y
         self.length = self.window.winfo_width()-40
         self.height = height
-        self.color = "gold"
+        self.color = "#B4B4B4"
+        self.instr_name = None
 
-        # visual defines how the track element is shown
-        self.visual = utils.round_rectangle(canvas,
-                                            self.pos_x, self.pos_y,
-                                            self.pos_x + self.length, self.pos_y + self.height,
-                                            radius=20, fill=self.color)
+    def plus_clicked(self, event):
+        print("plus")
+        self.choose_instrument(event)
 
-        self.chosen_instrument_text = "Choose"
-        # choose_rect is just a rectangle containing chosen_instrument_text
-        self.choose_rect = utils.create_rectangle_with_centered_text(
-            canvas, self.chosen_instrument_text, "black", 10, self.window.winfo_width() // 2 - 40,
-            self.pos_y+5, self.window.winfo_width() // 2 + 40, self.pos_y+self.height-5, "snow3")
+    def settings_clicked(self, event):
+        print("settings")
+        print(event)
+        self.open_instrument()
 
-        self.has_been_chosen_color = "red"
-        # open_choose_instrument is a clickable rectangle
-        # when clicked, it lets the user choose the instrument
-        self.open_choose_instrument = canvas.create_rectangle(
-            self.window.winfo_width() // 2 + 40, self.pos_y+5, self.window.winfo_width() // 2 + 60,
-            self.pos_y+self.height-5, fill=self.has_been_chosen_color)
-        self.canvas.tag_bind(self.open_choose_instrument, '<Button-1>', self.choose_instrument)
+    def draw_track(self):
 
-        self.instr_name = "---"
-        # track_name is just the printed name of the selected instrument
-        self.track_name = canvas.create_text(pos_x + 80, pos_y + self.height//2,
-                                             text=self.instr_name, font=("Arial", 12))
-
-        # open_instrument_button lets the user open (create)
-        # the window to modify the chosen instrument
-        self.open_instrument_button = tk.Button(window, text="Open Instr", command=self.open_instrument,
-                                                bg="snow3", height=1)
-        self.open_instrument_button.place(x=self.window.winfo_width() // 2 + 80, y=self.pos_y+5)
+        [settings_hexagon, settings_circle, plus_rect] = utils.draw_track_elements(self)
+        self.canvas.tag_bind(settings_hexagon, "<Button-1>", self.settings_clicked)
+        self.canvas.tag_bind(settings_circle, "<Button-1>", self.settings_clicked)
+        self.canvas.tag_bind(plus_rect, "<Button-1>", self.plus_clicked)
 
     def choose_instrument(self, event):
         """
@@ -83,19 +70,8 @@ class Track:
             selected_index = instruments_listbox.curselection()
             if selected_index:
                 instrument_name = instruments_listbox.get(selected_index[0])
-
-                new_chosen_color = "red" if self.has_been_chosen_color != "red" else "green"
-                self.canvas.itemconfig(self.open_choose_instrument, fill=new_chosen_color)
-                self.has_been_chosen_color = new_chosen_color
-
-                # new_chosen_ok = "Choose" if self.chosen_instrument_text != "Choose" else "OK"
-                # self.canvas.item config(self.choose_rect, text=new_chosen_ok) (item config is a single word)
-                # self.chosen_instrument_text = new_chosen_ok
-
-                new_name = "---" if self.instr_name != "---" else instrument_name
-                self.canvas.itemconfig(self.track_name, text=new_name)
-                self.instr_name = new_name
-
+                self.instr_name = instrument_name
+                self.draw_track()
                 listbox_window.destroy()
 
         instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE)
@@ -114,18 +90,12 @@ class Track:
         this creates/opens/instantiate the instrument
         """
         # todo: make this a switch construct
-        if self.instr_name == "---":
-            error_window = ErrorWindow("Track Error", "No instrument selected")
+        if self.instr_name is None:
+            ErrorWindow("Track Error", "No instrument selected")
         else:
-            """ # if self.instrument_name == "Drum Machine":
-            # this case assumes "Drum Machine"
-            parameters = [4, 4]
-            self.instrument = utils.create_instrument(self.instr_name, parameters)
-            self.instrument.ready = True
-            # print(self.instrument) """
             if self.instr_name == "Drum Machine":
-                #processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-                #pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+                # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+                # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
                 processing_java_path = "H:\Software\processing\processing-java"
                 pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\MDM_MinimalisticDrumMachine"
                 # ...
@@ -134,8 +104,8 @@ class Track:
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run "
                 subprocess.Popen(pde_open, shell=True)
             if self.instr_name == "Melody Chat":
-                #processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-                #pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+                # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+                # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
                 processing_java_path = "H:\Software\processing\processing-java"
                 pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\Chat"
                 # ...

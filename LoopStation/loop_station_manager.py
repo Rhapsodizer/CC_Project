@@ -3,45 +3,52 @@ from tkinter import ttk
 from LoopStation.track import add_new_track
 from Utils.error_manager import ErrorWindow
 from Utils import osc_bridge
+from Utils import utils
 import subprocess
 
 
+# todo: bpm/loop duration
 """
 Main window manager
 This window contains:
     - title
     - add new track
-    - bpm
+    - bpm/loop duration 
     - tracks
     - play/stop
 """
+
+tracks = []
+_bpm = 60
 
 
 def create_master_window():
     # Create the main window
     window = tk.Tk()
     window.title("Master")
-    window.geometry("512x512")
+    window.geometry("800x700")
     # Disable window resizing
     window.resizable(width=False, height=False)
 
     # the tracks
-    tracks = []
+    # tracks = []
 
     # BPM
     bpm = tk.StringVar()
     bpm.set("60")
 
     # Create the canvas
-    canvas = tk.Canvas(window, width=512, height=512, bg="dodger blue")
-    canvas.place(x=0, y=0)
+    c_width = 800
+    c_height = 700
+    canvas = tk.Canvas(window, width=c_width, height=c_height, bg="#505050")
+    canvas.pack()
 
     # Master text
-    master_text = canvas.create_text(256, 20, text="Master Loop", font=("Arial", 12))
+    master_text = canvas.create_text(c_width/2, 20, text="Master Loop", font=("Arial", 12))
     canvas.tag_raise(master_text)
 
     # Create new track object
-    new_track_button = tk.Button(window, text="Add new Track", bg="gold",
+    new_track_button = tk.Button(window, text="Add new Track", bg="#B4B4B4",
                                  command=lambda: add_new_track(window, canvas, tracks))
     new_track_button.place(x=40, y=40)
     new_track_button.lift()
@@ -62,17 +69,13 @@ def create_master_window():
     set_bpm_button.place(x=412, y=40)
     set_bpm_button.lift()
 
-    # Play
-    play_button = tk.Button(window, text="PLAY", bg="gold",
-                            command=lambda: play_all_tracks(tracks, bpm))
-    play_button.place(x=166, y=462)
-    play_button.lift()
-
-    # Stop
-    stop_button = tk.Button(window, text="STOP", bg="gold",
-                            command=lambda: stop_all_tracks(tracks))
-    stop_button.place(x=276, y=462)
-    stop_button.lift()
+    # Play, Pause, Stop
+    [play, pause, stop] = utils.draw_play_pause_stop(canvas, c_width, c_height)
+    canvas.tag_bind(play, "<Button-1>", play_clicked)
+    canvas.tag_bind(pause[0], "<Button-1>", pause_clicked)
+    canvas.tag_bind(pause[1], "<Button-1>", pause_clicked)
+    canvas.tag_bind(pause[2], "<Button-1>", pause_clicked)
+    canvas.tag_bind(stop, "<Button-1>", stop_clicked)
 
     # Window loop
     window.mainloop()
@@ -93,43 +96,63 @@ def on_bpm_set(bpm_box_var, curr_bpm):
     osc_bridge.oscDM.send_message("/setBpm", int(curr_bpm.get()))
 
 
-def play_all_tracks(tracks, _bpm):
-    bpm = int(_bpm.get())
+def play_clicked(event):
+    print("play")
+    print(event)
+    global tracks
+    global _bpm
+    # bpm = int(_bpm.get())
+    bpm = _bpm
     if bpm == 0:
-        error_window = ErrorWindow("BPM Error", "Error: BPM = 0")
+        ErrorWindow("BPM Error", "Error: BPM = 0")
     elif not tracks:
-        error_window = ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+        ErrorWindow("Empty Tracks Error", "Error: No Tracks")
     else:
-        # Send broadcast START PLAY trigger
-        osc_bridge.oscDM.send_message("/play", 0)
-        """ for t in tracks:
-            if not t.instrument:
-                error_window = ErrorWindow("No Instrument", "Error: No Instrument")
-            elif not t.instrument.ready:
-                error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
-            else:
-                t.instrument.play(bpm) """
+        play_all_tracks()
 
 
-def stop_all_tracks(tracks):
+def pause_clicked(event):
+    print("pause")
+    print(event)
+
+
+def stop_clicked(event):
+    print("stop")
+    print(event)
     if not tracks:
-        error_window = ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+        ErrorWindow("Empty Tracks Error", "Error: No Tracks")
     else:
-        # Send broadcast STOP trigger
-        osc_bridge.oscDM.send_message("/stop", 0)
-        """ for t in tracks:
-            if not t.instrument:
-                error_window = ErrorWindow("No Instrument", "Error: No Instrument")
-            elif not t.instrument.ready:
-                error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
-            else:
-                t.instrument.stop() """
+        stop_all_tracks()
+
+
+def play_all_tracks():
+    # Send broadcast START PLAY trigger
+    osc_bridge.oscDM.send_message("/play", 0)
+    """ for t in tracks:
+        if not t.instrument:
+            error_window = ErrorWindow("No Instrument", "Error: No Instrument")
+        elif not t.instrument.ready:
+            error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+        else:
+            t.instrument.play(bpm) """
+
+
+def stop_all_tracks():
+    # Send broadcast STOP trigger
+    osc_bridge.oscDM.send_message("/stop", 0)
+    """ for t in tracks:
+        if not t.instrument:
+            error_window = ErrorWindow("No Instrument", "Error: No Instrument")
+        elif not t.instrument.ready:
+            error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+        else:
+            t.instrument.stop() """
 
 
 # Open layer interaction sketch
-
-#processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-#pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+# todo: put this inside the window creation function?
+# processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+# pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
 processing_java_path = "H:\Software\processing\processing-java"
 pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
 # ...

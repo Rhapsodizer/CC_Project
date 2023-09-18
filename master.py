@@ -1,5 +1,13 @@
 from LoopStation import loop_station_manager
 
+
+
+"""
+Launch this script to open the main screen
+"""
+if __name__ == "__main__":
+    loop_station_manager.create_master_window()
+
 """
 to install tkinter:
 https://www.tcl.tk/software/tcltk/
@@ -15,12 +23,10 @@ then, pip install simpleaudio
 """
 
 """
-Launch this script to open the main screen
+colors: 0   - #000000 - "black"
+        80  - #505050
+        140 - #8C8C8C
+        180 - #B4B4B4
+        220 - #DCDCDC
+        255 - #FFFFFF - "white"
 """
-if __name__ == "__main__":
-    loop_station_manager.create_master_window()
-
-# todo: implement the stop button
-# todo: implement the moving cursor under the drum machine
-# todo: add new instruments
-# todo: also check @track.open_instrument
