@@ -78,20 +78,12 @@ void draw() {
   }
 
   //CHAT
-  //fill(128);
-  //String c = "My CHAT";
-  //text(c, 40 , 90);
-  
-  //fill(255,255,255);
-  //stroke(128);
-  //rect(20,100,710,175,20);
-  fill(0);
   int startY = 250;
   for (int i = sentences.size()-1; i >=0 ; i--) {
     String sentence = sentences.get(i);
-    text(sentence, 40, startY - (sentences.size()-1-i) * 30);
+    text(sentence, 40, startY - (sentences.size()-1-i) * 30);  
   }
- 
+  
   //NOTE
   textSize(16);
   fill(128);
@@ -133,7 +125,6 @@ void keyReleased() {
         word.add(c);
       }
     }
-    println("WORD:" + word);
 
    int sum = 0;
     if (word.size() >= 3 || words.size()==0) { //parole con più di 3 lettere eccetto la prima parola
@@ -161,12 +152,9 @@ void keyReleased() {
     } else {
       sum = 100; //VALORE DELLAA PAUSA
     }
-    println("Somma: " + sum);
     
     sumArray.add(sum);
     words.add(word);
-    
-    println("WORDs:" + words);
     
     //SETTING TONALITA'
     if(sumArray.size() == 1) {
@@ -182,13 +170,10 @@ void keyReleased() {
         tonalità = tonalità - 12;
       }
       
-      println("Tonalità: " + tonalità);
       sumArray.set(0, tonalità);
-      
       sumArray.add(1, 0); //imposto primo elemento della melodia a 0: tonica
     }
     sumKeyMelody = sumArray;
-    println("key+melody: " + sumKeyMelody);
 
     //FINE FRASE
     if(key == ENTER){
@@ -208,25 +193,23 @@ void keyReleased() {
       if (!words.isEmpty()) {
         wordsString = wordsString.substring(0, wordsString.length() - 1);
       }
-      println("Parole in una stringa: " + wordsString);
   
       sentences.add(wordsString);
-
       words.clear();
 
       println("RISULTATO" + sentences);
       if (sumArray.size() > 1) {
-        sumArray.add(sumArray.size() - 1); // INSERIRE ELEMENTO DELL'ARRAY con il numero di parole7note della frase
+        sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
         sumArray.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
         sumArray.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
       }
       
-      if(prima_frase==true){
-        sumArray.add(1); //INSERIRE ULTTIMISSIMO ELEMENTO (FRASE 1)
-        prima_frase=false;
+      if(prima_frase == true){
+        sumArray.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
+        prima_frase = false;
       } else {
-        sumArray.add(2); //INSERIRE ULTTIMISSIMO ELEMENTO (FRASE 2)
-        prima_frase=true;
+        sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
+        prima_frase = true;
       }
       
       println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
