@@ -1,7 +1,6 @@
 NetAddr("127.0.0.1", 57120);
 
 
-
 //---------------------------------------------------------------------
 //
 //                     MELODY CHAT
@@ -81,21 +80,27 @@ SynthDef(\smooth_pad, {
 )
 
 (
-~playSound = { arg freq;
-    Synth(\pad_smooth, [\freq, freq, \amp, 0.2, \sustain, 1]);
+~playSound = { arg freq, amp;
+    Synth(\pad_smooth, [\freq, freq, \amp, amp, \sustain, 1]);
 };
 
 OSCdef('OSCreceiver', { arg msg;
-	var array = msg.copyRange(2, msg.size-3).asArray; //prendo array delle note della melodia
+	var array = msg.copyRange(2, msg.size-5).asArray; //prendo array delle note della melodia
 	var tonalità = msg[1]; //prendo primo elemnto che setta la tonalità
 	var baseFreq = 261.63; //frequenza di base (C4)
 	var freqMultiplier = 2 ** (1 / 12); //moltiplicatore di frequenza per semitono
 
+	var amp = 0.2;
+
 	var playRoutine = Routine({
-		var dur = msg[msg.size-1] / msg[msg.size-2]; //calcola durata delle note
+		var dur = (60 * msg[msg.size-2] / msg[msg.size-3])/msg[msg.size-4]; //durata note: ((60/bpm)*nSteps)/numeroNote
 		array.do { arg noteIndex;
 			var freq = baseFreq * (freqMultiplier ** tonalità) * (freqMultiplier ** noteIndex); //frequenza della nota calcolata
-			~playSound.value(freq, dur); //riproduci il suono con la frequenza calcolata
+			if(noteIndex == 100,
+				{ amp = 0},
+				{ amp = 0.2}
+			);
+			~playSound.value(freq, amp, dur); //riproduci il suono con la frequenza calcolata
 			dur.wait; //attendere la durata delle note
 		}
 	});
