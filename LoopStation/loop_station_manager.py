@@ -114,6 +114,7 @@ def play_clicked(event):
 def pause_clicked(event):
     print("pause")
     print(event)
+    osc_bridge.oscDM.send_message("/pause", 0)
 
 
 def stop_clicked(event):
@@ -150,7 +151,6 @@ def stop_all_tracks():
 
 
 # Open layer interaction sketch
-# todo: put this inside the window creation function?
 # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
 # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
 processing_java_path = "H:\Software\processing\processing-java"

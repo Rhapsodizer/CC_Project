@@ -7,7 +7,7 @@ NetAddress oscSC, oscLI;
 // variables
 int bpm = 120;
 int nStep = 10;
-int curr;
+int curr, pos;
 int textHeight = 20;
 int t;
 boolean play = false;
@@ -58,6 +58,18 @@ class Step
   {
     if ( mouseX >= x-d/2 && mouseX <= x+d/2 && mouseY >= y-d/2 && mouseY <= y+d/2 )
     {
+      if (isActive[id]){
+        // Manage balls [off]
+        OscMessage msg2 = new OscMessage("/" + type + "/off");
+        msg2.add(id);
+        osc.send(msg2, oscLI);
+      } else {
+        // Manage balls [on]
+        OscMessage msg1 = new OscMessage("/" + type + "/on");
+        msg1.add(id);
+        osc.send(msg1, oscLI);
+      }
+      
       isActive[id] = !isActive[id];
       sendOSC();
     }
@@ -69,15 +81,6 @@ class Step
       // Trigger sound
       OscMessage msg0 = new OscMessage("/" + type);
       osc.send(msg0, oscSC);
-      // Manage balls [on]
-      OscMessage msg1 = new OscMessage("/" + type + "/on");
-      msg1.add(id + 1*nStep);
-      osc.send(msg1, oscLI);
-    } else {
-      // Manage balls [off]
-      OscMessage msg2 = new OscMessage("/" + type + "/off");
-      msg2.add(id + 2*nStep);
-      osc.send(msg2, oscLI);
     }
   }
   
@@ -110,6 +113,7 @@ void setup()
   }
   
   curr = 0;
+  pos = curr;
 }
 
 void draw()
@@ -131,9 +135,13 @@ void draw()
     bKik.get(i).draw();
   }
   
+  // Beat marker
+  fill(180);
+  triangle(100 + pos*50, 20, 90 + pos*50, 10, 110 + pos*50, 10);
 
-  if ((millis()-t > 60000/bpm) && play){
+  if ((millis()-t >= 60000/bpm) && play){
     // Make sound
+    pos = curr;
     bHat.get(curr).sendOSC();
     bSnr.get(curr).sendOSC();
     bKik.get(curr).sendOSC();
@@ -143,9 +151,6 @@ void draw()
     t=millis();
   }
     
-  // Beat marker
-  fill(180);
-  triangle(100 + curr*50, 20, 90 + curr*50, 10, 110 + curr*50, 10);
 }
 
 // Toggle step
@@ -160,14 +165,20 @@ void mousePressed()
 }
 
 // Receive OSC triggers
-void oscEvent(OscMessage trigger) {
+void oscEvent(OscMessage trigger)
+{
   if(trigger.checkAddrPattern("/play")) {
     play = true;
   }
-  if(trigger.checkAddrPattern("/stop")) {
+  else if(trigger.checkAddrPattern("/stop")) {
+    play = false;
+    curr = 0;
+    pos = curr;
+  }
+  else if(trigger.checkAddrPattern("/pause")) {
     play = false;
   }
-  if(trigger.checkAddrPattern("/setBpm")) {
+  else if(trigger.checkAddrPattern("/setBpm")) {
     bpm = trigger.get(0).intValue();
   }
 }
