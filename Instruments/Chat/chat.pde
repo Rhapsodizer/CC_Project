@@ -89,7 +89,7 @@ void draw() {
   fill(128);
   String KeyString = "My key: ";
   String MelodyString = "My melody: ";
-  
+
   for (int i = 0; i < sumKeyMelody.size(); i++) {
     if (i==0){
       KeyString += convertToNoteKey(sumKeyMelody.get(0));
@@ -197,7 +197,6 @@ void keyReleased() {
       sentences.add(wordsString);
       words.clear();
 
-      println("RISULTATO" + sentences);
       if (sumArray.size() > 1) {
         sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
         sumArray.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
@@ -209,9 +208,15 @@ void keyReleased() {
         prima_frase = false;
       } else {
         sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
-        prima_frase = true;
+        //int vol = 0;
+        //for (int i = 1; i < sumArray.size() - 4; i++) {
+          //vol += sumArray.get(i);
+        //}
+        //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
+        //sumArray.add((int)volume);
+        //prima_frase = true;
       }
-      
+     
       println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
       OscMessage newPadMessage = new OscMessage("/pad");
       for (float i : sumArray) {
