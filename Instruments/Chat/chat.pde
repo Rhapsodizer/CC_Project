@@ -21,7 +21,7 @@ float maxWords_length; // Lunghezza massima sentence
 int maxSentences = 5; // Numero massimo di sentence nell'array di stringhe
 
 int bpm = 60; //BPM
-int nSteps = 8; //Numero pulsazioni per battuta
+int nSteps = 5; //Numero pulsazioni per battuta
 
 boolean inputString = false;
 boolean prima_frase = true;
@@ -34,7 +34,7 @@ void setup() {
   
   //OSC
   oscP5 = new OscP5(this, 57120);
-  myRemoteLocation = new NetAddress("127.0.0.1", 57120);
+  myRemoteLocation = new NetAddress("127.0.0.1", 12002);
   pad = new OscMessage("/pad");
   //OSC
   
@@ -213,8 +213,6 @@ void keyReleased() {
           elementsAdded = 0;
         }
       }
-      println("sumarray:", sumArray);
-      println("sumarrayel:", sumArrayEl);
 
       if (sumArray.size() > 1) {
         sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
@@ -237,7 +235,7 @@ void keyReleased() {
       }
      
       println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
-      OscMessage newPadMessage = new OscMessage("/pad");
+      OscMessage newPadMessage = new OscMessage("/melody");
       for (float i : sumArray) {
         newPadMessage.add(i);
       }
