@@ -33,13 +33,8 @@ void setup() {
   textSize(20);
   
   //OSC
-<<<<<<< HEAD
-  oscP5 = new OscP5(this, 57120);
-  myRemoteLocation = new NetAddress("127.0.0.1", 12002);
-=======
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress("127.0.0.1", 57120);
->>>>>>> 45e240f4c97acc76d82dc13f636bf440b9d626f3
   pad = new OscMessage("/pad");
   //OSC
   
