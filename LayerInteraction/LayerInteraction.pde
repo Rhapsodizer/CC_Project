@@ -6,7 +6,7 @@ NetAddress address;
 
 //PVector sizeApplet = new PVector(1000, 1000);
   
-int numBalls = 30;
+int numBalls;
 PVector pos;
 PVector vel;
 PVector acc;
@@ -27,7 +27,7 @@ void setup(){
 //  surface.setSize((int)sizeApplet.x, (int)sizeApplet.y);
 //  surface.setResizable(false);
 //  surface.setLocation(0, 2*(int)sizeApplet.y);
-  //numBalls = int(args[0]) * 3;
+  numBalls = int(args[0]) * 4;
   balls = new Ball[numBalls];
   for (int i=0; i<numBalls; i++) {
     balls[i] = new Ball(i, false, balls);
@@ -142,7 +142,7 @@ class Ball {
     fill(220);
     stroke(180);
     circle(pos.x, pos.y, 2*r);
-    fill(180);
+    fill(128);
     if (id < numBalls/3) {
       text("HA",pos.x-10,pos.y+5);
     }

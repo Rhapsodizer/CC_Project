@@ -4,7 +4,7 @@ import subprocess
 from Utils.error_manager import ErrorWindow
 
 
-def add_new_track(window, canvas, tracks):
+def add_new_track(window, canvas, tracks, steps):
     """
     This function creates a new track object,
     if possible, then
@@ -14,7 +14,7 @@ def add_new_track(window, canvas, tracks):
 
     if len(tracks) < 8:
         y_offset = len(tracks) * (track_height + 10)
-        tr = Track(window, canvas, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
+        tr = Track(window, canvas, steps, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
         tr.draw_track()
         tracks.append(tr)
     else:
@@ -27,9 +27,10 @@ This class defines the track element
 
 
 class Track:
-    def __init__(self, window, canvas, instrument, pos_x, pos_y, height):
+    def __init__(self, window, canvas, steps, instrument, pos_x, pos_y, height):
         self.window = window
         self.canvas = canvas
+        self.steps = steps
         self.instrument = instrument
         self.pos_x = pos_x
         self.pos_y = pos_y
@@ -101,7 +102,7 @@ class Track:
                 # ...
                 # ...
 
-                pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run "
+                pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
                 subprocess.Popen(pde_open, shell=True)
             if self.instr_name == "Melody Chat":
                 # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
