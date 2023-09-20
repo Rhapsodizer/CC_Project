@@ -12,6 +12,7 @@ import java.util.HashMap;
 
 ArrayList<ArrayList<Character>> words = new ArrayList<ArrayList<Character>>(); // Array di array per memorizzare le parole
 ArrayList<Integer> sumArray = new ArrayList<Integer>(); // Array di array per memorizzare i numeri corrispondenti per messaggio OSC
+ArrayList<Integer> sumArrayEl = new ArrayList<Integer>();
 ArrayList<Integer> sumKeyMelody = new ArrayList<Integer>(); 
 ArrayList<String> sentences = new ArrayList<String>(); // Array di frasi da visualizzare
 
@@ -20,7 +21,7 @@ float maxWords_length; // Lunghezza massima sentence
 int maxSentences = 5; // Numero massimo di sentence nell'array di stringhe
 
 int bpm = 60; //BPM
-int nSteps = 4; //Numero pulsazioni per battuta
+int nSteps = 8; //Numero pulsazioni per battuta
 
 boolean inputString = false;
 boolean prima_frase = true;
@@ -106,6 +107,7 @@ void keyPressed() {
   
   if(inputString){
     sumArray.clear();
+    sumArrayEl.clear();
     inputString = false;
   }
     inputBuffer += key;
@@ -196,6 +198,23 @@ void keyReleased() {
   
       sentences.add(wordsString);
       words.clear();
+      println("NUMERO ELEMENTI:", sumArray.size());
+      
+      //COPIARE SEQUENZA PER NUMERO DI STEPS
+      for (int i = 1; i < sumArray.size(); i++) {
+        sumArrayEl.add(sumArray.get(i));
+      }
+      int elementsAdded = 0;
+      while (sumArray.size()-1 < nSteps) {
+        if (elementsAdded < sumArrayEl.size()) {
+          sumArray.add(sumArrayEl.get(elementsAdded)); 
+          elementsAdded++;
+        } else {
+          elementsAdded = 0;
+        }
+      }
+      println("sumarray:", sumArray);
+      println("sumarrayel:", sumArrayEl);
 
       if (sumArray.size() > 1) {
         sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
