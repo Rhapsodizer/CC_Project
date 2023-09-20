@@ -103,157 +103,20 @@ void draw() {
   text(MelodyString, 160, height - 20);
 }
 
-void keyPressed() {
+//void keyPressed() {
   
-  if(inputString){
-    sumArray.clear();
-    sumArrayEl.clear();
-    inputString = false;
-  }
-    inputBuffer += key;
-}
+//  if(inputString){
+//    sumArray.clear();
+//    sumArrayEl.clear();
+//    inputString = false;
+//  }
+//    inputBuffer += key;
+//}
 
-void keyReleased() {
+//void keyReleased() {
 
-  if ((key == ' '  || key == ENTER) && !inputBuffer.equals("")) {
-    
-    if (maxWords_length>width-80) {
-      words.remove(0); // Rimuovi la prima parola
-    }
-    
-    ArrayList<Character> word = new ArrayList<Character>();
-    for (char c : inputBuffer.toCharArray()) {
-      if (letterToNumber.containsKey(c)) {
-        word.add(c);
-      }
-    }
-
-   int sum = 0;
-    if (word.size() >= 3 || words.size()==0) { //parole con più di 3 lettere eccetto la prima parola
-      sum = getWordNumbersSum(word);
-      while (sum > 7 && sumArray.size() != 0) { // somma numeri da 1 a 7 (NOTE)
-        sum = sum - 7;
-      }
-      
-      //GRAMMATICA SCALA MAGGIORE
-      if (sum == 1) {
-        sum = 0; //I grado
-      } else if (sum == 2) {
-        sum = 2; //II grado
-      } else if (sum == 3) {
-        sum = 4; //III grado
-      } else if (sum == 4) {
-        sum = 5; //IV grado
-      } else if (sum == 5) {
-        sum = 7; //V grado
-      } else if (sum == 6) {
-        sum = 9; //VI grado
-      } else if (sum == 7) {
-        sum = 11; //VII grado
-      }
-    } else {
-      sum = 100; //VALORE DELLAA PAUSA
-    }
-    
-    sumArray.add(sum);
-    words.add(word);
-    
-    //SETTING TONALITA'
-    if(sumArray.size() == 1) {
-      int tonalità = sumArray.get(0);
-      
-      tonalità = tonalità - 1;
-      
-      if (tonalità < 0) { //controllo se faccio solo spazio all'inizio
-        tonalità = 0;
-      }
-      
-      while (tonalità>=12) { //finchè il numero non è tra 0 e 11, tolgo 12
-        tonalità = tonalità - 12;
-      }
-      
-      sumArray.set(0, tonalità);
-      sumArray.add(1, 0); //imposto primo elemento della melodia a 0: tonica
-    }
-    sumKeyMelody = sumArray;
-
-    //FINE FRASE
-    if(key == ENTER){
-      
-      if (sentences.size() >= maxSentences) {
-      sentences.remove(0); // Rimuovi la prima frase
-      }
-   
-      String wordsString = "";
-      for (ArrayList<Character> parola : words) {
-        StringBuilder wordString = new StringBuilder();
-        for (char c : parola) {
-          wordString.append(c);
-        }
-        wordsString += wordString.toString() + " ";
-      }
-      if (!words.isEmpty()) {
-        wordsString = wordsString.substring(0, wordsString.length() - 1);
-      }
   
-      sentences.add(wordsString);
-      words.clear();
-      println("NUMERO ELEMENTI:", sumArray.size());
-      
-      //COPIARE SEQUENZA PER NUMERO DI STEPS
-      for (int i = 1; i < sumArray.size(); i++) {
-        sumArrayEl.add(sumArray.get(i));
-      }
-      int elementsAdded = 0;
-      while (sumArray.size()-1 < nSteps) {
-        if (elementsAdded < sumArrayEl.size()) {
-          sumArray.add(sumArrayEl.get(elementsAdded)); 
-          elementsAdded++;
-        } else {
-          elementsAdded = 0;
-        }
-      }
-
-      if (sumArray.size() > 1) {
-        sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
-        sumArray.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
-        sumArray.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
-      }
-      
-      if(prima_frase == true){
-        sumArray.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
-        prima_frase = false;
-      } else {
-        sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
-        //int vol = 0;
-        //for (int i = 1; i < sumArray.size() - 4; i++) {
-          //vol += sumArray.get(i);
-        //}
-        //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
-        //sumArray.add((int)volume);
-        //prima_frase = true;
-      }
-     
-      println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
-      OscMessage newPadMessage = new OscMessage("/melody");
-      for (float i : sumArray) {
-        newPadMessage.add(i);
-      }
-      oscP5.send(newPadMessage, myRemoteLocation);
-      
-      inputString = true;
-      
-      if (sumKeyMelody.size() >= 2) {
-        sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi l'ultimo elemento
-        sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il penultimo elemento
-        sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il terzultimo elemento
-        sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il quartultimo elemento
-      }
-    }
-    
-    inputBuffer = ""; // Reset del buffer
-  }
-}
+//}
 
 
 String getWordNumbersString(ArrayList<Character> word) {
@@ -297,5 +160,180 @@ String convertToNoteMelody(int number, int startingPoint) {
     return notes[adjustedNumber];
   } else {
     return "Invalid";
+  }
+}
+
+// Receive OSC triggers
+void oscEvent(OscMessage trigger)
+{
+  // Manage username  /username 1 Riccardo
+  if(trigger.checkAddrPattern("/username")) {
+    int userType = trigger.get(0).intValue();
+    String username = trigger.get(1).stringValue();
+    if (userType == 1){
+      user1 = username;
+    } else if (userType == 2){
+      user2 = username;
+    }
+  }
+  
+  
+  // Manage characters  /char 2 f
+  if(trigger.checkAddrPattern("/char")) {
+    
+    int streamType = trigger.get(0).intValue();
+    if (streamType == 1){
+      
+    } else if (streamType == 2){
+      
+    }
+    
+    if(inputString){
+      sumArray.clear();
+      sumArrayEl.clear();
+      inputString = false;
+    }
+  
+    char stream = trigger.get(1).stringValue().toCharArray()[0];
+    inputBuffer += stream;
+    
+    if ((stream == ' '  || stream == '%') && !inputBuffer.equals("")) {
+    
+      if (maxWords_length>width-80) {
+        words.remove(0); // Rimuovi la prima parola
+      }
+    
+      ArrayList<Character> word = new ArrayList<Character>();
+      for (char c : inputBuffer.toCharArray()) {
+        if (letterToNumber.containsKey(c)) {
+          word.add(c);
+        }
+      }
+
+     int sum = 0;
+      if (word.size() >= 3 || words.size()==0) { //parole con più di 3 lettere eccetto la prima parola
+        sum = getWordNumbersSum(word);
+        while (sum > 7 && sumArray.size() != 0) { // somma numeri da 1 a 7 (NOTE)
+          sum = sum - 7;
+        }
+        
+        //GRAMMATICA SCALA MAGGIORE
+        if (sum == 1) {
+          sum = 0; //I grado
+        } else if (sum == 2) {
+          sum = 2; //II grado
+        } else if (sum == 3) {
+          sum = 4; //III grado
+        } else if (sum == 4) {
+          sum = 5; //IV grado
+        } else if (sum == 5) {
+          sum = 7; //V grado
+        } else if (sum == 6) {
+          sum = 9; //VI grado
+        } else if (sum == 7) {
+          sum = 11; //VII grado
+        }
+      } else {
+        sum = 100; //VALORE DELLAA PAUSA
+      }
+      
+      sumArray.add(sum);
+      words.add(word);
+      
+      //SETTING TONALITA'
+      if(sumArray.size() == 1) {
+        int tonalità = sumArray.get(0);
+        
+        tonalità = tonalità - 1;
+        
+        if (tonalità < 0) { //controllo se faccio solo spazio all'inizio
+          tonalità = 0;
+        }
+        
+        while (tonalità>=12) { //finchè il numero non è tra 0 e 11, tolgo 12
+          tonalità = tonalità - 12;
+        }
+        
+        sumArray.set(0, tonalità);
+        sumArray.add(1, 0); //imposto primo elemento della melodia a 0: tonica
+      }
+      sumKeyMelody = sumArray;
+  
+      //FINE FRASE
+      if(stream == '%'){
+        
+        if (sentences.size() >= maxSentences) {
+        sentences.remove(0); // Rimuovi la prima frase
+        }
+     
+        String wordsString = "";
+        for (ArrayList<Character> parola : words) {
+          StringBuilder wordString = new StringBuilder();
+          for (char c : parola) {
+            wordString.append(c);
+          }
+          wordsString += wordString.toString() + " ";
+        }
+        if (!words.isEmpty()) {
+          wordsString = wordsString.substring(0, wordsString.length() - 1);
+        }
+    
+        sentences.add(wordsString);
+        words.clear();
+        println("NUMERO ELEMENTI:", sumArray.size());
+        
+        //COPIARE SEQUENZA PER NUMERO DI STEPS
+        for (int i = 1; i < sumArray.size(); i++) {
+          sumArrayEl.add(sumArray.get(i));
+        }
+        int elementsAdded = 0;
+        while (sumArray.size()-1 < nSteps) {
+          if (elementsAdded < sumArrayEl.size()) {
+            sumArray.add(sumArrayEl.get(elementsAdded)); 
+            elementsAdded++;
+          } else {
+            elementsAdded = 0;
+          }
+        }
+  
+        if (sumArray.size() > 1) {
+          sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
+          sumArray.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
+          sumArray.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
+        }
+        
+        if(prima_frase == true){
+          sumArray.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
+          prima_frase = false;
+        } else {
+          sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
+          //int vol = 0;
+          //for (int i = 1; i < sumArray.size() - 4; i++) {
+            //vol += sumArray.get(i);
+          //}
+          //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
+          //sumArray.add((int)volume);
+          //prima_frase = true;
+        }
+       
+        println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
+        OscMessage newPadMessage = new OscMessage("/melody");
+        for (float i : sumArray) {
+          newPadMessage.add(i);
+        }
+        oscP5.send(newPadMessage, myRemoteLocation);
+        
+        inputString = true;
+        
+        if (sumKeyMelody.size() >= 2) {
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi l'ultimo elemento
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il penultimo elemento
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il terzultimo elemento
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il quartultimo elemento
+        }
+      }
+      
+      inputBuffer = ""; // Reset del buffer
+    }
   }
 }
