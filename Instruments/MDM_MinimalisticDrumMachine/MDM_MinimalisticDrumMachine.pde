@@ -5,8 +5,7 @@ OscP5 osc;
 NetAddress oscSC, oscLI;
 
 // variables
-int bpm = 120;
-int nStep = 10;
+int nStep;
 int curr, pos;
 int textHeight = 20;
 int t;
@@ -15,10 +14,6 @@ boolean play = false;
 ArrayList<Step> bHat = new ArrayList<Step>();
 ArrayList<Step> bSnr = new ArrayList<Step>();
 ArrayList<Step> bKik = new ArrayList<Step>();
-
-boolean[] hatRow = new boolean[nStep];
-boolean[] snrRow = new boolean[nStep];
-boolean[] kikRow = new boolean[nStep];
 
 
 class Step
@@ -91,9 +86,11 @@ class Step
 void setup()
 {
   size(600, 200);
+  nStep = int(args[0]);
   
-  // Starting time
-  t = millis();
+  boolean[] hatRow = new boolean[nStep];
+  boolean[] snrRow = new boolean[nStep];
+  boolean[] kikRow = new boolean[nStep];
   
   // OSC
   osc = new OscP5(this,12001);
@@ -138,19 +135,12 @@ void draw()
   // Beat marker
   fill(180);
   triangle(100 + pos*50, 20, 90 + pos*50, 10, 110 + pos*50, 10);
-
-  if ((millis()-t >= 60000/bpm) && play){
-    // Make sound
-    pos = curr;
-    bHat.get(curr).sendOSC();
-    bSnr.get(curr).sendOSC();
-    bKik.get(curr).sendOSC();
-    // Move cursor one step
-    curr++;
-    if (curr == nStep){curr = 0;}
-    t=millis();
-  }
-    
+  
+  // Play
+  pos = curr;
+  bHat.get(curr).sendOSC();
+  bSnr.get(curr).sendOSC();
+  bKik.get(curr).sendOSC();
 }
 
 // Toggle step
@@ -175,10 +165,18 @@ void oscEvent(OscMessage trigger)
     curr = 0;
     pos = curr;
   }
+  else if(trigger.checkAddrPattern("/nextStep")) {
+    curr++;
+    pos = curr;
+  }
+  else if(trigger.checkAddrPattern("/restart")) {
+    curr = 0;
+    pos = curr;
+  }
   else if(trigger.checkAddrPattern("/pause")) {
     play = false;
   }
-  else if(trigger.checkAddrPattern("/setBpm")) {
-    bpm = trigger.get(0).intValue();
+  else if(trigger.checkAddrPattern("/setSteps")) {
+    nStep = trigger.get(0).intValue();
   }
 }
