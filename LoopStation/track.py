@@ -2,23 +2,27 @@ from Utils import utils
 import tkinter as tk
 import subprocess
 from Utils.error_manager import ErrorWindow
+from threading import Thread
+from Instruments.Recorder_and_Player.recorder_and_player import open_rap_window
 
 
-def add_new_track(window, canvas, tracks, steps):
+def add_new_track(window, canvas, tracks, bpm, steps):
     """
     This function creates a new track object,
     if possible, then
     adds it to the list of tracks
     """
     track_height = 50
-
-    if len(tracks) < 8:
-        y_offset = len(tracks) * (track_height + 10)
-        tr = Track(window, canvas, steps, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
-        tr.draw_track()
-        tracks.append(tr)
+    if bpm == 0 or steps == 0:
+        ErrorWindow("Setup Error", "Error: Set bpm and steps first!")
     else:
-        ErrorWindow("Track Error", "Error: Max # of tracks")
+        if len(tracks) < 8:
+            y_offset = len(tracks) * (track_height + 10)
+            tr = Track(window, canvas, steps, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
+            tr.draw_track()
+            tracks.append(tr)
+        else:
+            ErrorWindow("Track Error", "Error: Max # of tracks")
 
 
 """
@@ -78,7 +82,7 @@ class Track:
         instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE)
         instruments_listbox.pack(expand=True, fill=tk.BOTH)
 
-        instrument_list = ["Drum Machine", "Melody Chat", "Microphone", "Midi Keyboard"]
+        instrument_list = ["Drum Machine", "Melody Chat", "Rec & Play", "Midi Keyboard"]
         for instr in instrument_list:
             instruments_listbox.insert(tk.END, instr)
 
@@ -90,7 +94,6 @@ class Track:
         a window specific for the instrument pops up
         this creates/opens/instantiate the instrument
         """
-        # todo: make this a switch construct
         if self.instr_name is None:
             ErrorWindow("Track Error", "No instrument selected")
         else:
@@ -114,3 +117,9 @@ class Track:
 
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run "
                 subprocess.Popen(pde_open, shell=True)
+
+            if self.instr_name == "Rec & Play":
+                rap_thread = Thread(target=open_rap_window(self.window))
+                # todo: calculate loop duration
+                # rap_thread = Thread(target=open_rap_window(self.window), args=[loop_duration])
+                rap_thread.start()

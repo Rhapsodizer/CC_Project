@@ -1,12 +1,26 @@
 from LoopStation import loop_station_manager
 
-
-
 """
 Launch this script to open the main screen
 """
 if __name__ == "__main__":
     loop_station_manager.create_master_window()
+
+"""
+Structure:
+    |----------------|                |-------|
+    |  Loop Station  |_._._._th_._._._| Instr | + + + +
+    |----------------|        :       |-------|       +        |--------|
+             +                |                       +        |   SC   |
+             +                :       |-------|       +        |--------|
+             +                |_._._._| Proc. |       +             +
+             +                        |-------|       +             +
+             +                            +           +             +
+             +       |-----|              +           +             +
+             + + + + | OSC |+ + + + + + + + + msg + + + + + + + + + +
+                     |-----| 
+"""
+
 
 """
 to install tkinter:

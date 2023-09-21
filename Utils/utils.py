@@ -1,5 +1,4 @@
 import tkinter as tk
-from Instruments.drum_machine import DrumMachine
 import math
 
 """
@@ -149,22 +148,112 @@ def create_rectangle_with_centered_text(canvas, text, text_color, text_dim, x1, 
 
     canvas.create_text(center_x, center_y, text=text, fill=text_color, font=("Arial", text_dim))
 
+# def create_circle(canvas, center_x, center_y, radius):
+#     # Calculate coordinates of the circle bounding box
+#     x1 = center_x - radius
+#     y1 = center_y - radius
+#     x2 = center_x + radius
+#     y2 = center_y + radius
+#
+#     # Draw the circle
+#     circle = canvas.create_oval(x1, y1, x2, y2, fill="#000000", outline='black')
+#
+#     return circle
 
-def create_instrument(instrument_name, parameters):
-    if instrument_name == "Drum Machine":
-        # Create a new window
-        # window = tk.Toplevel()
-        window = tk.Tk()
-        window.title("Drum Machine")
-        window.geometry("1024x256")
-        # Disable window resizing
-        window.resizable(width=False, height=False)
 
-        # Instantiate the Drum Machine
-        num_of_beats = parameters[0]
-        num_of_subdivisions = parameters[1]
-        dm = DrumMachine(window, num_of_beats, num_of_subdivisions)
-        dm.build_drums()
-        return dm
+def draw_toolbar(rap_object):
+    # Draw rect container
+    round_rectangle(rap_object.toolbar_canvas,
+                    rap_object.toolbar_pos_x,
+                    rap_object.toolbar_pos_y,
+                    rap_object.toolbar_pos_x + rap_object.toolbar_length,
+                    rap_object.toolbar_pos_y + rap_object.toolbar_height,
+                    radius=20, fill=rap_object.toolbar_color)
+
+    play_rectangle = rap_object.toolbar_canvas.create_rectangle(
+        rap_object.toolbar_pos_x, rap_object.toolbar_pos_y,
+        rap_object.toolbar_pos_x + 40, rap_object.toolbar_pos_y + 40,
+        fill="#8C8C8C", outline="#000000")
+    stop_rectangle = rap_object.toolbar_canvas.create_rectangle(
+        rap_object.toolbar_pos_x + 60, rap_object.toolbar_pos_y,
+        rap_object.toolbar_pos_x + 100, rap_object.toolbar_pos_y + 40,
+        fill="#8C8C8C", outline="#000000")
+
+    rect_side = 60
+    rect_nw_x = rap_object.c_width/2 - 80
+    rect_nw_y = rap_object.toolbar_pos_y + 5
+    circle_radius = 20
+    # Draw record icon
+    rec_rectangle = rap_object.toolbar_canvas.create_rectangle(
+        rect_nw_x, rect_nw_y,
+        rect_nw_x + rect_side, rap_object.toolbar_height/2 - 5,
+        fill="#8C8C8C", outline="#000000")
+    rec_circle = create_circle(rap_object.toolbar_canvas, rect_nw_x + rect_side/2,
+                               rect_nw_y + rect_side/2, circle_radius)
+    if rap_object.is_recording:
+        rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#FF0000")
     else:
-        print("NOT (yet) IMPLEMENTED")
+        rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#000000")
+
+    # Draw plus icon
+    horiz_plus = rap_object.c_width/2 + 40
+    plus_rect = rap_object.toolbar_canvas.create_polygon(
+        horiz_plus,      rap_object.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 15, rap_object.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 15, rap_object.toolbar_pos_y + 5,
+        horiz_plus + 45, rap_object.toolbar_pos_y + 5,
+        horiz_plus + 45, rap_object.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 60, rap_object.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 60, rap_object.toolbar_pos_y + rect_side/2 + 20,
+        horiz_plus + 45, rap_object.toolbar_pos_y + rect_side/2 + 20,
+        horiz_plus + 45, rap_object.toolbar_pos_y + rect_side/2 + 35,
+        horiz_plus + 15, rap_object.toolbar_pos_y + rect_side/2 + 35,
+        horiz_plus + 15, rap_object.toolbar_pos_y + rect_side/2 + 20,
+        horiz_plus,      rap_object.toolbar_pos_y + rect_side/2 + 20,
+        fill="#8C8C8C", outline="#000000"
+        )
+
+    if not rap_object.loaded and not rap_object.is_recording and not rap_object.has_finished_recording:
+        rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
+                                              text="No file selected", font=("Arial", 12), anchor=tk.W)
+    elif rap_object.loaded:
+        rap_object.toolbar_canvas.create_text(
+            rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
+            text="File name = " + rap_object.file_name, font=("Arial", 12), anchor=tk.W)
+    elif rap_object.is_recording:
+        rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
+                                              text="Recording for " + str(rap_object.loop_duration) + " seconds",
+                                              font=("Arial", 12), anchor=tk.W)
+    elif rap_object.has_finished_recording:
+        rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
+                                              text="Saving recording as " + str(rap_object.recorded_file_path),
+                                              font=("Arial", 12), anchor=tk.W)
+
+    return [rec_rectangle, rec_circle, plus_rect, play_rectangle, stop_rectangle]
+
+
+def draw_time_bar(rap_obj):
+    rap_obj.time_canvas.delete("all")
+    rap_obj.time_canvas.create_text(rap_obj.tc_width/2, rap_obj.tc_height/2,
+                                    text="{:.2f}".format(rap_obj.audio_time), font=("Arial", 12))
+
+
+
+# def create_instrument(instrument_name, parameters):
+#     if instrument_name == "Drum Machine":
+#         # Create a new window
+#         # window = tk.Toplevel()
+#         window = tk.Tk()
+#         window.title("Drum Machine")
+#         window.geometry("1024x256")
+#         # Disable window resizing
+#         window.resizable(width=False, height=False)
+#
+#         # Instantiate the Drum Machine
+#         num_of_beats = parameters[0]
+#         num_of_subdivisions = parameters[1]
+#         dm = DrumMachine(window, num_of_beats, num_of_subdivisions)
+#         dm.build_drums()
+#         return dm
+#     else:
+#         print("NOT (yet) IMPLEMENTED")

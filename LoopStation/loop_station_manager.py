@@ -53,7 +53,8 @@ def create_master_window():
 
     # Create new track object
     new_track_button = tk.Button(window, text="Add new Track", bg="#B4B4B4",
-                                 command=lambda: add_new_track(window, canvas, tracks, step_box_var.get()))
+                                 command=lambda: add_new_track(
+                                     window, canvas, tracks, int(bpm_box_var.get()), int(step_box_var.get())))
     new_track_button.place(x=40, y=40)
     new_track_button.lift()
 
@@ -64,31 +65,30 @@ def create_master_window():
 
     # BPM box
     bpm_box_var = tk.StringVar()
-    bpm_box_var.set("60")
+    bpm_box_var.set("0")
     bpm_box = ttk.Spinbox(window, from_=0, to=200, textvariable=bpm_box_var, width=4)
-    bpm_box.place(x=336, y=45)
+    bpm_box.place(x=c_width/2-70, y=45)
 
     # Set bpm
-    set_bpm_button = tk.Button(window, text="Set", bg="gold",
+    set_bpm_button = tk.Button(window, text="Set", bg="#B4B4B4",
                                command=lambda: on_bpm_set(bpm_box_var, bpm))
-    set_bpm_button.place(x=412, y=40)
+    set_bpm_button.place(x=c_width/2, y=40)
     set_bpm_button.lift()
 
-    ###########################################################################################
     # Step text
-    step_text = canvas.create_text(500, 60, text="# of steps:", font=("Arial", 12))
+    step_text = canvas.create_text(520, 60, text="Steps:", font=("Arial", 12))
     canvas.tag_raise(step_text)
 
     # Step box
     step_box_var = tk.StringVar()
-    step_box_var.set("12")
-    step_box = ttk.Spinbox(window, from_=0, to=200, textvariable=step_box_var, width=4)
-    step_box.place(x=540, y=45)
+    step_box_var.set("0")
+    step_box = ttk.Spinbox(window, from_=0, to=32, textvariable=step_box_var, width=4)
+    step_box.place(x=c_width/2+160, y=45)
 
     # Set steps
-    set_step_button = tk.Button(window, text="Set", bg="gold",
-                               command=lambda: on_step_set(step_box_var, steps))
-    set_step_button.place(x=620, y=40)
+    set_step_button = tk.Button(window, text="Set", bg="#B4B4B4",
+                                command=lambda: on_step_set(step_box_var, steps))
+    set_step_button.place(x=c_width/2+230, y=40)
     set_step_button.lift()
 
     ###########################################################################################
@@ -121,10 +121,11 @@ def on_bpm_set(bpm_box_var, curr_bpm):
     osc_bridge.oscDM.send_message("/setBpm", int(curr_bpm.get()))
     osc_bridge.oscCH.send_message("/setBpm", int(curr_bpm.get()))
 
+
 def on_step_set(step_box_var, curr_step):
     read_step = step_box_var.get()
     curr_step.set(read_step)
-    print("# of steps: ", int(curr_step.get()))
+    print("Steps: ", int(curr_step.get()))
 
     osc_bridge.oscDM.send_message("/setSteps", int(curr_step.get()))
     osc_bridge.oscCH.send_message("/setSteps", int(curr_step.get()))
