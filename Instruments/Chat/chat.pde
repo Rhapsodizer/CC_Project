@@ -15,22 +15,29 @@ ArrayList<Integer> sumArray = new ArrayList<Integer>(); // Array di array per me
 ArrayList<Integer> sumArrayEl = new ArrayList<Integer>();
 ArrayList<Integer> sumKeyMelody = new ArrayList<Integer>(); 
 ArrayList<Float> elementi_freq = new ArrayList<Float>(); //LISTA DI FREQ (+ pause >tot) da inviare a SC
-ArrayList<String> sentences = new ArrayList<String>(); // Array di frasi da visualizzare
+ArrayList<String> sentences1 = new ArrayList<String>(); //chat 1
+ArrayList<String> sentences2 = new ArrayList<String>(); //chat 2
 
 String inputBuffer = ""; // Buffer per memorizzare le lettere digitate
 float maxWords_length; // Lunghezza massima sentence
-int maxSentences = 5; // Numero massimo di sentence nell'array di stringhe
+int maxSentences1 = 5; // Numero massimo di sentence nell'array di stringhe 1
+int maxSentences2 = 5; // Numero massimo di sentence nell'array di stringhe 2
 
 int bpm = 60; //BPM
-int nSteps = 5; //Numero pulsazioni per battuta
+int nSteps = 10; //Numero pulsazioni per battuta
 
 boolean inputString = false;
 boolean prima_frase = true;
+int startY1 = height - 80; //posizione iniziale frase 1
+int startY2 = height - 110;//posizione iniziale frase 2
+
+String user1 = "";
+String user2 = "";
 
 HashMap<Character, Integer> letterToNumber = new HashMap<Character, Integer>(); // Mappa per associare le lettere ai numeri
 
 void setup() {
-  size(750, 325);
+  size(600, 500);
   textSize(20);
   
   //OSC
@@ -80,11 +87,32 @@ void draw() {
   }
 
   //CHAT
-  int startY = 250;
-  for (int i = sentences.size()-1; i >=0 ; i--) {
-    String sentence = sentences.get(i);
-    text(sentence, 40, startY - (sentences.size()-1-i) * 30);  
+  if(prima_frase == false){
+    startY1 = height - 80;
+    startY2 = height - 110;
+  } else if (prima_frase == true){
+    startY1 = height - 110;
+    startY2 = height - 80;
+  } 
+  for (int i = sentences1.size()-1; i >=0 ; i--) {
+    String sentence = sentences1.get(i);
+    int sentenceWidth = int(textWidth(sentence));
+    int posizionex = width - sentenceWidth -40;
+    int posizioney = startY1 - (sentences1.size()-1-i) * 60;
+    text(sentence, posizionex, posizioney);
   }
+  for (int i = sentences2.size()-1; i >=0 ; i--) {
+    String sentence = sentences2.get(i);
+    int posizionex = 40;
+    int posizioney = startY2 - (sentences2.size()-1-i) * 60;
+    text(sentence, posizionex, posizioney); 
+  }
+  
+  //USERNAME
+  fill(128);
+  text(user2, 40, 130);
+  int us1width = int(textWidth(user1));
+  text(user1, width-us1width-40, 130);
   
   //NOTE
   textSize(16);
@@ -264,9 +292,12 @@ void oscEvent(OscMessage trigger)
       //FINE FRASE
       if(stream == '%'){
         
-        if (sentences.size() >= maxSentences) {
-        sentences.remove(0); // Rimuovi la prima frase
-        }
+        if (sentences1.size() >= maxSentences1) {
+      sentences1.remove(0); // Rimuovi la prima frase della prima chat
+      }
+      if (sentences2.size() >= maxSentences2) {
+      sentences2.remove(0); // Rimuovi la prima frase della seconda chat
+      }
      
         String wordsString = "";
         for (ArrayList<Character> parola : words) {
@@ -279,10 +310,6 @@ void oscEvent(OscMessage trigger)
         if (!words.isEmpty()) {
           wordsString = wordsString.substring(0, wordsString.length() - 1);
         }
-    
-        sentences.add(wordsString);
-        words.clear();
-        println("NUMERO ELEMENTI:", sumArray.size());
         
         //COPIARE SEQUENZA PER NUMERO DI STEPS
         for (int i = 1; i < sumArray.size(); i++) {
@@ -306,28 +333,31 @@ void oscEvent(OscMessage trigger)
         
         if(prima_frase == true){
           sumArray.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
-          prima_frase = false;
+        prima_frase = false;
+        sentences1.add(wordsString);
         } else {
           sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
+        prima_frase = true;
+        sentences2.add(wordsString);
           //int vol = 0;
           //for (int i = 1; i < sumArray.size() - 4; i++) {
             //vol += sumArray.get(i);
           //}
           //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
           //sumArray.add((int)volume);
-          //prima_frase = true;
         }
+        
+        words.clear();
         
         //TRASFORMO IN FREQ
         float baseFreq = 261.63;
         float freqMultiplier = pow(2,1.0/12.0);
-        println(freqMultiplier);
         for(int i=1; i < sumArray.size()-4; i++){
           float freq = baseFreq*(pow(freqMultiplier,float(sumArray.get(0))))*(pow(freqMultiplier,float(sumArray.get(i))));
           freq = round(freq * 100) / 100.0;
           elementi_freq.add(freq);
         }
-       
+              
         println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
         println("OSC (freq corrispondenti)" + elementi_freq);
         OscMessage newPadMessage = new OscMessage("/melody");
