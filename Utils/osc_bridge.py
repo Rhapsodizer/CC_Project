@@ -1,6 +1,7 @@
 from pythonosc import udp_client
 import firebase_admin
 from firebase_admin import db
+import os
 
 # OSC definitions
 ip_addr = "127.0.0.1"
@@ -15,7 +16,9 @@ oscCH = udp_client.SimpleUDPClient(ip_addr, port_CH)
 
 
 # Connect to firebase
-credential = firebase_admin.credentials.Certificate('H:/Documenti/POLIMI/2_1/CC/Project/client/certificate.json') # Change path
+dirname = os.path.dirname(__file__)
+filename = os.path.join(dirname, './certificate.json')
+credential = firebase_admin.credentials.Certificate(filename)
 default_app = firebase_admin.initialize_app(credential, {
 	'databaseURL': 'https://creativeproject-12185-default-rtdb.europe-west1.firebasedatabase.app'
 	})
