@@ -14,6 +14,7 @@ ArrayList<ArrayList<Character>> words = new ArrayList<ArrayList<Character>>(); /
 ArrayList<Integer> sumArray = new ArrayList<Integer>(); // Array di array per memorizzare i numeri corrispondenti per messaggio OSC
 ArrayList<Integer> sumArrayEl = new ArrayList<Integer>();
 ArrayList<Integer> sumKeyMelody = new ArrayList<Integer>(); 
+ArrayList<Float> elementi_freq = new ArrayList<Float>(); //LISTA DI FREQ (+ pause >tot) da inviare a SC
 ArrayList<String> sentences = new ArrayList<String>(); // Array di frasi da visualizzare
 
 String inputBuffer = ""; // Buffer per memorizzare le lettere digitate
@@ -191,6 +192,7 @@ void oscEvent(OscMessage trigger)
     if(inputString){
       sumArray.clear();
       sumArrayEl.clear();
+      elementi_freq.clear();
       inputString = false;
     }
   
@@ -315,10 +317,21 @@ void oscEvent(OscMessage trigger)
           //sumArray.add((int)volume);
           //prima_frase = true;
         }
+        
+        //TRASFORMO IN FREQ
+        float baseFreq = 261.63;
+        float freqMultiplier = pow(2,1.0/12.0);
+        println(freqMultiplier);
+        for(int i=1; i < sumArray.size()-4; i++){
+          float freq = baseFreq*(pow(freqMultiplier,float(sumArray.get(0))))*(pow(freqMultiplier,float(sumArray.get(i))));
+          freq = round(freq * 100) / 100.0;
+          elementi_freq.add(freq);
+        }
        
         println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
+        println("OSC (freq corrispondenti)" + elementi_freq);
         OscMessage newPadMessage = new OscMessage("/melody");
-        for (float i : sumArray) {
+        for (float i : elementi_freq) {
           newPadMessage.add(i);
         }
         oscP5.send(newPadMessage, myRemoteLocation);
