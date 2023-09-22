@@ -10,27 +10,34 @@ OscMessage pad;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-ArrayList<ArrayList<Character>> words = new ArrayList<ArrayList<Character>>(); // Array di array per memorizzare le parole
-ArrayList<Integer> sumArray = new ArrayList<Integer>(); // Array di array per memorizzare i numeri corrispondenti per messaggio OSC
-ArrayList<Integer> sumArrayEl = new ArrayList<Integer>();
+ArrayList<ArrayList<Character>> words1 = new ArrayList<ArrayList<Character>>(); // Array di array per memorizzare le parole
+ArrayList<ArrayList<Character>> words2 = new ArrayList<ArrayList<Character>>(); // Array di array per memorizzare le parole
+ArrayList<Integer> sumArray1 = new ArrayList<Integer>(); // Array di array per memorizzare i numeri corrispondenti per messaggio OSC
+ArrayList<Integer> sumArray2 = new ArrayList<Integer>(); // Array di array per memorizzare i numeri corrispondenti per messaggio OSC
+ArrayList<Integer> sumArrayEl1 = new ArrayList<Integer>();
+ArrayList<Integer> sumArrayEl2 = new ArrayList<Integer>();
 ArrayList<Integer> sumKeyMelody = new ArrayList<Integer>(); 
-ArrayList<Float> elementi_freq = new ArrayList<Float>(); //LISTA DI FREQ (+ pause >tot) da inviare a SC
+ArrayList<Float> elementi_freq1 = new ArrayList<Float>(); //LISTA DI FREQ (+ pause >tot) da inviare a SC
+ArrayList<Float> elementi_freq2 = new ArrayList<Float>(); //LISTA DI FREQ (+ pause >tot) da inviare a SC
 ArrayList<String> sentences1 = new ArrayList<String>(); //chat 1
 ArrayList<String> sentences2 = new ArrayList<String>(); //chat 2
 
-String inputBuffer = ""; // Buffer per memorizzare le lettere digitate
-float maxWords_length; // Lunghezza massima sentence
-int maxSentences1 = 5; // Numero massimo di sentence nell'array di stringhe 1
-int maxSentences2 = 5; // Numero massimo di sentence nell'array di stringhe 2
+String inputBuffer1 = ""; // Buffer per memorizzare le lettere digitate
+String inputBuffer2 = ""; // Buffer per memorizzare le lettere digitate
+float maxWords_length1; // Lunghezza massima sentence
+float maxWords_length2; // Lunghezza massima sentence
+int maxSentences1 = 9; // Numero massimo di sentence nell'array di stringhe 1
+int maxSentences2 = 9; // Numero massimo di sentence nell'array di stringhe 2
 
 int bpm = 60; //BPM
 int nSteps = 10; //Numero pulsazioni per battuta
 
-boolean inputString = false;
+boolean inputString1 = false;
+boolean inputString2 = false;
 boolean prima_frase = true;
-int startY1 = height - 80; //posizione iniziale frase 1
-int startY2 = height - 110;//posizione iniziale frase 2
 
+int count1 = 0; //CONTATORE CHAT 1
+int count2 = 0;
 String user1 = "";
 String user2 = "";
 
@@ -52,8 +59,7 @@ void setup() {
   for (int i = 0; i < lowercaseLetters.length; i++) {
     letterToNumber.put(lowercaseLetters[i], i + 1);
     letterToNumber.put(uppercaseLetters[i], i + 1);
-  }
-  
+  }  
 }
 
 void draw() {
@@ -62,57 +68,78 @@ void draw() {
   
   textSize(20);
   
-  //CHAT IN TEMPO REALE
+  //CHAT2 IN TEMPO REALE
   fill(128);
-  String w = "My word: ";
-  text(w, 40, 30);
+  String w2 = "My word: ";
+  text(w2, 40, 30);
   fill(0);
-  text(inputBuffer, 40 + textWidth(w), 30);
+  text(inputBuffer2, 40 + textWidth(w2), 30);
+  
+  //CHAT1 IN TEMPO REALE
+  fill(128);
+  String w1 = "My word: ";
+  text(w1, width/2, 30);
+  fill(0);
+  text(inputBuffer1, width/2 + textWidth(w1), 30);
 
   //PAROLE MEMORIZZATE
   fill(128);
-  String s = "My sentence: ";
-  text(s, 40 , 60);
+  String s2 = "My sentence: ";
+  text(s2, 40 , 60);
   fill(0);
-  float x = textWidth(s);
-  for (int i = 0; i < words.size(); i++) {
-    ArrayList<Character> word = words.get(i);
+  float x2 = textWidth(s2);
+  for (int i = 0; i < words2.size(); i++) {
+    ArrayList<Character> word = words2.get(i);
     String wordString = "";
     for (char c : word) {
       wordString += c;
     }
-    text(wordString, 40+x, 60);
-    x += textWidth(wordString) + 5;
-    maxWords_length = x;
+    text(wordString, 40+x2, 60);
+    x2 += textWidth(wordString) + 5;
+    maxWords_length2 = x2;
+  }
+  //PAROLE MEMORIZZATE
+  fill(128);
+  String s1 = "My sentence: ";
+  text(s1, width/2 , 60);
+  fill(0);
+  float x1 = textWidth(s1);
+  for (int i = 0; i < words1.size(); i++) {
+    ArrayList<Character> word = words1.get(i);
+    String wordString = "";
+    for (char c : word) {
+      wordString += c;
+    }
+    text(wordString, width/2+x1, 60);
+    x1 += textWidth(wordString) + 5;
+    maxWords_length1 = x1;
   }
 
   //CHAT
-  if(prima_frase == false){
-    startY1 = height - 80;
-    startY2 = height - 110;
-  } else if (prima_frase == true){
-    startY1 = height - 110;
-    startY2 = height - 80;
-  } 
+  //if(prima_frase == false){
+  //  startY1 = height - 80;
+  //  startY2 = height - 110;
+  //} else if (prima_frase == true){
+  //  startY1 = height - 110;
+  //  startY2 = height - 80;
+  //} 
   for (int i = sentences1.size()-1; i >=0 ; i--) {
     String sentence = sentences1.get(i);
-    int sentenceWidth = int(textWidth(sentence));
-    int posizionex = width - sentenceWidth -40;
-    int posizioney = startY1 - (sentences1.size()-1-i) * 60;
+    int posizionex = width/2;
+    int posizioney = height - 80 - (sentences1.size()-1-i) * 30 - count1*30;
     text(sentence, posizionex, posizioney);
   }
   for (int i = sentences2.size()-1; i >=0 ; i--) {
     String sentence = sentences2.get(i);
     int posizionex = 40;
-    int posizioney = startY2 - (sentences2.size()-1-i) * 60;
+    int posizioney = height - 80 - (sentences2.size()-1-i) * 30 - count2*30;
     text(sentence, posizionex, posizioney); 
   }
-  
+
   //USERNAME
   fill(128);
+  text(user1, width/2, 130);
   text(user2, 40, 130);
-  int us1width = int(textWidth(user1));
-  text(user1, width-us1width-40, 130);
   
   //NOTE
   textSize(16);
@@ -212,38 +239,35 @@ void oscEvent(OscMessage trigger)
     
     int streamType = trigger.get(0).intValue();
     if (streamType == 1){
+      
       prima_frase = true;
-    } else if (streamType == 2){
-      prima_frase = false;
-    }
+      char stream1 = trigger.get(1).stringValue().toCharArray()[0];
+      inputBuffer1 += stream1;
+      
+      if(inputString1){
+        sumArray1.clear();
+        sumArrayEl1.clear();
+        elementi_freq1.clear();
+        inputString1 = false;
+      }
+      
+      if ((stream1 == ' '  || stream1 == '%') && !inputBuffer1.equals("")) {
     
-    if(inputString){
-      sumArray.clear();
-      sumArrayEl.clear();
-      elementi_freq.clear();
-      inputString = false;
-    }
-  
-    char stream = trigger.get(1).stringValue().toCharArray()[0];
-    inputBuffer += stream;
-    
-    if ((stream == ' '  || stream == '%') && !inputBuffer.equals("")) {
-    
-      if (maxWords_length>width-80) {
-        words.remove(0); // Rimuovi la prima parola
+      if (maxWords_length1>width-80) {
+        words1.remove(0); // Rimuovi la prima parola
       }
     
       ArrayList<Character> word = new ArrayList<Character>();
-      for (char c : inputBuffer.toCharArray()) {
+      for (char c : inputBuffer1.toCharArray()) {
         if (letterToNumber.containsKey(c)) {
           word.add(c);
         }
       }
 
      int sum = 0;
-      if (word.size() >= 3 || words.size()==0) { //parole con più di 3 lettere eccetto la prima parola
+      if (word.size() >= 3 || words1.size()==0) { //parole con più di 3 lettere eccetto la prima parola
         sum = getWordNumbersSum(word);
-        while (sum > 7 && sumArray.size() != 0) { // somma numeri da 1 a 7 (NOTE)
+        while (sum > 7 && sumArray1.size() != 0) { // somma numeri da 1 a 7 (NOTE)
           sum = sum - 7;
         }
         
@@ -267,12 +291,12 @@ void oscEvent(OscMessage trigger)
         sum = 100; //VALORE DELLAA PAUSA
       }
       
-      sumArray.add(sum);
-      words.add(word);
+      sumArray1.add(sum);
+      words1.add(word);
       
       //SETTING TONALITA'
-      if(sumArray.size() == 1) {
-        int tonalità = sumArray.get(0);
+      if(sumArray1.size() == 1) {
+        int tonalità = sumArray1.get(0);
         
         tonalità = tonalità - 1;
         
@@ -284,87 +308,86 @@ void oscEvent(OscMessage trigger)
           tonalità = tonalità - 12;
         }
         
-        sumArray.set(0, tonalità);
-        sumArray.add(1, 0); //imposto primo elemento della melodia a 0: tonica
+        sumArray1.set(0, tonalità);
+        sumArray1.add(1, 0); //imposto primo elemento della melodia a 0: tonica
       }
-      sumKeyMelody = sumArray;
+      sumKeyMelody = sumArray1;
   
       //FINE FRASE
-      if(stream == '%'){
+      if(stream1 == '%'){
+        count1++;
+        //count2++;
         
         if (sentences1.size() >= maxSentences1) {
-      sentences1.remove(0); // Rimuovi la prima frase della prima chat
-      }
-      if (sentences2.size() >= maxSentences2) {
-      sentences2.remove(0); // Rimuovi la prima frase della seconda chat
-      }
+          sentences1.remove(0); // Rimuovi la prima frase della prima chat
+        }
      
         String wordsString = "";
-        for (ArrayList<Character> parola : words) {
+        for (ArrayList<Character> parola : words1) {
           StringBuilder wordString = new StringBuilder();
           for (char c : parola) {
             wordString.append(c);
           }
           wordsString += wordString.toString() + " ";
         }
-        if (!words.isEmpty()) {
+        if (!words1.isEmpty()) {
           wordsString = wordsString.substring(0, wordsString.length() - 1);
         }
         
         //COPIARE SEQUENZA PER NUMERO DI STEPS
-        for (int i = 1; i < sumArray.size(); i++) {
-          sumArrayEl.add(sumArray.get(i));
+        for (int i = 1; i < sumArray1.size(); i++) {
+          sumArrayEl1.add(sumArray1.get(i));
         }
         int elementsAdded = 0;
-        while (sumArray.size()-1 < nSteps) {
-          if (elementsAdded < sumArrayEl.size()) {
-            sumArray.add(sumArrayEl.get(elementsAdded)); 
+        while (sumArray1.size()-1 < nSteps) {
+          if (elementsAdded < sumArrayEl1.size()) {
+            sumArray1.add(sumArrayEl1.get(elementsAdded)); 
             elementsAdded++;
           } else {
             elementsAdded = 0;
           }
         }
   
-        if (sumArray.size() > 1) {
-          sumArray.add(sumArray.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
-          sumArray.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
-          sumArray.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
+        if (sumArray1.size() > 1) {
+          sumArray1.add(sumArray1.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
+          sumArray1.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
+          sumArray1.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
         }
         
-        if(prima_frase == true){
-          sumArray.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
-          sentences1.add(wordsString);
-        } else {
-          sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
-          sentences2.add(wordsString);
-          //int vol = 0;
-          //for (int i = 1; i < sumArray.size() - 4; i++) {
-            //vol += sumArray.get(i);
-          //}
-          //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
-          //sumArray.add((int)volume);
-        }
+        //if(prima_frase == true){
+        sumArray1.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
+        sentences1.add(wordsString);
+        //} else {
+        //  sumArray1.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
+        //  sentences2.add(wordsString);
+        //  //int vol = 0;
+        //  //for (int i = 1; i < sumArray.size() - 4; i++) {
+        //    //vol += sumArray.get(i);
+        //  //}
+        //  //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
+        //  //sumArray.add((int)volume);
+        //}
         
-        words.clear();
+        words1.clear();
         
         //TRASFORMO IN FREQ
         float baseFreq = 261.63;
         float freqMultiplier = pow(2,1.0/12.0);
-        for(int i=1; i < sumArray.size()-4; i++){
-          float freq = baseFreq*(pow(freqMultiplier,float(sumArray.get(0))))*(pow(freqMultiplier,float(sumArray.get(i))));
+        for(int i=1; i < sumArray1.size()-4; i++){
+          float freq = baseFreq*(pow(freqMultiplier,float(sumArray1.get(0))))*(pow(freqMultiplier,float(sumArray1.get(i))));
           freq = round(freq * 100) / 100.0;
-          elementi_freq.add(freq);
+          elementi_freq1.add(freq);
         }
               
-        println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray);
-        println("OSC (freq corrispondenti)" + elementi_freq);
+        println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray1);
+        println("OSC (freq corrispondenti)" + elementi_freq1);
         OscMessage newPadMessage = new OscMessage("/melody");
-        for (float i : elementi_freq) {
+        for (float i : elementi_freq1) {
           newPadMessage.add(i);
         }
         oscP5.send(newPadMessage, myRemoteLocation);
         
-        inputString = true;
+        inputString1 = true;
         
         if (sumKeyMelody.size() >= 2) {
           sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi l'ultimo elemento
@@ -374,7 +397,187 @@ void oscEvent(OscMessage trigger)
         }
       }
       
-      inputBuffer = ""; // Reset del buffer
+      inputBuffer1 = ""; // Reset del buffer
     }
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+      
+    } else if (streamType == 2){
+      
+      prima_frase = false;
+      char stream2 = trigger.get(1).stringValue().toCharArray()[0];
+      inputBuffer2 += stream2;
+      
+      if(inputString2){
+        sumArray2.clear();
+        sumArrayEl2.clear();
+        elementi_freq2.clear();
+        inputString2 = false;
+      }
+      
+      if ((stream2 == ' '  || stream2 == '%') && !inputBuffer2.equals("")) {
+    
+      if (maxWords_length2>width-80) {
+        words2.remove(0); // Rimuovi la prima parola
+      }
+    
+      ArrayList<Character> word = new ArrayList<Character>();
+      for (char c : inputBuffer2.toCharArray()) {
+        if (letterToNumber.containsKey(c)) {
+          word.add(c);
+        }
+      }
+
+     int sum = 0;
+      if (word.size() >= 3 || words2.size()==0) { //parole con più di 3 lettere eccetto la prima parola
+        sum = getWordNumbersSum(word);
+        while (sum > 7 && sumArray2.size() != 0) { // somma numeri da 1 a 7 (NOTE)
+          sum = sum - 7;
+        }
+        
+        //GRAMMATICA SCALA MAGGIORE
+        if (sum == 1) {
+          sum = 0; //I grado
+        } else if (sum == 2) {
+          sum = 2; //II grado
+        } else if (sum == 3) {
+          sum = 4; //III grado
+        } else if (sum == 4) {
+          sum = 5; //IV grado
+        } else if (sum == 5) {
+          sum = 7; //V grado
+        } else if (sum == 6) {
+          sum = 9; //VI grado
+        } else if (sum == 7) {
+          sum = 11; //VII grado
+        }
+      } else {
+        sum = 100; //VALORE DELLAA PAUSA
+      }
+      
+      sumArray2.add(sum);
+      words2.add(word);
+      
+      //SETTING TONALITA'
+      if(sumArray2.size() == 1) {
+        int tonalità = sumArray2.get(0);
+        
+        tonalità = tonalità - 1;
+        
+        if (tonalità < 0) { //controllo se faccio solo spazio all'inizio
+          tonalità = 0;
+        }
+        
+        while (tonalità>=12) { //finchè il numero non è tra 0 e 11, tolgo 12
+          tonalità = tonalità - 12;
+        }
+        
+        sumArray2.set(0, tonalità);
+        sumArray2.add(1, 0); //imposto primo elemento della melodia a 0: tonica
+      }
+      sumKeyMelody = sumArray2;
+  
+      //FINE FRASE
+      if(stream2 == '%'){
+        count2++;
+        //count1++;
+        
+        if (sentences2.size() >= maxSentences2) {
+          sentences2.remove(0); // Rimuovi la prima frase della prima chat
+        }
+     
+        String wordsString = "";
+        for (ArrayList<Character> parola : words2) {
+          StringBuilder wordString = new StringBuilder();
+          for (char c : parola) {
+            wordString.append(c);
+          }
+          wordsString += wordString.toString() + " ";
+        }
+        if (!words2.isEmpty()) {
+          wordsString = wordsString.substring(0, wordsString.length() - 1);
+        }
+        
+        //COPIARE SEQUENZA PER NUMERO DI STEPS
+        for (int i = 1; i < sumArray2.size(); i++) {
+          sumArrayEl2.add(sumArray2.get(i));
+        }
+        int elementsAdded = 0;
+        while (sumArray2.size()-1 < nSteps) {
+          if (elementsAdded < sumArrayEl2.size()) {
+            sumArray2.add(sumArrayEl2.get(elementsAdded)); 
+            elementsAdded++;
+          } else {
+            elementsAdded = 0;
+          }
+        }
+  
+        if (sumArray2.size() > 1) {
+          sumArray2.add(sumArray2.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
+          sumArray2.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
+          sumArray2.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
+        }
+        
+        //if(prima_frase == true){
+          sumArray2.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
+          sentences2.add(wordsString);
+        //} else {
+        //  sumArray2.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
+        //  sentences2.add(wordsString);
+        //  //int vol = 0;
+        //  //for (int i = 1; i < sumArray.size() - 4; i++) {
+        //    //vol += sumArray.get(i);
+        //  //}
+        //  //float volume = (float)vol / sumArray.get(sumArray.size() - 4);
+        //  //sumArray.add((int)volume);
+        //}
+        
+        words2.clear();
+        
+        //TRASFORMO IN FREQ
+        float baseFreq = 261.63;
+        float freqMultiplier = pow(2,1.0/12.0);
+        for(int i=1; i < sumArray1.size()-4; i++){
+          float freq = baseFreq*(pow(freqMultiplier,float(sumArray1.get(0))))*(pow(freqMultiplier,float(sumArray2.get(i))));
+          freq = round(freq * 100) / 100.0;
+          elementi_freq2.add(freq);
+        }
+              
+        println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray2);
+        println("OSC (freq corrispondenti)" + elementi_freq2);
+        OscMessage newPadMessage = new OscMessage("/melody");
+        for (float i : elementi_freq2) {
+          newPadMessage.add(i);
+        }
+        oscP5.send(newPadMessage, myRemoteLocation);
+        
+        inputString2 = true;
+        
+        if (sumKeyMelody.size() >= 2) {
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi l'ultimo elemento
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il penultimo elemento
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il terzultimo elemento
+          sumKeyMelody.remove(sumKeyMelody.size() - 1); // Rimuovi il quartultimo elemento
+        }
+      }
+      
+      inputBuffer2 = ""; // Reset del buffer
+    }
+    }
+    
+    
+    
+  
+    
   }
 }
