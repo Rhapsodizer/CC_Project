@@ -212,9 +212,9 @@ void oscEvent(OscMessage trigger)
     
     int streamType = trigger.get(0).intValue();
     if (streamType == 1){
-      
+      prima_frase = true;
     } else if (streamType == 2){
-      
+      prima_frase = false;
     }
     
     if(inputString){
@@ -333,12 +333,10 @@ void oscEvent(OscMessage trigger)
         
         if(prima_frase == true){
           sumArray.add(1); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 1)
-        prima_frase = false;
-        sentences1.add(wordsString);
+          sentences1.add(wordsString);
         } else {
           sumArray.add(2); //INSERIRE ULTIMISSIMO ELEMENTO (FRASE 2)
-        prima_frase = true;
-        sentences2.add(wordsString);
+          sentences2.add(wordsString);
           //int vol = 0;
           //for (int i = 1; i < sumArray.size() - 4; i++) {
             //vol += sumArray.get(i);
