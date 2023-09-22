@@ -19,8 +19,8 @@ This window contains:
 """
 
 tracks = []
-_bpm = 60
-_steps = 12
+_bpm = 120
+_steps = 16
 
 
 def create_master_window():
@@ -36,10 +36,10 @@ def create_master_window():
 
     # BPM
     bpm = tk.StringVar()
-    bpm.set("60")
+    bpm.set("120")
     # STEPS
     steps = tk.StringVar()
-    steps.set("12")
+    steps.set("16")
 
     # Create the canvas
     c_width = 800
@@ -65,7 +65,7 @@ def create_master_window():
 
     # BPM box
     bpm_box_var = tk.StringVar()
-    bpm_box_var.set("0")
+    bpm_box_var.set("120")
     bpm_box = ttk.Spinbox(window, from_=0, to=200, textvariable=bpm_box_var, width=4)
     bpm_box.place(x=c_width/2-70, y=45)
 
@@ -81,7 +81,7 @@ def create_master_window():
 
     # Step box
     step_box_var = tk.StringVar()
-    step_box_var.set("0")
+    step_box_var.set("16")
     step_box = ttk.Spinbox(window, from_=0, to=32, textvariable=step_box_var, width=4)
     step_box.place(x=c_width/2+160, y=45)
 
@@ -191,10 +191,10 @@ def stop_all_tracks():
 # Open layer interaction sketch
 # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
 # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
-# processing_java_path = "H:\Software\processing\processing-java"
-# pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
-processing_java_path = "processing-java"
-pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/LayerInteraction"
+processing_java_path = "H:\Software\processing\processing-java"
+pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
+# processing_java_path = "processing-java"
+# pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/LayerInteraction"
 
 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(_steps)
 subprocess.Popen(pde_open, shell=True)

@@ -85,7 +85,7 @@ class Step
 
 void setup()
 {
-  size(600, 200);
+  size(900, 200);
   nStep = int(args[0]);
   
   boolean[] hatRow = new boolean[nStep];

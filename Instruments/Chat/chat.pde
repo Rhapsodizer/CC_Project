@@ -26,18 +26,16 @@ String inputBuffer1 = ""; // Buffer per memorizzare le lettere digitate
 String inputBuffer2 = ""; // Buffer per memorizzare le lettere digitate
 float maxWords_length1; // Lunghezza massima sentence
 float maxWords_length2; // Lunghezza massima sentence
-int maxSentences1 = 9; // Numero massimo di sentence nell'array di stringhe 1
-int maxSentences2 = 9; // Numero massimo di sentence nell'array di stringhe 2
+int maxSentences = 9; // Numero massimo di sentence nell'array di stringhe
 
-int bpm = 60; //BPM
-int nSteps = 10; //Numero pulsazioni per battuta
+//int bpm = 60; //BPM
+int nSteps; //Numero pulsazioni per battuta
 
 boolean inputString1 = false;
 boolean inputString2 = false;
 boolean prima_frase = true;
 
-int count1 = 0; //CONTATORE CHAT 1
-int count2 = 0;
+int count = 0; //CONTATORE CHAT
 String user1 = "";
 String user2 = "";
 
@@ -46,6 +44,8 @@ HashMap<Character, Integer> letterToNumber = new HashMap<Character, Integer>(); 
 void setup() {
   size(600, 500);
   textSize(20);
+  
+  nSteps = int(args[0]);
   
   //OSC
   oscP5 = new OscP5(this, 12002);
@@ -126,13 +126,13 @@ void draw() {
   for (int i = sentences1.size()-1; i >=0 ; i--) {
     String sentence = sentences1.get(i);
     int posizionex = width/2;
-    int posizioney = height - 80 - (sentences1.size()-1-i) * 30 - count1*30;
+    int posizioney = height - 80 - (sentences1.size()-1-i) * 30;
     text(sentence, posizionex, posizioney);
   }
   for (int i = sentences2.size()-1; i >=0 ; i--) {
     String sentence = sentences2.get(i);
     int posizionex = 40;
-    int posizioney = height - 80 - (sentences2.size()-1-i) * 30 - count2*30;
+    int posizioney = height - 80 - (sentences2.size()-1-i) * 30;
     text(sentence, posizionex, posizioney); 
   }
 
@@ -315,11 +315,12 @@ void oscEvent(OscMessage trigger)
   
       //FINE FRASE
       if(stream1 == '%'){
-        count1++;
-        //count2++;
+        count++;
+        sentences2.add("");
         
-        if (sentences1.size() >= maxSentences1) {
+        if (sentences1.size() >= maxSentences) {
           sentences1.remove(0); // Rimuovi la prima frase della prima chat
+          sentences2.remove(0); // Rimuovi la prima frase della prima chat
         }
      
         String wordsString = "";
@@ -350,7 +351,7 @@ void oscEvent(OscMessage trigger)
   
         if (sumArray1.size() > 1) {
           sumArray1.add(sumArray1.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
-          sumArray1.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
+          //sumArray1.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
           sumArray1.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
         }
         
@@ -489,11 +490,12 @@ void oscEvent(OscMessage trigger)
   
       //FINE FRASE
       if(stream2 == '%'){
-        count2++;
-        //count1++;
+        count++;
+        sentences1.add("");
         
-        if (sentences2.size() >= maxSentences2) {
+        if (sentences2.size() >= maxSentences) {
           sentences2.remove(0); // Rimuovi la prima frase della prima chat
+          sentences1.remove(0); // Rimuovi la prima frase della prima chat
         }
      
         String wordsString = "";
@@ -524,7 +526,7 @@ void oscEvent(OscMessage trigger)
   
         if (sumArray2.size() > 1) {
           sumArray2.add(sumArray2.size() - 1); //INSERIRE ELEMENTO DELL'ARRAY con il numero di parole/note della frase
-          sumArray2.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
+          //sumArray2.add(bpm); //INSERIRE PENULTIMO ELEMENTO con bpm
           sumArray2.add(nSteps); //INSERIRE PENULTIMO ELEMENTO con pulsazioni in loop
         }
         
