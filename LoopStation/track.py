@@ -52,9 +52,18 @@ class Track:
         print(event)
         self.open_instrument()
 
-    def draw_track(self):
+    def play_this_clicked(self, event):
+        print(event)
+        # self.play_this()
 
-        [settings_hexagon, settings_circle, plus_rect] = utils.draw_track_elements(self)
+    def stop_this_clicked(self, event):
+        print(event)
+        # self.stop_this()
+
+    def draw_track(self):
+        [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect] = utils.draw_track_elements(self)
+        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this)
+        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this)
         self.canvas.tag_bind(settings_hexagon, "<Button-1>", self.settings_clicked)
         self.canvas.tag_bind(settings_circle, "<Button-1>", self.settings_clicked)
         self.canvas.tag_bind(plus_rect, "<Button-1>", self.plus_clicked)
@@ -123,3 +132,9 @@ class Track:
                 # todo: calculate loop duration
                 # rap_thread = Thread(target=open_rap_window(self.window), args=[loop_duration])
                 rap_thread.start()
+
+    def play_this(self):
+        print("playing this track alone. disable play on all the others")
+
+    def stop_this(self):
+        print("stop playing this track. unlocking all the others")

@@ -41,7 +41,7 @@ class RecorderAndPlayer:
         self.toolbar_length = self.c_width - 40
         self.toolbar_height = self.c_tb_height - 20
         self.toolbar_color = "#B4B4B4"
-        self.file_name = ""
+        self.file_title = ""
         self.audio_file = None
         self.values_of_audio_segment = None
         self.waiting_time = 10  # ms
@@ -52,7 +52,10 @@ class RecorderAndPlayer:
         self.has_finished_recording = False
         self.recorder = None
         # self.expected_lag = 0.5
-        self.recorded_file_path = "recorded_audio.wav"
+        dirname = os.path.dirname(__file__)
+        print(dirname)
+        self.recorded_filename = "recorded_audio.wav"
+        self.recorded_file_path = os.path.join(dirname, "./recorded_audio.wav")
         self.frame_length = 256
         self.tc_height = 52
         self.tc_width = 256
@@ -126,8 +129,8 @@ class RecorderAndPlayer:
         if self.audio_file:
             audio_segment = AudioSegment.from_mp3(self.audio_file)
             self.values_of_audio_segment = audio_segment.get_array_of_samples()
-            file_title = os.path.basename(self.audio_file)
-            self.file_name = file_title
+            self.file_title = os.path.basename(self.audio_file)
+            # self.file_name = file_title
             self.loaded = True
             self.draw_all()
 
@@ -216,7 +219,7 @@ class RecorderAndPlayer:
         self.canvas.delete("all")
         self.loaded = False
         self.draw_toolbar()
-        print("Recording started...")
+        # print("Recording started...")
         audio = []
         self.is_recording = True
         self.draw_toolbar()

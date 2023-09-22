@@ -98,11 +98,27 @@ def draw_play_pause_stop(canvas, width, height):
 
 
 def draw_track_elements(track_object):
+    side = 40
+    x_offset = 20
+    y_offset = 5
     # Draw rect container
     round_rectangle(track_object.canvas,
                     track_object.pos_x, track_object.pos_y,
                     track_object.pos_x + track_object.length, track_object.pos_y + track_object.height,
                     radius=20, fill=track_object.color)
+
+    # Draw play_this icon
+    play_this_trg = track_object.canvas.create_polygon(
+        track_object.length / 2 - side * 0.866, track_object.pos_y + track_object.height - side - y_offset,
+        track_object.length / 2 - side * 0.866 + side * 0.866, track_object.pos_y + track_object.height - side / 2 - y_offset,
+        track_object.length / 2 - side * 0.866, track_object.pos_y + track_object.height - y_offset,
+        fill="#8C8C8C", outline="#000000")
+
+    # Draw stop_this icon
+    stop_this_rect = track_object.canvas.create_rectangle(
+        track_object.length / 2 + x_offset, track_object.pos_y + track_object.height - side - y_offset,
+        track_object.length / 2 + side + x_offset, track_object.pos_y + track_object.height - y_offset,
+        fill="#8C8C8C", outline="#000000")
 
     if track_object.instr_name is None:
         track_object.canvas.create_text(track_object.pos_x + 20, track_object.pos_y + 25,
@@ -136,7 +152,7 @@ def draw_track_elements(track_object):
                                                    fill="#8C8C8C", outline="#000000"
                                                    )
 
-    return [settings_hexagon, settings_circle, plus_rect]
+    return [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect]
 
 
 def create_rectangle_with_centered_text(canvas, text, text_color, text_dim, x1, y1, x2, y2, rectangle_color):
@@ -191,7 +207,7 @@ def draw_toolbar(rap_object):
     rec_circle = create_circle(rap_object.toolbar_canvas, rect_nw_x + rect_side/2,
                                rect_nw_y + rect_side/2, circle_radius)
     if rap_object.is_recording:
-        rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#FF0000")
+        rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#8F0000")
     else:
         rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#000000")
 
@@ -219,14 +235,14 @@ def draw_toolbar(rap_object):
     elif rap_object.loaded:
         rap_object.toolbar_canvas.create_text(
             rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
-            text="File name = " + rap_object.file_name, font=("Arial", 12), anchor=tk.W)
+            text="File name = " + rap_object.file_title, font=("Arial", 12), anchor=tk.W)
     elif rap_object.is_recording:
         rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
                                               text="Recording for " + str(rap_object.loop_duration) + " seconds",
                                               font=("Arial", 12), anchor=tk.W)
     elif rap_object.has_finished_recording:
         rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
-                                              text="Saving recording as " + str(rap_object.recorded_file_path),
+                                              text="Saving recording as: " + str(rap_object.recorded_filename),
                                               font=("Arial", 12), anchor=tk.W)
 
     return [rec_rectangle, rec_circle, plus_rect, play_rectangle, stop_rectangle]
