@@ -5,7 +5,9 @@ OscP5 oscP5;
 NetAddress address;
 
 //PVector sizeApplet = new PVector(1000, 1000);
-  
+
+int nSteps;
+int nLayers;
 int numBalls;
 PVector pos;
 PVector vel;
@@ -17,6 +19,8 @@ float friction = -0.9;
 Ball[] balls;
 int time;
 
+String[] noteNames;
+
 OscMessage collision = new OscMessage("/collision");
   
 //void settings() {  
@@ -27,7 +31,10 @@ void setup(){
 //  surface.setSize((int)sizeApplet.x, (int)sizeApplet.y);
 //  surface.setResizable(false);
 //  surface.setLocation(0, 2*(int)sizeApplet.y);
-  numBalls = int(args[0]) * 4;
+  nSteps = int(args[0]);
+  nLayers = 4;
+  noteNames = new String[nSteps];
+  numBalls = nSteps * nLayers;
   balls = new Ball[numBalls];
   for (int i=0; i<numBalls; i++) {
     balls[i] = new Ball(i, false, balls);
@@ -143,14 +150,17 @@ class Ball {
     stroke(180);
     circle(pos.x, pos.y, 2*r);
     fill(128);
-    if (id < numBalls/3) {
+    if (id < nSteps) {
       text("HA",pos.x-10,pos.y+5);
     }
-    else if ((id >= numBalls/3) && (id < 2*numBalls/3)) {
+    else if ((id >= nSteps) && (id < 2*nSteps)) {
       text("SN",pos.x-10,pos.y+5);
     }
-    else if (id >= 2*numBalls/3 && (id < 3*numBalls/3)) {
+    else if (id >= 2*nSteps && (id < 3*nSteps)) {
       text("KC",pos.x-10,pos.y+5);
+    }
+    else if (id >= 3*nSteps && (id < 4*nSteps)) {
+      text(noteNames[id - 3*nSteps], pos.x-10,pos.y+5);
     }
     noStroke();
   }
@@ -164,21 +174,31 @@ class Ball {
 
 // OSC events listener
 void oscEvent(OscMessage theOscMessage) {
-  println("### received an osc message with addrpattern "+theOscMessage.addrPattern()+" and typetag "+theOscMessage.typetag());
-  theOscMessage.print();
+  //println("### received an osc message with addrpattern "+theOscMessage.addrPattern()+" and typetag "+theOscMessage.typetag());
+  //theOscMessage.print();
   
   // Create ball trigger
   if(theOscMessage.checkAddrPattern("/kick/on") || theOscMessage.checkAddrPattern("/hat/on") || theOscMessage.checkAddrPattern("/snare/on")){
     int id = theOscMessage.get(0).intValue();
     if (theOscMessage.checkAddrPattern("/snare/on")) {
-      id = id + 1*(numBalls/3);
+      id = id + 1*nSteps;
     } else if (theOscMessage.checkAddrPattern("/kick/on")) {
-      id = id + 2*(numBalls/3);
+      id = id + 2*nSteps;
     }
     balls[id].lastStatus = balls[id].status;
     balls[id].status = true;
     balls[id].pos = new PVector(random(width), random(height));
     balls[id].vel = new PVector(random(1,3), random(1,3));
+  }
+  if(theOscMessage.checkAddrPattern("/noteChars")){  
+    for (int i = 0; i<nSteps; i++){
+      int id = i + 3*nSteps;
+      noteNames[i] = theOscMessage.get(i).stringValue();
+      println(noteNames[i]);
+      balls[id].status = true;
+      balls[id].pos = new PVector(random(width), random(height));
+      balls[id].vel = new PVector(random(1,3), random(1,3));
+    }
   }
   // Delete ball trigger
   if(theOscMessage.checkAddrPattern("/hat/off")) {
@@ -186,11 +206,11 @@ void oscEvent(OscMessage theOscMessage) {
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
   } else if(theOscMessage.checkAddrPattern("/snare/off")) {
-    int id = theOscMessage.get(0).intValue() + 1*numBalls/3;
+    int id = theOscMessage.get(0).intValue() + 1*nSteps;
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
   } else if(theOscMessage.checkAddrPattern("/kick/off")) {
-    int id = theOscMessage.get(0).intValue() + 2*numBalls/3;
+    int id = theOscMessage.get(0).intValue() + 2*nSteps;
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
   }

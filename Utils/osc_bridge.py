@@ -27,11 +27,9 @@ default_app = firebase_admin.initialize_app(credential, {
 # Listeners
 def listenerU1(event):
     oscCH.send_message("/username", [1, event.data])
-    print(event.data)
 
 def listenerC1(event):
     oscCH.send_message("/char", [1, event.data])
-    print(event.data)
 
 def listenerU2(event):
     oscCH.send_message("/username", [2, event.data])

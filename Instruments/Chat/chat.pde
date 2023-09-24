@@ -4,6 +4,7 @@ import netP5.*;
 
 OscP5 oscP5;
 NetAddress myRemoteLocation;
+NetAddress addressIL;
 OscMessage pad;
 //OSC
 
@@ -46,11 +47,12 @@ void setup() {
   textSize(20);
   
   //nSteps = int(args[0]);
-  nSteps = 12;
+  nSteps = 16;
   
   //OSC
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress("127.0.0.1", 57120);
+  addressIL = new NetAddress("127.0.0.1", 12000);
   pad = new OscMessage("/pad");
   //OSC
   
@@ -377,6 +379,12 @@ void oscEvent(OscMessage trigger)
           newPadMessage.add(i);
         }
         oscP5.send(newPadMessage, myRemoteLocation);
+        // Send note to interaction layer
+        OscMessage sendIL = new OscMessage("/noteChars");
+        for (int i=1; i<sumKeyMelody.size()-4; i++) {
+          sendIL.add(convertToNoteMelody(sumKeyMelody.get(i), sumKeyMelody.get(0)));
+        }
+        oscP5.send(sendIL, addressIL);
         
         inputString1 = true;
         
