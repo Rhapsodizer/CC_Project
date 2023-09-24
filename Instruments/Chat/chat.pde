@@ -42,10 +42,11 @@ String user2 = "";
 HashMap<Character, Integer> letterToNumber = new HashMap<Character, Integer>(); // Mappa per associare le lettere ai numeri
 
 void setup() {
-  size(600, 500);
+  size(900, 500);
   textSize(20);
   
-  nSteps = int(args[0]);
+  //nSteps = int(args[0]);
+  nSteps = 12;
   
   //OSC
   oscP5 = new OscP5(this, 12002);
@@ -115,14 +116,6 @@ void draw() {
     maxWords_length1 = x1;
   }
 
-  //CHAT
-  //if(prima_frase == false){
-  //  startY1 = height - 80;
-  //  startY2 = height - 110;
-  //} else if (prima_frase == true){
-  //  startY1 = height - 110;
-  //  startY2 = height - 80;
-  //} 
   for (int i = sentences1.size()-1; i >=0 ; i--) {
     String sentence = sentences1.get(i);
     int posizionex = width/2;
@@ -159,22 +152,6 @@ void draw() {
   text(MelodyString, 160, height - 20);
 }
 
-//void keyPressed() {
-  
-//  if(inputString){
-//    sumArray.clear();
-//    sumArrayEl.clear();
-//    inputString = false;
-//  }
-//    inputBuffer += key;
-//}
-
-//void keyReleased() {
-
-  
-//}
-
-
 String getWordNumbersString(ArrayList<Character> word) {
   String numbersString = "";
   for (char c : word) {
@@ -210,9 +187,8 @@ String convertToNoteMelody(int number, int startingPoint) {
     return "Pause";
   }
   
-  String[] notes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
-  if (startingPoint >= 0 && startingPoint <= 11 && number >=0) {
-    int adjustedNumber = (number + startingPoint) % 12;
+    String[] notes = {"C4", "C#4", "D4", "D#4", "E4", "F4", "F#4", "G4", "G#4", "A4", "A#4", "B4", "C5", "C#5", "D5", "D#5", "E5", "F5", "F#5", "G5", "G#5", "A5", "A#5", "B5"};  if (startingPoint >= 0 && startingPoint <= 11 && number >=0) {
+    int adjustedNumber = (number + startingPoint) % 24;
     return notes[adjustedNumber];
   } else {
     return "Invalid";
@@ -265,7 +241,7 @@ void oscEvent(OscMessage trigger)
       }
 
      int sum = 0;
-      if (word.size() >= 3 || words1.size()==0) { //parole con più di 3 lettere eccetto la prima parola
+      if (word.size() >= 2 || words1.size()==0) { //parole con più di 3 lettere eccetto la prima parola
         sum = getWordNumbersSum(word);
         while (sum > 7 && sumArray1.size() != 0) { // somma numeri da 1 a 7 (NOTE)
           sum = sum - 7;
@@ -286,6 +262,20 @@ void oscEvent(OscMessage trigger)
           sum = 9; //VI grado
         } else if (sum == 7) {
           sum = 11; //VII grado
+        } else if (sum == 8) {
+          sum = 12; //I grado (ottava alta)
+        } else if (sum == 9) {
+          sum = 14; //II grado (ottava alta)
+        } else if (sum == 10) {
+          sum = 16; //III grado (ottava alta)
+        } else if (sum == 11) {
+          sum = 17; //IV grado (ottava alta)
+        } else if (sum == 12) {
+          sum = 19; //V grado (ottava alta)
+        } else if (sum == 13) {
+          sum = 21; //VI grado (ottava alta)
+        } else if (sum == 14) {
+          sum = 23; //VII grado (ottava alta)
         }
       } else {
         sum = 100; //VALORE DELLAA PAUSA
@@ -428,7 +418,7 @@ void oscEvent(OscMessage trigger)
       
       if ((stream2 == ' '  || stream2 == '%') && !inputBuffer2.equals("")) {
     
-      if (maxWords_length2>width-80) {
+      if (maxWords_length2>(width/2)-80) {
         words2.remove(0); // Rimuovi la prima parola
       }
     
@@ -440,7 +430,7 @@ void oscEvent(OscMessage trigger)
       }
 
      int sum = 0;
-      if (word.size() >= 3 || words2.size()==0) { //parole con più di 3 lettere eccetto la prima parola
+      if (word.size() >= 2 || words2.size()==0) { //parole con più di 3 lettere eccetto la prima parola
         sum = getWordNumbersSum(word);
         while (sum > 7 && sumArray2.size() != 0) { // somma numeri da 1 a 7 (NOTE)
           sum = sum - 7;
@@ -461,6 +451,20 @@ void oscEvent(OscMessage trigger)
           sum = 9; //VI grado
         } else if (sum == 7) {
           sum = 11; //VII grado
+        } else if (sum == 8) {
+          sum = 12; //I grado (ottava alta)
+        } else if (sum == 9) {
+          sum = 14; //II grado (ottava alta)
+        } else if (sum == 10) {
+          sum = 16; //III grado (ottava alta)
+        } else if (sum == 11) {
+          sum = 17; //IV grado (ottava alta)
+        } else if (sum == 12) {
+          sum = 19; //V grado (ottava alta)
+        } else if (sum == 13) {
+          sum = 21; //VI grado (ottava alta)
+        } else if (sum == 14) {
+          sum = 23; //VII grado (ottava alta)
         }
       } else {
         sum = 100; //VALORE DELLAA PAUSA
