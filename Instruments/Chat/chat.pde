@@ -366,10 +366,15 @@ void oscEvent(OscMessage trigger)
         //TRASFORMO IN FREQ
         float baseFreq = 261.63;
         float freqMultiplier = pow(2,1.0/12.0);
-        for(int i=1; i < sumArray1.size()-4; i++){
-          float freq = baseFreq*(pow(freqMultiplier,float(sumArray1.get(0))))*(pow(freqMultiplier,float(sumArray1.get(i))));
-          freq = round(freq * 100) / 100.0;
-          elementi_freq1.add(freq);
+        for (int i = 1; i < sumArray1.size() - 4; i++) {
+          if (sumArray1.get(i) != 100) {
+            float freq = baseFreq * (pow(freqMultiplier, float(sumArray1.get(0)))) * (pow(freqMultiplier, float(sumArray1.get(i))));
+            freq = round(freq * 100) / 100.0;
+            elementi_freq1.add(freq);
+          } else {
+            float freq = 0.0; //setto a 0 la frequenza per le pause
+            elementi_freq1.add(freq);
+          }
         }
               
         println("OSC (1st el -> key, last-2 el -> n°notes, last-1 el -> bpm: , last el -> nSteps:, ultimiss -> frase 1 o 2? " + sumArray1);
