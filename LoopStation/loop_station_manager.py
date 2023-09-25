@@ -116,74 +116,81 @@ class LoopStationManager:
         print(event)
         if not self.bpm_is_valid or not self.steps_is_valid:
             ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-            print("error")
         elif not self.tracks:
             ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-            print("error")
         else:
             for tr in self.tracks:
-                if tr.instrument is None:
-                    # error_window = ErrorWindow("No Instrument", "Error: No Instrument")
+                if not tr.instr_name:
+                    ErrorWindow("No Instrument", "Error: No Instrument")
                     print("error")
                     self.ls_is_ready = False
                     break
-                # elif not t.instrument.ready:
-                #     error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+                elif not tr.instrument_is_ready:
+                    ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+                    print("error")
+                    self.ls_is_ready = False
+                    break
                 else:
                     self.ls_is_ready = True
 
-        if self.ls_is_ready:
-            self.play_all_tracks()
+            if self.ls_is_ready:
+                self.play_all_tracks()
 
     def pause_clicked(self, event):
         print(event)
         if not self.bpm_is_valid or not self.steps_is_valid:
             ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-            print("error")
         elif not self.tracks:
             ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-            print("error")
         else:
             for tr in self.tracks:
-                print("pause")
-                # tr.pause_this()
-                # osc_bridge.oscDM.send_message("/pause", 0)
-                # osc_bridge.oscCH.send_message("/pause", 0)
+                if not tr.instr_name:
+                    ErrorWindow("No Instrument", "Error: No Instrument")
+                    print("error")
+                    self.ls_is_ready = False
+                    break
+                elif not tr.instrument_is_ready:
+                    ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+                    print("error")
+                    self.ls_is_ready = False
+                    break
+                else:
+                    print("pause")
 
     def stop_clicked(self, event):
-        print("stop")
         print(event)
         if not self.bpm_is_valid or not self.steps_is_valid:
             ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-            print("error")
         elif not self.tracks:
             ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-            print("error")
         else:
-            self.ls_is_ready = False
+            for tr in self.tracks:
+                if not tr.instr_name:
+                    ErrorWindow("No Instrument", "Error: No Instrument")
+                    self.ls_is_ready = False
+                    break
+                elif not tr.instrument_is_ready:
+                    ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+                    self.ls_is_ready = False
+                    break
+                else:
+                    self.ls_is_ready = False
             self.stop_all_tracks()
 
     def play_all_tracks(self):
-        for tr in self.tracks:
-            print("play all")
-            # Send broadcast START PLAY trigger
-            # osc_bridge.oscDM.send_message("/play", 0)
-            # osc_bridge.oscCH.send_message("/play", 0)
+        for i, tr in enumerate(self.tracks):
+            print(f"playing track {i}")
+            tr.play_this()
 
+    def pause_all_tracks(self):
+        for i, tr in enumerate(self.tracks):
+            print(f"stopping track {i}")
+            tr.pause_this()
 
     def stop_all_tracks(self):
-        for tr in self.tracks:
-            print("stop all")
-            # Send broadcast STOP trigger
-            # osc_bridge.oscDM.send_message("/stop", 0)
-            # osc_bridge.oscCH.send_message("/stop", 0)
-            # for t in tracks:
-            #     if not t.instrument:
-            #         error_window = ErrorWindow("No Instrument", "Error: No Instrument")
-            #     elif not t.instrument.ready:
-            #         error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
-            #     else:
-            #         t.instrument.stop()
+        for i, tr in enumerate(self.tracks):
+            print(f"stopping track {i}")
+            tr.stop_this()
 
     def launch_interaction_layer(self):
         # Open layer interaction sketch
@@ -203,7 +210,7 @@ class LoopStationManager:
         print("removing local files...")
         # utils.draw_closing_screen(self)
         osc_bridge.cleanup()
-        os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")
+        # os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")
         # time.sleep(2)
         sys.exit(0)
 

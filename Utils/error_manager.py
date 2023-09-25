@@ -14,7 +14,7 @@ class ErrorWindow:
         self.window.geometry("512x64")
         self.window.resizable(width=False, height=False)
 
-        self.canvas = tk.Canvas(self.window, width=512, height=64, bg="red")
+        self.canvas = tk.Canvas(self.window, width=512, height=64, bg="#800000")
         self.canvas.place(x=0, y=0)
 
         self.error_message = error_message
