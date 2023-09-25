@@ -5,7 +5,7 @@ import netP5.*;
 OscP5 oscP5;
 NetAddress myRemoteLocation;
 NetAddress addressIL;
-OscMessage pad;
+OscMessage melody;
 //OSC
 
 import java.util.ArrayList;
@@ -29,7 +29,6 @@ float maxWords_length1; // Lunghezza massima sentence
 float maxWords_length2; // Lunghezza massima sentence
 int maxSentences = 9; // Numero massimo di sentence nell'array di stringhe
 
-//int bpm = 60; //BPM
 int nSteps; //Numero pulsazioni per battuta
 
 boolean inputString1 = false;
@@ -53,7 +52,7 @@ void setup() {
   oscP5 = new OscP5(this, 12002);
   myRemoteLocation = new NetAddress("127.0.0.1", 57120);
   addressIL = new NetAddress("127.0.0.1", 12000);
-  pad = new OscMessage("/pad");
+  melody = new OscMessage("/melody");
   //OSC
   
   char[] lowercaseLetters = "abcdefghijklmnopqrstuvwxyz".toCharArray();
