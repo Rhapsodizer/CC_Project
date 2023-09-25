@@ -6,7 +6,7 @@ import os
 import tkinter as tk
 import subprocess
 import sys
-
+import threading
 
 """
 Main window manager
@@ -39,7 +39,8 @@ class LoopStationManager:
 
     def draw_all(self):
         [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-         bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop, safe_close] = utils.draw_all_ls(self)
+         bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop,
+         safe_close, close_x1, close_x2] = utils.draw_all_ls(self)
         self.canvas.tag_bind(up_bpm_triangle, "<Button-1>", self.up_bpm)
         self.canvas.tag_bind(down_bpm_triangle, "<Button-1>", self.down_bpm)
         self.canvas.tag_bind(up_steps_triangle, "<Button-1>", self.up_steps)
@@ -53,16 +54,20 @@ class LoopStationManager:
         self.canvas.tag_bind(pause[2], "<Button-1>", self.pause_clicked)
         self.canvas.tag_bind(stop, "<Button-1>", self.stop_clicked)
         self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
+        self.canvas.tag_bind(close_x1, "<Button-1>", self.safe_close_clicked)
+        self.canvas.tag_bind(close_x2, "<Button-1>", self.safe_close_clicked)
 
     def add_track_clicked(self, event):
         print(event)
-        if len(self.tracks) < 8 and self.bpm_is_valid and self.steps_is_valid:
-            tr = create_new_track(self)
-            self.tracks.append(tr)
-            self.draw_all()
+        if len(self.tracks) < 8:
+            if self.bpm_is_valid and self.steps_is_valid:
+                tr = create_new_track(self)
+                self.tracks.append(tr)
+                self.draw_all()
+            else:
+                ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
         else:
-            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-            print("Track Error")
+            ErrorWindow("Track Error", "Error: Maximum number of track reached")
 
     def up_bpm(self, event):
         print(event)
@@ -206,13 +211,8 @@ class LoopStationManager:
 
     def safe_close_clicked(self, event):
         print(event)
-        print("closing...")
-        print("removing local files...")
-        # utils.draw_closing_screen(self)
-        osc_bridge.cleanup()
+        utils.draw_shutdown_ls(self)
         # os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")
-        # time.sleep(2)
-        sys.exit(0)
 
     # todo
     # trigger "nextstep" every time step, having bpm and number of steps

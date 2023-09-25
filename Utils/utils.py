@@ -1,5 +1,8 @@
+import sys
+import time
 import tkinter as tk
 import math
+from Utils import osc_bridge
 
 """
 Misc functions:
@@ -75,10 +78,11 @@ def draw_all_ls(ls_obj):
     draw_all_tracks_ls(ls_obj)
     plus_add_track = draw_plus_ls(ls_obj)
     [play, pause, stop] = draw_play_pause_stop_ls(ls_obj)
-    safe_close_button = safe_close_ls(ls_obj)
+    [safe_close_button, close_x1, close_x2] = safe_close_ls(ls_obj)
     ls_obj.canvas.update()
     return [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-            bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop, safe_close_button]
+            bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop,
+            safe_close_button, close_x1, close_x2]
 
 
 def draw_bpm_steps_ls(ls_obj):
@@ -228,7 +232,34 @@ def safe_close_ls(ls_obj):
         width - x_offset, y_offset + half_diagonal,
         fill="#800000", outline="#000000")
 
-    return safe_close_button
+    close_x1 = canvas.create_polygon(
+        width - x_offset - half_diagonal / 3 - 1, y_offset - half_diagonal / 3 + 1,
+        width - x_offset - half_diagonal / 3 + 1, y_offset - half_diagonal / 3 - 1,
+        width - x_offset + half_diagonal / 3 + 1, y_offset + half_diagonal / 3 - 1,
+        width - x_offset + half_diagonal / 3 - 1, y_offset + half_diagonal / 3 + 1,
+        fill="#000000", outline="#000000")
+
+    close_x2 = canvas.create_polygon(
+        width - x_offset + half_diagonal / 3 - 1, y_offset - half_diagonal / 3 - 1,
+        width - x_offset + half_diagonal / 3 + 1, y_offset - half_diagonal / 3 + 1,
+        width - x_offset - half_diagonal / 3 + 1, y_offset + half_diagonal / 3 + 1,
+        width - x_offset - half_diagonal / 3 - 1, y_offset + half_diagonal / 3 - 1,
+        fill="#000000", outline="#000000")
+
+    return [safe_close_button, close_x1, close_x2]
+
+
+def draw_shutdown_ls(ls_obj):
+    ls_obj.canvas.delete("all")
+    ls_obj.canvas.update()
+    ls_obj.canvas.config(bg="#505050")
+    ls_obj.canvas.create_text(40, ls_obj.c_height / 2,
+                              text="Shutting down, please wait. . .", font=("Arial", 20), anchor=tk.W)
+    ls_obj.canvas.update()
+    time.sleep(0.001)
+    osc_bridge.cleanup()
+    print("done.")
+    sys.exit(0)
 
 
 """
@@ -262,7 +293,7 @@ def draw_track_elements_tr(track_obj):
 
     if track_obj.instr_name is None:
         track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
-                                     text="Empty track", font=("Arial", 12), anchor=tk.W)
+                                     text="Empty track", font=("Arial", 12), fill="#505050", anchor=tk.W)
     else:
         track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
                                      text=track_obj.instr_name, font=("Arial", 12), anchor=tk.W)
@@ -291,7 +322,35 @@ def draw_track_elements_tr(track_obj):
                                                 horiz_plus, track_obj.pos_y + track_obj.height - 15,
                                                 fill="#8C8C8C", outline="#000000")
 
-    return [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect]
+    # Draw Remove icon
+    x_offset = 80
+    y_offset = track_obj.pos_y + track_obj.height/2
+    half_diagonal = 20
+    width = track_obj.canvas.winfo_width()
+    # Draw close icon
+    remove_button = track_obj.canvas.create_polygon(
+        width - x_offset - half_diagonal, y_offset,
+        width - x_offset, y_offset - half_diagonal,
+        width - x_offset + half_diagonal, y_offset,
+        width - x_offset, y_offset + half_diagonal,
+        fill="#8C8C8C", outline="#000000")
+
+    remove_x1 = track_obj.canvas.create_polygon(
+        width - x_offset - half_diagonal / 3 - 1, y_offset - half_diagonal / 3 + 1,
+        width - x_offset - half_diagonal / 3 + 1, y_offset - half_diagonal / 3 - 1,
+        width - x_offset + half_diagonal / 3 + 1, y_offset + half_diagonal / 3 - 1,
+        width - x_offset + half_diagonal / 3 - 1, y_offset + half_diagonal / 3 + 1,
+        fill="#505050", outline="#505050")
+
+    remove_x2 = track_obj.canvas.create_polygon(
+        width - x_offset + half_diagonal / 3 - 1, y_offset - half_diagonal / 3 - 1,
+        width - x_offset + half_diagonal / 3 + 1, y_offset - half_diagonal / 3 + 1,
+        width - x_offset - half_diagonal / 3 + 1, y_offset + half_diagonal / 3 + 1,
+        width - x_offset - half_diagonal / 3 - 1, y_offset + half_diagonal / 3 - 1,
+        fill="#505050", outline="#505050")
+
+    return [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
+            remove_button, remove_x1, remove_x2]
 
 
 """
@@ -299,7 +358,7 @@ R&P-related functions:
 """
 
 
-def draw_toolbar(rap_obj):
+def draw_toolbar_rap(rap_obj):
     # Draw rect container
     round_rectangle(rap_obj.toolbar_canvas,
                     rap_obj.toolbar_pos_x,
@@ -370,7 +429,8 @@ def draw_toolbar(rap_obj):
     return [rec_rectangle, rec_circle, plus_rect, play_rectangle, stop_rectangle]
 
 
-def draw_time_bar(rap_obj):
+def draw_time_bar_rap(rap_obj):
     rap_obj.time_canvas.delete("all")
     rap_obj.time_canvas.create_text(rap_obj.tc_width/2, rap_obj.tc_height/2,
-                                    text="{:.2f}".format(rap_obj.audio_time), font=("Arial", 12))
+                                    text="{:.2f}".format(rap_obj.audio_time) + " / " + str(rap_obj.loop_duration),
+                                    font=("Arial", 12))

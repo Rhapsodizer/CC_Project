@@ -36,14 +36,17 @@ class Track:
         self.color = "#B4B4B4"
         self.instr_name = None
 
-    def plus_clicked(self, event):
-        print("plus")
-        self.choose_instrument(event)
-
-    def settings_clicked(self, event):
-        print("settings")
-        print(event)
-        self.setup_instrument()
+    def draw_track(self):
+        [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
+         remove_button, remove_x1, remove_x2] = utils.draw_track_elements_tr(self)
+        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this_clicked)
+        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this_clicked)
+        self.canvas.tag_bind(settings_hexagon, "<Button-1>", self.settings_clicked)
+        self.canvas.tag_bind(settings_circle, "<Button-1>", self.settings_clicked)
+        self.canvas.tag_bind(plus_rect, "<Button-1>", self.plus_clicked)
+        self.canvas.tag_bind(remove_button, "<Button-1>", self.remove_clicked)
+        self.canvas.tag_bind(remove_x1, "<Button-1>", self.remove_clicked)
+        self.canvas.tag_bind(remove_x2, "<Button-1>", self.remove_clicked)
 
     def play_this_clicked(self, event):
         print(event)
@@ -53,14 +56,16 @@ class Track:
         print(event)
         self.stop_this()
 
-    def draw_track(self):
-        [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect] = (
-            utils.draw_track_elements_tr(self))
-        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this_clicked)
-        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this_clicked)
-        self.canvas.tag_bind(settings_hexagon, "<Button-1>", self.settings_clicked)
-        self.canvas.tag_bind(settings_circle, "<Button-1>", self.settings_clicked)
-        self.canvas.tag_bind(plus_rect, "<Button-1>", self.plus_clicked)
+    def plus_clicked(self, event):
+        self.choose_instrument(event)
+
+    def settings_clicked(self, event):
+        print(event)
+        self.setup_instrument()
+
+    def remove_clicked(self, event):
+        print(event)
+        self.destroy()
 
     def choose_instrument(self, event):
         """
@@ -124,15 +129,15 @@ class Track:
                 subprocess.Popen(pde_open, shell=True)
 
             if self.instr_name == "Rec & Play":
-                rap_thread = Thread(target=open_rap_window(self.window))
-                # todo: calculate loop duration
-                # rap_thread = Thread(target=open_rap_window(self.window), args=[loop_duration])
+                rap_thread = Thread(target=open_rap_window,
+                                    args=[self.window, self.ls_parent.bpm, self.ls_parent.steps])
                 rap_thread.start()
 
     def play_this(self):
         if self.instrument_is_ready:
             print("playing this track alone. disable play on all the others")
             # Send broadcast START PLAY trigger
+            osc_bridge.oscDM.send_message("/play", 0)
             osc_bridge.oscDM.send_message("/play", 0)
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
@@ -147,6 +152,7 @@ class Track:
             print("Stopping this track alone. disable play on all the others")
             # Send broadcast PAUSE trigger
             osc_bridge.oscDM.send_message("/pause", 0)
+            osc_bridge.oscDM.send_message("/pause", 0)
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
         else:
@@ -157,7 +163,20 @@ class Track:
             print("stop playing this track. unlocking all the others")
             # Send broadcast STOP trigger
             osc_bridge.oscDM.send_message("/stop", 0)
+            osc_bridge.oscDM.send_message("/stop", 0)
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
         else:
             ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+
+    def destroy(self):
+        tr_dist = 10
+        if self in self.ls_parent.tracks:
+            index = self.ls_parent.tracks.index(self)
+            self.ls_parent.tracks.pop(index)
+            # self.ls_parent.tracks.remove(self)
+            for i, tr in enumerate(self.ls_parent.tracks):
+                if i >= index:
+                    tr.pos_y = tr.pos_y - (self.height + tr_dist)
+            self.ls_parent.draw_all()
+        del self

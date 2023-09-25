@@ -11,20 +11,20 @@ import wave
 import struct
 import time
 from Utils import utils
+from Utils.error_manager import ErrorWindow
 
 
-def open_rap_window(using_root):  # todo: add loop_duration as parameter
+def open_rap_window(using_root, bpm, steps):
     rap_window = tk.Toplevel(using_root)
     rap_window.geometry("1024x512")
     rap_window.config(bg="#DCDCDC")
     rap_window.resizable(width=False, height=False)
-    rap = RecorderAndPlayer(rap_window)
+    rap = RecorderAndPlayer(rap_window, bpm, steps)
     rap.draw_all()
-    rap.set_loop_duration(5)
 
 
 class RecorderAndPlayer:
-    def __init__(self, window):
+    def __init__(self, window, bpm, steps):
         self.window = window
         self.c_width = 1024
         self.c_tb_height = 200
@@ -33,7 +33,9 @@ class RecorderAndPlayer:
         self.toolbar_canvas.place(x=0, y=0)
         self.canvas = tk.Canvas(self.window, width=self.c_width, height=self.c_height, bg="#B4B4B4")
         self.canvas.place(x=0, y=256)
-        self.loop_duration = 0  # in seconds
+        self.bpm = bpm
+        self.steps = steps
+        self.loop_duration = 60/self.bpm + self.steps  # in seconds
         self.loaded = False
         self.toolbar_pos_x = 20
         self.toolbar_pos_y = 20
@@ -85,12 +87,13 @@ class RecorderAndPlayer:
         thread = Thread(target=self.record_mic)
         thread.start()
 
-    def set_loop_duration(self, new_loop_duration_in_seconds):
-        self.loop_duration = new_loop_duration_in_seconds
-        # print(self.loop_duration)
+    # def calculate_loop_duration(self):
+    #     loop_dur = 60/self.bpm * self.steps
+    #     print(loop_dur)
+    #     return loop_dur
 
     def draw_toolbar(self):
-        [record_rect, record_circle, plus, p, s] = utils.draw_toolbar(self)
+        [record_rect, record_circle, plus, p, s] = utils.draw_toolbar_rap(self)
         self.toolbar_canvas.tag_bind(record_rect, "<Button-1>", self.record_clicked)
         self.toolbar_canvas.tag_bind(record_circle, "<Button-1>", self.record_clicked)
         self.toolbar_canvas.tag_bind(plus, "<Button-1>", self.plus_clicked)
@@ -98,16 +101,15 @@ class RecorderAndPlayer:
         self.toolbar_canvas.tag_bind(s, "<Button-1>", self.sf)
 
     def draw_time_bar(self):
-        utils.draw_time_bar(self)
+        utils.draw_time_bar_rap(self)
 
     def draw_visual(self):
         self.canvas.delete("all")
         if self.loaded:
             # self.canvas.delete("all")
             duration_time_in_ms = int(self.loop_duration * 1000)
-            # cut the audio segment so that lasts N seconds, where N is given by the spinbox
+            # cut the audio segment so that lasts N seconds
             cut_audio_segment = self.values_of_audio_segment[:duration_time_in_ms]
-
             # Capture amplitude every 100 ms
             for t in range(0, len(cut_audio_segment), self.waiting_time):
                 self.audio_data.append(np.max(np.abs(cut_audio_segment[t:t + self.waiting_time])))
@@ -178,8 +180,7 @@ class RecorderAndPlayer:
 
             self.show_audio_data = audio_data_normalized
         else:
-            print("setup error")
-            # todo window error
+            ErrorWindow("Setup Error", "Error: Setup Error")
 
     def play_file_in_thread(self):
         self.reset_time()
@@ -195,8 +196,7 @@ class RecorderAndPlayer:
                 display_thread = threading.Thread(target=self.draw_file, args=(dim, 0))
                 display_thread.start()
         else:
-            print("setup error")
-            # todo window error
+            ErrorWindow("Setup Error", "Error: Setup Error")
 
     def draw_file(self, dim, i):
         if i < len(self.show_audio_data) and self.is_playing:
@@ -219,7 +219,6 @@ class RecorderAndPlayer:
         self.canvas.delete("all")
         self.loaded = False
         self.draw_toolbar()
-        # print("Recording started...")
         audio = []
         self.is_recording = True
         self.draw_toolbar()
@@ -242,7 +241,6 @@ class RecorderAndPlayer:
                 f.setparams((1, 2, 16000, self.frame_length, "NONE", "NONE"))
                 f.writeframes(struct.pack("h" * len(audio), *audio))
 
-            # print("Recording saved as", self.recorded_file_path)
             self.is_recording = False
             self.has_finished_recording = True
             self.draw_toolbar()
