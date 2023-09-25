@@ -6,24 +6,34 @@ from threading import Thread
 from Instruments.Recorder_and_Player.recorder_and_player import open_rap_window
 
 
-def add_new_track(window, canvas, tracks, bpm, steps):
-    """
-    This function creates a new track object,
-    if possible, then
-    adds it to the list of tracks
-    """
+def create_new_track(ls):
+    num_tracks = len(ls.tracks)
     track_height = 50
-    if bpm == 0 or steps == 0:
-        ErrorWindow("Setup Error", "Error: Set bpm and steps first!")
-    else:
-        if len(tracks) < 8:
-            y_offset = len(tracks) * (track_height + 10)
-            tr = Track(window, canvas, steps, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
-            tr.draw_track()
-            tracks.append(tr)
-        else:
-            ErrorWindow("Track Error", "Error: Max # of tracks")
+    track_distance = 10
+    track_offset_x = 20
+    y_offset = num_tracks * (track_height + track_distance)
+    tr = Track(ls, instrument=None, pos_x=track_offset_x, pos_y=y_offset + 100, track_height=track_height)
+    return tr
 
+
+# def add_new_track(window, canvas, tracks, bpm, steps):
+#     """
+#     This function creates a new track object,
+#     if possible, then
+#     adds it to the list of tracks
+#     """
+#     track_height = 50
+#     if bpm == 0 or steps == 0:
+#         ErrorWindow("Setup Error", "Error: Set bpm and steps first!")
+#     else:
+#         if len(tracks) < 8:
+#             y_offset = len(tracks) * (track_height + 10)
+#             tr = Track(window, canvas, steps, instrument=None, pos_x=20, pos_y=y_offset + 100, height=track_height)
+#             tr.draw_track()
+#             tracks.append(tr)
+#         else:
+#             ErrorWindow("Track Error", "Error: Max # of tracks")
+#
 
 """
 This class defines the track element
@@ -31,15 +41,16 @@ This class defines the track element
 
 
 class Track:
-    def __init__(self, window, canvas, steps, instrument, pos_x, pos_y, height):
-        self.window = window
-        self.canvas = canvas
-        self.steps = steps
+    def __init__(self, loop_station_parent, instrument, pos_x, pos_y, track_height):
+        self.ls_parent = loop_station_parent
+        self.window = loop_station_parent.window
+        self.canvas = loop_station_parent.canvas
+        self.steps = loop_station_parent.steps
         self.instrument = instrument
         self.pos_x = pos_x
         self.pos_y = pos_y
-        self.length = self.window.winfo_width()-40
-        self.height = height
+        self.length = self.window.winfo_width() - 40
+        self.height = track_height
         self.color = "#B4B4B4"
         self.instr_name = None
 
@@ -61,9 +72,9 @@ class Track:
         # self.stop_this()
 
     def draw_track(self):
-        [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect] = utils.draw_track_elements(self)
-        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this)
-        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this)
+        [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect] = utils.draw_track_elements_tr(self)
+        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this_clicked)
+        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this_clicked)
         self.canvas.tag_bind(settings_hexagon, "<Button-1>", self.settings_clicked)
         self.canvas.tag_bind(settings_circle, "<Button-1>", self.settings_clicked)
         self.canvas.tag_bind(plus_rect, "<Button-1>", self.plus_clicked)

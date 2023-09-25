@@ -1,205 +1,212 @@
-import tkinter as tk
-from tkinter import ttk
-from LoopStation.track import add_new_track
+from LoopStation.track import create_new_track
 from Utils.error_manager import ErrorWindow
-from Utils import osc_bridge
+import Utils.osc_bridge as osc_bridge
 from Utils import utils
+import os
+import tkinter as tk
 import subprocess
+import sys
 
 
-# todo: bpm/loop duration
 """
 Main window manager
-This window contains:
-    - title
-    - add new track
-    - bpm/loop duration 
-    - tracks
-    - play/stop
-"""
-
-tracks = []
-_bpm = 120
-_steps = 16
-
-
-def create_master_window():
-    # Create the main window
-    window = tk.Tk()
-    window.title("Master")
-    window.geometry("800x700")
-    # Disable window resizing
-    window.resizable(width=False, height=False)
-
-    # the tracks
-    # tracks = []
-
-    # BPM
-    bpm = tk.StringVar()
-    bpm.set("120")
-    # STEPS
-    steps = tk.StringVar()
-    steps.set("16")
-
-    # Create the canvas
-    c_width = 800
-    c_height = 700
-    canvas = tk.Canvas(window, width=c_width, height=c_height, bg="#505050")
-    canvas.pack()
-
-    # Master text
-    master_text = canvas.create_text(c_width/2, 20, text="Master Loop", font=("Arial", 12))
-    canvas.tag_raise(master_text)
-
-    # Create new track object
-    new_track_button = tk.Button(window, text="Add new Track", bg="#B4B4B4",
-                                 command=lambda: add_new_track(
-                                     window, canvas, tracks, int(bpm_box_var.get()), int(step_box_var.get())))
-    new_track_button.place(x=40, y=40)
-    new_track_button.lift()
-
-    ###########################################################################################
-    # BPM text
-    bpm_text = canvas.create_text(302, 60, text="BPM:", font=("Arial", 12))
-    canvas.tag_raise(bpm_text)
-
-    # BPM box
-    bpm_box_var = tk.StringVar()
-    bpm_box_var.set("120")
-    bpm_box = ttk.Spinbox(window, from_=0, to=200, textvariable=bpm_box_var, width=4)
-    bpm_box.place(x=c_width/2-70, y=45)
-
-    # Set bpm
-    set_bpm_button = tk.Button(window, text="Set", bg="#B4B4B4",
-                               command=lambda: on_bpm_set(bpm_box_var, bpm))
-    set_bpm_button.place(x=c_width/2, y=40)
-    set_bpm_button.lift()
-
-    # Step text
-    step_text = canvas.create_text(520, 60, text="Steps:", font=("Arial", 12))
-    canvas.tag_raise(step_text)
-
-    # Step box
-    step_box_var = tk.StringVar()
-    step_box_var.set("16")
-    step_box = ttk.Spinbox(window, from_=0, to=32, textvariable=step_box_var, width=4)
-    step_box.place(x=c_width/2+160, y=45)
-
-    # Set steps
-    set_step_button = tk.Button(window, text="Set", bg="#B4B4B4",
-                                command=lambda: on_step_set(step_box_var, steps))
-    set_step_button.place(x=c_width/2+230, y=40)
-    set_step_button.lift()
-
-    ###########################################################################################
-
-    # Play, Pause, Stop
-    [play, pause, stop] = utils.draw_play_pause_stop(canvas, c_width, c_height)
-    canvas.tag_bind(play, "<Button-1>", play_clicked)
-    canvas.tag_bind(pause[0], "<Button-1>", pause_clicked)
-    canvas.tag_bind(pause[1], "<Button-1>", pause_clicked)
-    canvas.tag_bind(pause[2], "<Button-1>", pause_clicked)
-    canvas.tag_bind(stop, "<Button-1>", stop_clicked)
-
-    # Window loop
-    window.mainloop()
-
-
-"""
-functions:
-    - on_bpm_set: save the new set bpm
-    - play_all_tracks: checks that all the instruments have been initialized, then plays
-    - stop_all_tracks: stops the execution of all tracks
 """
 
 
-def on_bpm_set(bpm_box_var, curr_bpm):
-    read_bpm = bpm_box_var.get()
-    curr_bpm.set(read_bpm)
-    print("BPM: ", int(curr_bpm.get()))
-
-    osc_bridge.oscDM.send_message("/setBpm", int(curr_bpm.get()))
-    osc_bridge.oscCH.send_message("/setBpm", int(curr_bpm.get()))
+def create_loop_station_manager_window(root):
+    lsm = LoopStationManager(root)
+    lsm.draw_all()
+    lsm.launch_interaction_layer()
 
 
-def on_step_set(step_box_var, curr_step):
-    read_step = step_box_var.get()
-    curr_step.set(read_step)
-    print("Steps: ", int(curr_step.get()))
+class LoopStationManager:
+    def __init__(self, root):
+        self.window = root
+        self.window.title("Loop Station Manager")
+        self.window.geometry("800x700")
+        self.window.resizable(width=False, height=False)
+        self.c_width = 800
+        self.c_height = 700
+        self.canvas = tk.Canvas(self.window, width=self.c_width, height=self.c_height, bg="#505050")
+        self.canvas.pack()
+        self.tracks = []
+        self.bpm = 120
+        self.steps = 16
+        self.bpm_is_valid = False
+        self.steps_is_valid = False
+        self.loop_duration = self.calculate_loop_duration
+        self.ls_is_ready = False
 
-    osc_bridge.oscDM.send_message("/setSteps", int(curr_step.get()))
-    osc_bridge.oscCH.send_message("/setSteps", int(curr_step.get()))
+    def draw_all(self):
+        [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
+         bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop, safe_close] = utils.draw_all_ls(self)
+        self.canvas.tag_bind(up_bpm_triangle, "<Button-1>", self.up_bpm)
+        self.canvas.tag_bind(down_bpm_triangle, "<Button-1>", self.down_bpm)
+        self.canvas.tag_bind(up_steps_triangle, "<Button-1>", self.up_steps)
+        self.canvas.tag_bind(down_steps_triangle, "<Button-1>", self.down_steps)
+        self.canvas.tag_bind(bpm_valid_rect, "<Button-1>", self.on_bpm_set)
+        self.canvas.tag_bind(steps_valid_rect, "<Button-1>", self.on_steps_set)
+        self.canvas.tag_bind(plus_add_track, "<Button-1>", self.add_track_clicked)
+        self.canvas.tag_bind(play, "<Button-1>", self.play_clicked)
+        self.canvas.tag_bind(pause[0], "<Button-1>", self.pause_clicked)
+        self.canvas.tag_bind(pause[1], "<Button-1>", self.pause_clicked)
+        self.canvas.tag_bind(pause[2], "<Button-1>", self.pause_clicked)
+        self.canvas.tag_bind(stop, "<Button-1>", self.stop_clicked)
+        self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
 
-
-def play_clicked(event):
-    print("play")
-    print(event)
-    global tracks
-    global _bpm
-    # bpm = int(_bpm.get())
-    bpm = _bpm
-    if bpm == 0:
-        ErrorWindow("BPM Error", "Error: BPM = 0")
-    elif not tracks:
-        ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-    else:
-        play_all_tracks()
-
-
-def pause_clicked(event):
-    print("pause")
-    print(event)
-    osc_bridge.oscDM.send_message("/pause", 0)
-    osc_bridge.oscCH.send_message("/pause", 0)
-
-
-def stop_clicked(event):
-    print("stop")
-    print(event)
-    if not tracks:
-        ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-    else:
-        stop_all_tracks()
-
-
-def play_all_tracks():
-    # Send broadcast START PLAY trigger
-    osc_bridge.oscDM.send_message("/play", 0)
-    osc_bridge.oscCH.send_message("/play", 0)
-    """ for t in tracks:
-        if not t.instrument:
-            error_window = ErrorWindow("No Instrument", "Error: No Instrument")
-        elif not t.instrument.ready:
-            error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+    def add_track_clicked(self, event):
+        print(event)
+        if len(self.tracks) < 8 and self.bpm_is_valid and self.steps_is_valid:
+            tr = create_new_track(self)
+            self.tracks.append(tr)
+            self.draw_all()
         else:
-            t.instrument.play(bpm) """
+            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
+            print("Track Error")
 
+    def up_bpm(self, event):
+        print(event)
+        if self.bpm < 200:
+            self.bpm += 1
+        self.bpm_is_valid = False
+        self.draw_all()
 
-def stop_all_tracks():
-    # Send broadcast STOP trigger
-    osc_bridge.oscDM.send_message("/stop", 0)
-    osc_bridge.oscCH.send_message("/stop", 0)
-    """ for t in tracks:
-        if not t.instrument:
-            error_window = ErrorWindow("No Instrument", "Error: No Instrument")
-        elif not t.instrument.ready:
-            error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+    def down_bpm(self, event):
+        print(event)
+        if self.bpm > 1:
+            self.bpm -= 1
+        self.bpm_is_valid = False
+        self.draw_all()
+
+    def up_steps(self, event):
+        print(event)
+        if self.steps < 32:
+            self.steps += 1
+        self.steps_is_valid = False
+        self.draw_all()
+
+    def down_steps(self, event):
+        print(event)
+        if self.steps > 1:
+            self.steps -= 1
+        self.steps_is_valid = False
+        self.draw_all()
+
+    def calculate_loop_duration(self):
+        return 60 / self.bpm * self.steps
+
+    def on_bpm_set(self, event):
+        print(self.bpm)
+        print(event)
+        self.bpm_is_valid = True
+        self.draw_all()
+        osc_bridge.oscDM.send_message("/setBpm", self.bpm)
+        osc_bridge.oscCH.send_message("/setBpm", self.bpm)
+
+    def on_steps_set(self, event):
+        print(self.steps)
+        print(event)
+        self.steps_is_valid = True
+        self.draw_all()
+        osc_bridge.oscDM.send_message("/setSteps", self.steps)
+        osc_bridge.oscCH.send_message("/setSteps", self.steps)
+
+    def play_clicked(self, event):
+        print("play")
+        print(event)
+        if not self.bpm_is_valid or not self.steps_is_valid:
+            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
+            print("error")
+        elif not self.tracks:
+            ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+            print("error")
         else:
-            t.instrument.stop() """
+            for tr in self.tracks:
+                if tr.instrument is None:
+                    # error_window = ErrorWindow("No Instrument", "Error: No Instrument")
+                    print("error")
+                    self.ls_is_ready = False
+                    break
+                # elif not t.instrument.ready:
+                #     error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+                else:
+                    self.ls_is_ready = True
+
+        if self.ls_is_ready:
+            self.play_all_tracks()
+
+    def pause_clicked(self, event):
+        print(event)
+        if not self.bpm_is_valid or not self.steps_is_valid:
+            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
+            print("error")
+        elif not self.tracks:
+            ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+            print("error")
+        else:
+            for tr in self.tracks:
+                print("pause")
+                # tr.pause_this()
+                # osc_bridge.oscDM.send_message("/pause", 0)
+                # osc_bridge.oscCH.send_message("/pause", 0)
+
+    def stop_clicked(self, event):
+        print("stop")
+        print(event)
+        if not self.bpm_is_valid or not self.steps_is_valid:
+            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
+            print("error")
+        elif not self.tracks:
+            ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+            print("error")
+        else:
+            self.ls_is_ready = False
+            self.stop_all_tracks()
+
+    def play_all_tracks(self):
+        for tr in self.tracks:
+            print("play all")
+            # Send broadcast START PLAY trigger
+            # osc_bridge.oscDM.send_message("/play", 0)
+            # osc_bridge.oscCH.send_message("/play", 0)
 
 
-# Open layer interaction sketch
-# processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-# pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
-processing_java_path = "H:\Software\processing\processing-java"
-pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
-# processing_java_path = "processing-java"
-# pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/LayerInteraction"
+    def stop_all_tracks(self):
+        for tr in self.tracks:
+            print("stop all")
+            # Send broadcast STOP trigger
+            # osc_bridge.oscDM.send_message("/stop", 0)
+            # osc_bridge.oscCH.send_message("/stop", 0)
+            # for t in tracks:
+            #     if not t.instrument:
+            #         error_window = ErrorWindow("No Instrument", "Error: No Instrument")
+            #     elif not t.instrument.ready:
+            #         error_window = ErrorWindow("Instrument not Ready", "Open the Instrument")
+            #     else:
+            #         t.instrument.stop()
 
-pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(_steps)
-subprocess.Popen(pde_open, shell=True)
+    def launch_interaction_layer(self):
+        # Open layer interaction sketch
+        # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
+        # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
+        processing_java_path = "H:\Software\processing\processing-java"
+        pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
+        # processing_java_path = "processing-java"
+        # pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/LayerInteraction"
+        pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
+        subprocess.Popen(pde_open, shell=True)
+        # todo move this paths in jason file
 
+    def safe_close_clicked(self, event):
+        print(event)
+        print("closing...")
+        print("removing local files...")
+        # utils.draw_closing_screen(self)
+        osc_bridge.cleanup()
+        os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")
+        # time.sleep(2)
+        sys.exit(0)
 
-# TO DO
-# trigger "nextstep" every time step, having bpm and number of steps
-# at the end of the loop (last nexstep) trigger an osc message to pose the cursor at 0
+    # todo
+    # trigger "nextstep" every time step, having bpm and number of steps
+    # at the end of the loop (last nexstep) trigger an osc message to pose the cursor at 0

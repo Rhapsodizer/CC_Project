@@ -1,10 +1,17 @@
-from LoopStation import loop_station_manager
+from LoopStation.loop_station_manager import create_loop_station_manager_window
+import tkinter as tk
+
 
 """
 Launch this script to open the main screen
 """
+
+
 if __name__ == "__main__":
-    loop_station_manager.create_master_window()
+    root = tk.Tk()
+    create_loop_station_manager_window(root)
+    root.mainloop()
+
 
 """
 Structure:

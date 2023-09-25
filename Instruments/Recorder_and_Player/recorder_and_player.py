@@ -25,7 +25,6 @@ def open_rap_window(using_root):  # todo: add loop_duration as parameter
 
 class RecorderAndPlayer:
     def __init__(self, window):
-        # super().__init__("Rec and Play")
         self.window = window
         self.c_width = 1024
         self.c_tb_height = 200
@@ -143,6 +142,8 @@ class RecorderAndPlayer:
     def play_audio(self):
         pygame.mixer.music.load(self.audio_file)
         pygame.mixer.music.play()
+        # pygame.mixer.music.pause()
+        # pygame.mixer.music.unpause()
 
     def stop_file(self):
         pygame.mixer.music.stop()
@@ -191,8 +192,7 @@ class RecorderAndPlayer:
                 audio_thread = threading.Thread(target=self.play_audio)
                 audio_thread.start()
 
-                display_thread = threading.Thread(target=self.draw_file,
-                                                  args=(dim, 0))
+                display_thread = threading.Thread(target=self.draw_file, args=(dim, 0))
                 display_thread.start()
         else:
             print("setup error")
