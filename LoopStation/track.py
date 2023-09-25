@@ -62,8 +62,8 @@ class Track:
 
     def draw_track(self):
         [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect] = utils.draw_track_elements(self)
-        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this)
-        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this)
+        self.canvas.tag_bind(play_this_trg, "<Button-1>", self.play_this_clicked)
+        self.canvas.tag_bind(stop_this_rect, "<Button-1>", self.stop_this_clicked)
         self.canvas.tag_bind(settings_hexagon, "<Button-1>", self.settings_clicked)
         self.canvas.tag_bind(settings_circle, "<Button-1>", self.settings_clicked)
         self.canvas.tag_bind(plus_rect, "<Button-1>", self.plus_clicked)

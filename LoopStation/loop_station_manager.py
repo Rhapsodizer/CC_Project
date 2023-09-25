@@ -2,10 +2,9 @@ import tkinter as tk
 from tkinter import ttk
 from LoopStation.track import add_new_track
 from Utils.error_manager import ErrorWindow
-from Utils import osc_bridge
+import Utils.osc_bridge as osc_bridge
 from Utils import utils
 import subprocess
-
 
 # todo: bpm/loop duration
 """
@@ -57,6 +56,11 @@ def create_master_window():
                                      window, canvas, tracks, int(bpm_box_var.get()), int(step_box_var.get())))
     new_track_button.place(x=40, y=40)
     new_track_button.lift()
+
+    close_button = tk.Button(window, text="Close", bg="#B4B4B4",
+                             command=osc_bridge.cleanup)
+    close_button.place(x=40, y=100)
+    close_button.lift()
 
     ###########################################################################################
     # BPM text
@@ -176,7 +180,7 @@ def play_all_tracks():
 
 
 def stop_all_tracks():
-    # Send broadcast STOP trigger
+    # # Send broadcast STOP trigger
     osc_bridge.oscDM.send_message("/stop", 0)
     osc_bridge.oscCH.send_message("/stop", 0)
     """ for t in tracks:

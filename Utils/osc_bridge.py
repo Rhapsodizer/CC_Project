@@ -2,6 +2,7 @@ from pythonosc import udp_client
 import firebase_admin
 from firebase_admin import db
 import os
+import sys
 
 # OSC definitions
 ip_addr = "127.0.0.1"
@@ -20,9 +21,8 @@ dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, './certificate.json')
 credential = firebase_admin.credentials.Certificate(filename)
 default_app = firebase_admin.initialize_app(credential, {
-	'databaseURL': 'https://creativeproject-12185-default-rtdb.europe-west1.firebasedatabase.app'
-	})
-
+    'databaseURL': 'https://creativeproject-12185-default-rtdb.europe-west1.firebasedatabase.app'
+    })
 
 # Listeners
 def listenerU1(event):
@@ -33,11 +33,23 @@ def listenerC1(event):
 
 def listenerU2(event):
     oscCH.send_message("/username", [2, event.data])
-    
+
 def listenerC2(event):
     oscCH.send_message("/char", [2, event.data])
 
-db.reference('table/username1').listen(listenerU1)
-db.reference('table/charStream1').listen(listenerC1)
-db.reference('table/username2').listen(listenerU2)
-db.reference('table/charStream2').listen(listenerC2)
+un1 = db.reference('table/username1').listen(listenerU1)
+cs1 = db.reference('table/charStream1').listen(listenerC1)
+un2 = db.reference('table/username2').listen(listenerU2)
+cs2 = db.reference('table/charStream2').listen(listenerC2)
+
+
+# Function to clean up resources (close Firebase connection and thread)
+def cleanup():
+    global un1, cs1, un2, cs2
+    print("wait for ok...")
+    un1.close()
+    cs1.close()
+    un2.close()
+    cs2.close()
+    print("ok")
+    sys.exit(0)
