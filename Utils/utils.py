@@ -2,14 +2,7 @@ import tkinter as tk
 import math
 
 """
-This file contains useful functions:
-    - round_rectangle
-    - create_hexagon
-    - create_circle
-    draw_play_pause_stop
-    - create_rectangle_with_centered_text
-    - create_instrument: this function creates the actual instrument
-            object given the name as string
+Misc functions:
 """
 
 
@@ -66,15 +59,138 @@ def create_circle(canvas, center_x, center_y, radius):
     return circle
 
 
-def draw_play_pause_stop(canvas, width, height):
+"""
+Loop_station-related functions:
+"""
+
+
+def draw_all_ls(ls_obj):
+    ls_obj.canvas.delete("all")
+    # Master text
+    ls_obj.canvas.create_text(ls_obj.c_width / 2, 20, text="Loop Station Manager", font=("Arial", 20))
+
+    # elements
+    [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
+     bpm_valid_rect, steps_valid_rect] = draw_bpm_steps_ls(ls_obj)
+    draw_all_tracks_ls(ls_obj)
+    plus_add_track = draw_plus_ls(ls_obj)
+    [play, pause, stop] = draw_play_pause_stop_ls(ls_obj)
+    safe_close_button = safe_close_ls(ls_obj)
+    ls_obj.canvas.update()
+    return [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
+            bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop, safe_close_button]
+
+
+def draw_bpm_steps_ls(ls_obj):
+    # trg
+    height = 20
+    side = 20
+
+    # BPM
+    draw_bpm_ls(ls_obj)
+    x_set_bpm = ls_obj.c_width/2 - 65
+    y_set_bpm = 70
+    up_bpm_triangle = ls_obj.canvas.create_polygon(
+        x_set_bpm, y_set_bpm - 2,
+        x_set_bpm + side/2, y_set_bpm - height*0.866,
+        x_set_bpm + side, y_set_bpm - 2,
+        fill="#8C8C8C", outline="#000000")
+    down_bpm_triangle = ls_obj.canvas.create_polygon(
+        x_set_bpm, y_set_bpm + 2,
+        x_set_bpm + side / 2, y_set_bpm + height * 0.866,
+        x_set_bpm + side, y_set_bpm + 2,
+        fill="#8C8C8C", outline="#000000")
+
+    if ls_obj.bpm_is_valid:
+        fill_bpm = "#006400"
+    else:
+        fill_bpm = "#8F0000"
+    bpm_valid_rect = ls_obj.canvas.create_rectangle(
+        x_set_bpm + side + 10, y_set_bpm - height/2,
+        x_set_bpm + side*2 + 10, y_set_bpm + height/2,
+        fill=fill_bpm, outline="#000000")
+
+    # Steps
+    x_set_steps = ls_obj.c_width / 2 + 130
+    y_set_steps = 70
+    draw_steps_ls(ls_obj)
+    up_steps_triangle = ls_obj.canvas.create_polygon(
+        x_set_steps, y_set_steps - 2,
+        x_set_steps + side / 2, y_set_steps - height * 0.866,
+        x_set_steps + side, y_set_steps - 2,
+        fill="#8C8C8C", outline="#000000")
+    down_steps_triangle = ls_obj.canvas.create_polygon(
+        x_set_steps, y_set_bpm + 2,
+        x_set_steps + side / 2, y_set_steps + height * 0.866,
+        x_set_steps + side, y_set_steps + 2,
+        fill="#8C8C8C", outline="#000000")
+
+    if ls_obj.steps_is_valid:
+        fill_steps = "#006400"
+    else:
+        fill_steps = "#8F0000"
+    steps_valid_rect = ls_obj.canvas.create_rectangle(
+        x_set_steps + side + 10, y_set_steps - height/2,
+        x_set_steps + side*2 + 10, y_set_steps + height/2,
+        fill=fill_steps, outline="#000000")
+
+    return [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
+            bpm_valid_rect, steps_valid_rect]
+
+
+def draw_bpm_ls(ls_obj):
+    ls_obj.canvas.create_text(ls_obj.c_width / 2 - 180, 70,
+                              text="BPM: " + str(ls_obj.bpm), font=("Arial", 12), anchor=tk.W)
+
+
+def draw_steps_ls(ls_obj):
+    ls_obj.canvas.create_text(ls_obj.c_width / 2 + 20, 70,
+                              text="Steps: " + str(ls_obj.steps), font=("Arial", 12), anchor=tk.W)
+
+
+def draw_all_tracks_ls(ls_obj):
+    for tr in ls_obj.tracks:
+        tr.draw_track()
+
+
+def draw_plus_ls(ls_obj):
+    # Draw plus icon
+    offset_x = 100
+    track_height = 50
+    track_distance = 10
+    offset_y = 100 + len(ls_obj.tracks) * (track_height + track_distance)
+    plus_add_track = ls_obj.canvas.create_polygon(
+        offset_x, offset_y + 15,
+        offset_x + 10, offset_y + 15,
+        offset_x + 10, offset_y + 5,
+        offset_x + 30, offset_y + 5,
+        offset_x + 30, offset_y + 15,
+        offset_x + 40, offset_y + 15,
+        offset_x + 40, offset_y + track_height - 15,
+        offset_x + 30, offset_y + track_height - 15,
+        offset_x + 30, offset_y + track_height - 5,
+        offset_x + 10, offset_y + track_height - 5,
+        offset_x + 10, offset_y + track_height - 15,
+        offset_x, offset_y + track_height - 15,
+        fill="#8C8C8C", outline="#000000"
+        )
+
+    return plus_add_track
+
+
+def draw_play_pause_stop_ls(ls_obj):
     side = 60
     x_offset = 60
     y_offset = 30
+    canvas = ls_obj.canvas
+    width = ls_obj.c_width
+    height = ls_obj.c_height
 
     # Draw play icon
-    play_triangle = canvas.create_polygon(width/2 - side - x_offset*0.866, height - side - y_offset,
-                                          width/2 - side - x_offset*0.866 + side*0.866, height - side/2 - y_offset,
-                                          width/2 - side - x_offset*0.866, height - y_offset,
+    play_triangle = canvas.create_polygon(width / 2 - side - x_offset * 0.866, height - side - y_offset,
+                                          width / 2 - side - x_offset * 0.866 + side * 0.866,
+                                          height - side / 2 - y_offset,
+                                          width / 2 - side - x_offset * 0.866, height - y_offset,
                                           fill="#8C8C8C", outline="#000000")
 
     # Draw pause icon
@@ -90,160 +206,166 @@ def draw_play_pause_stop(canvas, width, height):
     p = [pr1, pr2, pr3]
 
     # Draw stop icon
-    stop_rectangle = canvas.create_rectangle(width/2 + x_offset, height - side - y_offset,
-                                             width/2 + side + x_offset, height - y_offset,
+    stop_rectangle = canvas.create_rectangle(width / 2 + x_offset, height - side - y_offset,
+                                             width / 2 + side + x_offset, height - y_offset,
                                              fill="#8C8C8C", outline="#000000")
 
     return [play_triangle, p, stop_rectangle]
 
 
-def draw_track_elements(track_object):
+def safe_close_ls(ls_obj):
+    x_offset = 40
+    y_offset = 40
+    half_diagonal = 30
+
+    canvas = ls_obj.canvas
+    width = ls_obj.c_width
+    # Draw close icon
+    safe_close_button = canvas.create_polygon(
+        width - x_offset - half_diagonal, y_offset,
+        width - x_offset, y_offset - half_diagonal,
+        width - x_offset + half_diagonal, y_offset,
+        width - x_offset, y_offset + half_diagonal,
+        fill="#800000", outline="#000000")
+
+    return safe_close_button
+
+
+"""
+Track-related functions:
+"""
+
+
+def draw_track_elements_tr(track_obj):
     side = 40
     x_offset = 20
     y_offset = 5
     # Draw rect container
-    round_rectangle(track_object.canvas,
-                    track_object.pos_x, track_object.pos_y,
-                    track_object.pos_x + track_object.length, track_object.pos_y + track_object.height,
-                    radius=20, fill=track_object.color)
+    round_rectangle(track_obj.canvas,
+                    track_obj.pos_x, track_obj.pos_y,
+                    track_obj.pos_x + track_obj.length, track_obj.pos_y + track_obj.height,
+                    radius=20, fill=track_obj.color)
 
     # Draw play_this icon
-    play_this_trg = track_object.canvas.create_polygon(
-        track_object.length / 2 - side * 0.866, track_object.pos_y + track_object.height - side - y_offset,
-        track_object.length / 2 - side * 0.866 + side * 0.866, track_object.pos_y + track_object.height - side / 2 - y_offset,
-        track_object.length / 2 - side * 0.866, track_object.pos_y + track_object.height - y_offset,
+    play_this_trg = track_obj.canvas.create_polygon(
+        track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - side - y_offset,
+        track_obj.length / 2 - side * 0.866 + side * 0.866,
+        track_obj.pos_y + track_obj.height - side / 2 - y_offset,
+        track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - y_offset,
         fill="#8C8C8C", outline="#000000")
 
     # Draw stop_this icon
-    stop_this_rect = track_object.canvas.create_rectangle(
-        track_object.length / 2 + x_offset, track_object.pos_y + track_object.height - side - y_offset,
-        track_object.length / 2 + side + x_offset, track_object.pos_y + track_object.height - y_offset,
+    stop_this_rect = track_obj.canvas.create_rectangle(
+        track_obj.length / 2 + x_offset, track_obj.pos_y + track_obj.height - side - y_offset,
+        track_obj.length / 2 + side + x_offset, track_obj.pos_y + track_obj.height - y_offset,
         fill="#8C8C8C", outline="#000000")
 
-    if track_object.instr_name is None:
-        track_object.canvas.create_text(track_object.pos_x + 20, track_object.pos_y + 25,
-                                        text="Empty track", font=("Arial", 12), anchor=tk.W)
+    if track_obj.instr_name is None:
+        track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
+                                     text="Empty track", font=("Arial", 12), anchor=tk.W)
     else:
-        track_object.canvas.create_text(track_object.pos_x + 20, track_object.pos_y + 25,
-                                        text=track_object.instr_name, font=("Arial", 12), anchor=tk.W)
+        track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
+                                     text=track_obj.instr_name, font=("Arial", 12), anchor=tk.W)
 
-    hex_center_x = track_object.canvas.winfo_width() * 2 / 3 + 70
-    hex_center_y = track_object.pos_y + track_object.height / 2
+    hex_center_x = track_obj.canvas.winfo_width() * 2 / 3 + 70
+    hex_center_y = track_obj.pos_y + track_obj.height / 2
     hex_radius = 22
     circle_radius = 10
     # Draw settings icon (hexagon)
-    settings_hexagon = create_hexagon(track_object.canvas, hex_center_x, hex_center_y, hex_radius)
-    settings_circle = create_circle(track_object.canvas, hex_center_x, hex_center_y, circle_radius)
+    settings_hexagon = create_hexagon(track_obj.canvas, hex_center_x, hex_center_y, hex_radius)
+    settings_circle = create_circle(track_obj.canvas, hex_center_x, hex_center_y, circle_radius)
 
     # Draw plus icon
     horiz_plus = hex_center_x + 40
-    plus_rect = track_object.canvas.create_polygon(horiz_plus, track_object.pos_y + 15,
-                                                   horiz_plus + 10, track_object.pos_y + 15,
-                                                   horiz_plus + 10, track_object.pos_y + 5,
-                                                   horiz_plus + 30, track_object.pos_y + 5,
-                                                   horiz_plus + 30, track_object.pos_y + 15,
-                                                   horiz_plus + 40, track_object.pos_y + 15,
-                                                   horiz_plus + 40, track_object.pos_y + track_object.height - 15,
-                                                   horiz_plus + 30, track_object.pos_y + track_object.height - 15,
-                                                   horiz_plus + 30, track_object.pos_y + track_object.height - 5,
-                                                   horiz_plus + 10, track_object.pos_y + track_object.height - 5,
-                                                   horiz_plus + 10, track_object.pos_y + track_object.height - 15,
-                                                   horiz_plus, track_object.pos_y + track_object.height - 15,
-                                                   fill="#8C8C8C", outline="#000000"
-                                                   )
+    plus_rect = track_obj.canvas.create_polygon(horiz_plus, track_obj.pos_y + 15,
+                                                horiz_plus + 10, track_obj.pos_y + 15,
+                                                horiz_plus + 10, track_obj.pos_y + 5,
+                                                horiz_plus + 30, track_obj.pos_y + 5,
+                                                horiz_plus + 30, track_obj.pos_y + 15,
+                                                horiz_plus + 40, track_obj.pos_y + 15,
+                                                horiz_plus + 40, track_obj.pos_y + track_obj.height - 15,
+                                                horiz_plus + 30, track_obj.pos_y + track_obj.height - 15,
+                                                horiz_plus + 30, track_obj.pos_y + track_obj.height - 5,
+                                                horiz_plus + 10, track_obj.pos_y + track_obj.height - 5,
+                                                horiz_plus + 10, track_obj.pos_y + track_obj.height - 15,
+                                                horiz_plus, track_obj.pos_y + track_obj.height - 15,
+                                                fill="#8C8C8C", outline="#000000")
 
     return [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect]
 
 
-def create_rectangle_with_centered_text(canvas, text, text_color, text_dim, x1, y1, x2, y2, rectangle_color):
-    canvas.create_rectangle(x1, y1, x2, y2, fill=rectangle_color)
-
-    # Calculate the center of the rectangle
-    center_x = (x1 + x2) // 2
-    center_y = (y1 + y2) // 2
-
-    canvas.create_text(center_x, center_y, text=text, fill=text_color, font=("Arial", text_dim))
-
-# def create_circle(canvas, center_x, center_y, radius):
-#     # Calculate coordinates of the circle bounding box
-#     x1 = center_x - radius
-#     y1 = center_y - radius
-#     x2 = center_x + radius
-#     y2 = center_y + radius
-#
-#     # Draw the circle
-#     circle = canvas.create_oval(x1, y1, x2, y2, fill="#000000", outline='black')
-#
-#     return circle
+"""
+R&P-related functions:
+"""
 
 
-def draw_toolbar(rap_object):
+def draw_toolbar(rap_obj):
     # Draw rect container
-    round_rectangle(rap_object.toolbar_canvas,
-                    rap_object.toolbar_pos_x,
-                    rap_object.toolbar_pos_y,
-                    rap_object.toolbar_pos_x + rap_object.toolbar_length,
-                    rap_object.toolbar_pos_y + rap_object.toolbar_height,
-                    radius=20, fill=rap_object.toolbar_color)
+    round_rectangle(rap_obj.toolbar_canvas,
+                    rap_obj.toolbar_pos_x,
+                    rap_obj.toolbar_pos_y,
+                    rap_obj.toolbar_pos_x + rap_obj.toolbar_length,
+                    rap_obj.toolbar_pos_y + rap_obj.toolbar_height,
+                    radius=20, fill=rap_obj.toolbar_color)
 
-    play_rectangle = rap_object.toolbar_canvas.create_rectangle(
-        rap_object.toolbar_pos_x, rap_object.toolbar_pos_y,
-        rap_object.toolbar_pos_x + 40, rap_object.toolbar_pos_y + 40,
+    play_rectangle = rap_obj.toolbar_canvas.create_rectangle(
+        rap_obj.toolbar_pos_x, rap_obj.toolbar_pos_y,
+        rap_obj.toolbar_pos_x + 40, rap_obj.toolbar_pos_y + 40,
         fill="#8C8C8C", outline="#000000")
-    stop_rectangle = rap_object.toolbar_canvas.create_rectangle(
-        rap_object.toolbar_pos_x + 60, rap_object.toolbar_pos_y,
-        rap_object.toolbar_pos_x + 100, rap_object.toolbar_pos_y + 40,
+    stop_rectangle = rap_obj.toolbar_canvas.create_rectangle(
+        rap_obj.toolbar_pos_x + 60, rap_obj.toolbar_pos_y,
+        rap_obj.toolbar_pos_x + 100, rap_obj.toolbar_pos_y + 40,
         fill="#8C8C8C", outline="#000000")
 
     rect_side = 60
-    rect_nw_x = rap_object.c_width/2 - 80
-    rect_nw_y = rap_object.toolbar_pos_y + 5
+    rect_nw_x = rap_obj.c_width/2 - 80
+    rect_nw_y = rap_obj.toolbar_pos_y + 5
     circle_radius = 20
     # Draw record icon
-    rec_rectangle = rap_object.toolbar_canvas.create_rectangle(
+    rec_rectangle = rap_obj.toolbar_canvas.create_rectangle(
         rect_nw_x, rect_nw_y,
-        rect_nw_x + rect_side, rap_object.toolbar_height/2 - 5,
+        rect_nw_x + rect_side, rap_obj.toolbar_height/2 - 5,
         fill="#8C8C8C", outline="#000000")
-    rec_circle = create_circle(rap_object.toolbar_canvas, rect_nw_x + rect_side/2,
+    rec_circle = create_circle(rap_obj.toolbar_canvas, rect_nw_x + rect_side/2,
                                rect_nw_y + rect_side/2, circle_radius)
-    if rap_object.is_recording:
-        rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#8F0000")
+    if rap_obj.is_recording:
+        rap_obj.toolbar_canvas.itemconfig(rec_circle, fill="#8F0000")
     else:
-        rap_object.toolbar_canvas.itemconfig(rec_circle, fill="#000000")
+        rap_obj.toolbar_canvas.itemconfig(rec_circle, fill="#000000")
 
     # Draw plus icon
-    horiz_plus = rap_object.c_width/2 + 40
-    plus_rect = rap_object.toolbar_canvas.create_polygon(
-        horiz_plus,      rap_object.toolbar_pos_y + rect_side/2 - 10,
-        horiz_plus + 15, rap_object.toolbar_pos_y + rect_side/2 - 10,
-        horiz_plus + 15, rap_object.toolbar_pos_y + 5,
-        horiz_plus + 45, rap_object.toolbar_pos_y + 5,
-        horiz_plus + 45, rap_object.toolbar_pos_y + rect_side/2 - 10,
-        horiz_plus + 60, rap_object.toolbar_pos_y + rect_side/2 - 10,
-        horiz_plus + 60, rap_object.toolbar_pos_y + rect_side/2 + 20,
-        horiz_plus + 45, rap_object.toolbar_pos_y + rect_side/2 + 20,
-        horiz_plus + 45, rap_object.toolbar_pos_y + rect_side/2 + 35,
-        horiz_plus + 15, rap_object.toolbar_pos_y + rect_side/2 + 35,
-        horiz_plus + 15, rap_object.toolbar_pos_y + rect_side/2 + 20,
-        horiz_plus,      rap_object.toolbar_pos_y + rect_side/2 + 20,
+    horiz_plus = rap_obj.c_width/2 + 40
+    plus_rect = rap_obj.toolbar_canvas.create_polygon(
+        horiz_plus,      rap_obj.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 15, rap_obj.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 15, rap_obj.toolbar_pos_y + 5,
+        horiz_plus + 45, rap_obj.toolbar_pos_y + 5,
+        horiz_plus + 45, rap_obj.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 60, rap_obj.toolbar_pos_y + rect_side/2 - 10,
+        horiz_plus + 60, rap_obj.toolbar_pos_y + rect_side/2 + 20,
+        horiz_plus + 45, rap_obj.toolbar_pos_y + rect_side/2 + 20,
+        horiz_plus + 45, rap_obj.toolbar_pos_y + rect_side/2 + 35,
+        horiz_plus + 15, rap_obj.toolbar_pos_y + rect_side/2 + 35,
+        horiz_plus + 15, rap_obj.toolbar_pos_y + rect_side/2 + 20,
+        horiz_plus,      rap_obj.toolbar_pos_y + rect_side/2 + 20,
         fill="#8C8C8C", outline="#000000"
         )
 
-    if not rap_object.loaded and not rap_object.is_recording and not rap_object.has_finished_recording:
-        rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
-                                              text="No file selected", font=("Arial", 12), anchor=tk.W)
-    elif rap_object.loaded:
-        rap_object.toolbar_canvas.create_text(
-            rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
-            text="File name = " + rap_object.file_title, font=("Arial", 12), anchor=tk.W)
-    elif rap_object.is_recording:
-        rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
-                                              text="Recording for " + str(rap_object.loop_duration) + " seconds",
-                                              font=("Arial", 12), anchor=tk.W)
-    elif rap_object.has_finished_recording:
-        rap_object.toolbar_canvas.create_text(rap_object.toolbar_pos_x + 20, rap_object.toolbar_pos_y + 100,
-                                              text="Saving recording as: " + str(rap_object.recorded_filename),
-                                              font=("Arial", 12), anchor=tk.W)
+    if not rap_obj.loaded and not rap_obj.is_recording and not rap_obj.has_finished_recording:
+        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+                                           text="No file selected", font=("Arial", 12), anchor=tk.W)
+    elif rap_obj.loaded:
+        rap_obj.toolbar_canvas.create_text(
+            rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+            text="File name = " + rap_obj.file_title, font=("Arial", 12), anchor=tk.W)
+    elif rap_obj.is_recording:
+        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+                                           text="Recording for " + str(rap_obj.loop_duration) + " seconds",
+                                           font=("Arial", 12), anchor=tk.W)
+    elif rap_obj.has_finished_recording:
+        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+                                           text="Saving recording as: " + str(rap_obj.recorded_filename),
+                                           font=("Arial", 12), anchor=tk.W)
 
     return [rec_rectangle, rec_circle, plus_rect, play_rectangle, stop_rectangle]
 
@@ -252,24 +374,3 @@ def draw_time_bar(rap_obj):
     rap_obj.time_canvas.delete("all")
     rap_obj.time_canvas.create_text(rap_obj.tc_width/2, rap_obj.tc_height/2,
                                     text="{:.2f}".format(rap_obj.audio_time), font=("Arial", 12))
-
-
-
-# def create_instrument(instrument_name, parameters):
-#     if instrument_name == "Drum Machine":
-#         # Create a new window
-#         # window = tk.Toplevel()
-#         window = tk.Tk()
-#         window.title("Drum Machine")
-#         window.geometry("1024x256")
-#         # Disable window resizing
-#         window.resizable(width=False, height=False)
-#
-#         # Instantiate the Drum Machine
-#         num_of_beats = parameters[0]
-#         num_of_subdivisions = parameters[1]
-#         dm = DrumMachine(window, num_of_beats, num_of_subdivisions)
-#         dm.build_drums()
-#         return dm
-#     else:
-#         print("NOT (yet) IMPLEMENTED")
