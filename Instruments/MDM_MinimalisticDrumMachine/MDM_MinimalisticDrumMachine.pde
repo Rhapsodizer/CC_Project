@@ -20,6 +20,7 @@ class Step
 {
   int x,y,d;
   int id;
+  float pitchKick;
   String type;
   boolean[] isActive;
   
@@ -31,6 +32,7 @@ class Step
     id = _id;
     type = _type;
     isActive = _isActive;
+    pitchKick = 800;
   }
   
   public void draw()
@@ -75,6 +77,7 @@ class Step
     if (isActive[id]){
       // Trigger sound
       OscMessage msg0 = new OscMessage("/" + type);
+      msg0.add(pitchKick);
       osc.send(msg0, oscSC);
     }
   }
@@ -138,9 +141,6 @@ void draw()
   
   // Play
   pos = curr;
-  bHat.get(curr).sendOSC();
-  bSnr.get(curr).sendOSC();
-  bKik.get(curr).sendOSC();
 }
 
 // Toggle step
@@ -157,26 +157,27 @@ void mousePressed()
 // Receive OSC triggers
 void oscEvent(OscMessage trigger)
 {
-  if(trigger.checkAddrPattern("/play")) {
-    play = true;
-  }
-  else if(trigger.checkAddrPattern("/stop")) {
-    play = false;
+  if(trigger.checkAddrPattern("/start")) {
     curr = 0;
     pos = curr;
   }
   else if(trigger.checkAddrPattern("/nextStep")) {
     curr++;
     pos = curr;
-  }
-  else if(trigger.checkAddrPattern("/restart")) {
-    curr = 0;
-    pos = curr;
-  }
-  else if(trigger.checkAddrPattern("/pause")) {
-    play = false;
+    bHat.get(curr).sendOSC();
+    bSnr.get(curr).sendOSC();
+    bKik.get(curr).sendOSC();
   }
   else if(trigger.checkAddrPattern("/setSteps")) {
     nStep = trigger.get(0).intValue();
+  }
+  // Collisions
+  else if(trigger.checkAddrPattern("/collision/kk")) {
+    bKik.get(trigger.get(0).intValue()).pitchKick = trigger.get(2).floatValue();
+    bKik.get(trigger.get(1).intValue()).pitchKick = trigger.get(2).floatValue();
+  }
+  // Exit applet
+  else if(trigger.checkAddrPattern("/terminate")) {
+    exit();
   }
 }

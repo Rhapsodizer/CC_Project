@@ -2,7 +2,8 @@ import oscP5.*;
 import netP5.*;
 
 OscP5 oscP5;
-NetAddress address;
+NetAddress addressSC;
+NetAddress addressDM;
 
 //PVector sizeApplet = new PVector(1000, 1000);
 
@@ -20,6 +21,7 @@ Ball[] balls;
 int time;
 
 String[] noteNames;
+String[] types = {"hat", "snare", "kick", "melody"};
 
 OscMessage collision = new OscMessage("/collision");
   
@@ -36,10 +38,16 @@ void setup(){
   noteNames = new String[nSteps];
   numBalls = nSteps * nLayers;
   balls = new Ball[numBalls];
-  for (int i=0; i<numBalls; i++) {
-    balls[i] = new Ball(i, false, balls);
+  
+  // Initialize ball object array
+  for (int i=0; i<nSteps; i++) {
+    balls[i]            = new Ball(i, types[0], false, balls);
+    balls[i + 1*nSteps] = new Ball(i, types[1], false, balls);
+    balls[i + 2*nSteps] = new Ball(i, types[2], false, balls);
+    balls[i + 3*nSteps] = new Ball(i, types[3], false, balls);
   }
   
+  // Applet parameters
   size(800, 800);
   frameRate(60);
   textSize(20);
@@ -47,7 +55,8 @@ void setup(){
   
   // Define OSC clients and server
   oscP5 = new OscP5(this, 12000);
-  address = new NetAddress("127.0.0.1", 57120);
+  addressSC = new NetAddress("127.0.0.1", 57120);
+  addressDM = new NetAddress("127.0.0.1", 12001);
 }
 
 void draw() {
@@ -71,104 +80,18 @@ void draw() {
   }
 }
 
-class Ball {
-  
-  PVector pos;
-  PVector vel;
-  PVector acc;
-  PVector de;
-  float r;
-  int id;
-  boolean lastStatus = false;
-  boolean status;
-  boolean lastCollided[] = new boolean[numBalls];
-  boolean collided[] = new boolean[numBalls];
-  int animStart[] = new int[numBalls];
-  Ball[] others;
-  
-  
-  Ball(int _id, boolean _status, Ball[] _others) {
-    r = 25;
-    id = _id;
-    status = _status;
-    others = _others;
-    } 
-  
-  // Manage collisions
-  void collide() {
-    for (int i = 0; i < numBalls; i++) {
-      if (others[i].status == true && i!=id){
-        de = new PVector(others[i].pos.x - pos.x, others[i].pos.y - pos.y);
-        float distance = sqrt(de.x*de.x + de.y*de.y);
-        if (distance < 2*r) {
-          float angle = atan2(de.y, de.x);
-          float targetX = pos.x + cos(angle) * 2*r;
-          float targetY = pos.y + sin(angle) * 2*r;
-          acc = new PVector((targetX - others[i].pos.x) * spring, (targetY - others[i].pos.y) * spring);
-          vel.sub(acc);
-          others[i].vel.add(acc);
-          // Make event non-repetitive
-          collided[i] = true;
-          if (lastCollided[i]==false && collided[i]==true) {
-            collision_event();
-            animStart[i] = millis();
-            lastCollided[i] = true;
-          }
-        } else {
-          collided[i] = false;
-          lastCollided[i] = false;
-        }
-      } 
-    }
+// Collision triggers
+void collision_event(int id, int other_id, String type, String other_type) {
+  oscP5.send(collision, addressSC);
+  // Collision kick-kick
+  if (type == "kick" && other_type == "kick") {
+    OscMessage collisionKK = new OscMessage("/collision/kk");
+    collisionKK.add(id);
+    collisionKK.add(other_id);
+    collisionKK.add(random(500, 8000));
+    oscP5.send(collisionKK, addressDM);
   }
-  
-  // Manage movement of each ball
-  void move() {
-    vel.y += gravity;
-    pos.add(vel);
-    if (pos.x + r > width) {
-      pos.x = width - r;
-      vel.x *= friction;
-    }
-    else if (pos.x - r < 0) {
-      pos.x = r;
-      vel.x *= friction;
-    }
-    if (pos.y + r > height) {
-      pos.y = height - r;
-      vel.y *= friction; 
-    } 
-    else if (pos.y - r < 0) {
-      pos.y = r;
-      vel.y *= friction;
-    }
-  }
-  
-  // Draw the single ball
-  void display() {
-    fill(220);
-    stroke(180);
-    circle(pos.x, pos.y, 2*r);
-    fill(128);
-    if (id < nSteps) {
-      text("HA",pos.x-10,pos.y+5);
-    }
-    else if ((id >= nSteps) && (id < 2*nSteps)) {
-      text("SN",pos.x-10,pos.y+5);
-    }
-    else if (id >= 2*nSteps && (id < 3*nSteps)) {
-      text("KC",pos.x-10,pos.y+5);
-    }
-    else if (id >= 3*nSteps && (id < 4*nSteps)) {
-      text(noteNames[id - 3*nSteps], pos.x-10,pos.y+5);
-    }
-    noStroke();
-  }
-  
-  // Collision triggers
-  void collision_event() {
-    oscP5.send(collision, address);
-  }
+    
 }
 
 
@@ -213,5 +136,9 @@ void oscEvent(OscMessage theOscMessage) {
     int id = theOscMessage.get(0).intValue() + 2*nSteps;
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
+  }
+  // Exit applet
+  else if(theOscMessage.checkAddrPattern("/terminate")) {
+    exit();
   }
 }

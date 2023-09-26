@@ -2,7 +2,7 @@ import time
 
 from LoopStation.track import create_new_track
 from Utils.error_manager import ErrorWindow
-import Utils.osc_bridge as osc_bridge
+import Utils.osc_bridge as osc
 from Utils import utils
 import os
 import tkinter as tk
@@ -107,16 +107,16 @@ class LoopStationManager:
         print(event)
         self.bpm_is_valid = True
         self.draw_all()
-        osc_bridge.oscDM.send_message("/setBpm", self.bpm)
-        osc_bridge.oscCH.send_message("/setBpm", self.bpm)
+        osc.oscDM.send_message("/setBpm", self.bpm)
+        osc.oscCH.send_message("/setBpm", self.bpm)
 
     def on_steps_set(self, event):
         print(self.steps)
         print(event)
         self.steps_is_valid = True
         self.draw_all()
-        osc_bridge.oscDM.send_message("/setSteps", self.steps)
-        osc_bridge.oscCH.send_message("/setSteps", self.steps)
+        osc.oscDM.send_message("/setSteps", self.steps)
+        osc.oscCH.send_message("/setSteps", self.steps)
 
     def play_clicked(self, event):
         print("play")
@@ -220,6 +220,10 @@ class LoopStationManager:
         # todo move this paths in jason file
 
     def safe_close_clicked(self, event):
+        osc.oscLI.send_message("/terminate", 0)
+        osc.oscDM.send_message("/terminate", 0)
+        osc.oscCH.send_message("/terminate", 0)
+
         print(event)
         utils.draw_shutdown_ls(self)
         # os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")

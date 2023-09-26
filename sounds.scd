@@ -64,18 +64,18 @@ s.options.sampleRate = 48000;
 //---------------------------------------------------------------------
 
 (
-SynthDef(\kick1, {
+SynthDef(\kick1, { arg pitch = 800;
     var snd;
     snd = DC.ar(0);
-    snd = snd + (SinOsc.ar(XLine.ar(800, 400, 0.01)) * Env.perc(0.0005, 0.01).ar);
+    snd = snd + (SinOsc.ar(XLine.ar(pitch, 400, 0.01)) * Env.perc(0.0005, 0.01).ar);
     snd = snd + (BPF.ar(Hasher.ar(Sweep.ar), XLine.ar(800, 100, 0.01), 0.6) * Env.perc(0.001, 0.02).delay(0.001).ar);
     snd = snd + (SinOsc.ar(XLine.ar(172, 50, 0.01)) * Env.perc(0.0001, 0.3, 1, \lin).delay(0.005).ar(2));
     snd = snd.tanh;
-    Out.ar(\out.kr(0), Pan2.ar(snd, \pan.kr(0), \amp.kr(0.1)));
+    Out.ar(\out.kr(0), Pan2.ar(snd, \pan.kr(0), 1));
 }).add;
 )
 
-Synth(\kick1, [amp: 0.8]);
+Synth(\kick1, [amp: 0.8, pitch: 800]);
 
 (
 SynthDef(\kick2, {
@@ -117,9 +117,9 @@ some of the attacks are so fast that Env:kr doesn't correctly handle them. that'
 */
 
 (
-SynthDef(\hat, { arg amp = 0.4, startPan = -1, endPan = 1, pitchVariation = 5000, release = 0.1;
+SynthDef(\hat, { arg amp = 1, startPan = -1, endPan = 1, pitch = 10000, release = 0.1;
   var whiteNoise = WhiteNoise.ar(mul: Env.perc(releaseTime: release, curve: -7).kr(doneAction: 2));
-  Out.ar(0, Pan2.ar(BBandPass.ar(whiteNoise, freq: pitchVariation, bw: 1), pos: Line.kr(startPan, endPan, 4)) * amp);
+  Out.ar(0, Pan2.ar(BBandPass.ar(whiteNoise, freq: pitch, bw: 1), pos: Line.kr(startPan, endPan, 4)) * amp);
 }).add;
 )
 Synth(\hat);
@@ -146,10 +146,14 @@ SynthDef(\snare, {
 )
 Synth(\snare);
 
-
+//---------------------------------------------------------------------
+//
+//                     OSC MANAGEMENT
+//
+//---------------------------------------------------------------------
 (
-OSCdef('kick',{Synth(\kick1, [amp: 0.7])},"/kick");
-OSCdef('hat',{Synth(\hat)},"/hat");
+OSCdef('kick',{arg msg; Synth(\kick1, [pitch: msg[1]]);}, "/kick");
+OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
 OSCdef('snare',{Synth(\snare)},"/snare");
 OSCdef('collision',{Synth(\kick3)},"/collision");
 OSCdef('melody',{Synth(\melody)},"/melody");

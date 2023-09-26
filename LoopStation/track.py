@@ -4,7 +4,7 @@ import subprocess
 from Utils.error_manager import ErrorWindow
 from threading import Thread
 from Instruments.Recorder_and_Player.recorder_and_player import open_rap_window
-import Utils.osc_bridge as osc_bridge
+import Utils.osc_bridge as osc
 
 
 def create_new_track(ls):
@@ -136,9 +136,11 @@ class Track:
     def play_this(self):
         if self.instrument_is_ready:
             print("playing this track alone. disable play on all the others")
-            # Send broadcast START PLAY trigger
-            osc_bridge.oscDM.send_message("/play", 0)
-            osc_bridge.oscDM.send_message("/play", 0)
+            # Send START PLAY trigger
+            if self.instr_name == "Drum Machine":
+                osc.oscDM.send_message("/play", 0)
+            elif self.instr_name == "Melody Chat":
+                osc.oscCH.send_message("/play", 0)
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
         else:
@@ -151,8 +153,8 @@ class Track:
         if self.instrument_is_ready:
             print("Stopping this track alone. disable play on all the others")
             # Send broadcast PAUSE trigger
-            osc_bridge.oscDM.send_message("/pause", 0)
-            osc_bridge.oscDM.send_message("/pause", 0)
+            osc.oscDM.send_message("/pause", 0)
+            osc.oscDM.send_message("/pause", 0)
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
         else:
@@ -161,15 +163,23 @@ class Track:
     def stop_this(self):
         if self.instrument_is_ready:
             print("stop playing this track. unlocking all the others")
-            # Send broadcast STOP trigger
-            osc_bridge.oscDM.send_message("/stop", 0)
-            osc_bridge.oscDM.send_message("/stop", 0)
+            # Send STOP trigger
+            if self.instr_name == "Drum Machine":
+                osc.oscDM.send_message("/stop", 0)
+            elif self.instr_name == "Melody Chat":
+                osc.oscCH.send_message("/stop", 0)
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
         else:
             ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
 
     def destroy(self):
+        # Send trigger to exit target applet
+        if self.instr_name == "Drum Machine":
+            osc.oscDM.send_message("/terminate", 0)
+        elif self.instr_name == "Melody Chat":
+            osc.oscCH.send_message("/terminate", 0)
+        
         tr_dist = 10
         if self in self.ls_parent.tracks:
             index = self.ls_parent.tracks.index(self)
@@ -180,3 +190,4 @@ class Track:
                     tr.pos_y = tr.pos_y - (self.height + tr_dist)
             self.ls_parent.draw_all()
         del self
+        
