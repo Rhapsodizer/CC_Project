@@ -12,6 +12,7 @@ import struct
 import time
 from Utils import utils
 from Utils.error_manager import ErrorWindow
+from pythonosc import dispatcher, osc_server
 
 
 def open_rap_window(using_root, bpm, steps):
@@ -21,6 +22,11 @@ def open_rap_window(using_root, bpm, steps):
     rap_window.resizable(width=False, height=False)
     rap = RecorderAndPlayer(rap_window, bpm, steps)
     rap.draw_all()
+
+
+def handle_osc_message(unused_addr, args):
+    _ = unused_addr
+    print("Received OSC message:", args)
 
 
 class RecorderAndPlayer:
@@ -64,11 +70,16 @@ class RecorderAndPlayer:
         self.time_canvas.place(x=self.c_width/2 - self.tc_width/2, y=201)
         self.audio_time = 0.0
         self.zero_time = 0.0
+        self.dispatcher_instance = dispatcher.Dispatcher()
+        self.dispatcher_instance.map("/message", handle_osc_message)
+        self.server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", 5006), self.dispatcher_instance)
+        server_thread = Thread(target=self.server.serve_forever)
+        server_thread.daemon = True
+        server_thread.start()
         # Initialize pygame for audio playback
         pygame.mixer.init()
 
     def plus_clicked(self, event):
-        # print("plus")
         self.audio_data = []
         self.show_audio_data = []
         self.loaded = False
@@ -77,7 +88,7 @@ class RecorderAndPlayer:
         self.choose_file(event)
 
     def record_clicked(self, event):
-        print(event)
+        _ = event
         self.audio_data = []
         self.show_audio_data = []
         self.loaded = False
@@ -122,8 +133,8 @@ class RecorderAndPlayer:
         self.draw_visual()
 
     def choose_file(self, event):
+        _ = event
         self.reset_time()
-        print(event)
         self.audio_file = filedialog.askopenfilename(
             parent=self.window,
             filetypes=[("MP3 Files", "*.mp3"), ("WAV Files", "*.wav")])

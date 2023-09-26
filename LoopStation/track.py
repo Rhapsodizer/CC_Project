@@ -5,6 +5,7 @@ from Utils.error_manager import ErrorWindow
 from threading import Thread
 from Instruments.Recorder_and_Player.recorder_and_player import open_rap_window
 import Utils.osc_bridge as osc
+from pythonosc import udp_client
 
 
 def create_new_track(ls):
@@ -35,6 +36,7 @@ class Track:
         self.height = track_height
         self.color = "#B4B4B4"
         self.instr_name = None
+        self.postman = udp_client.SimpleUDPClient("127.0.0.1", 5006)
 
     def draw_track(self):
         [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
@@ -49,22 +51,22 @@ class Track:
         self.canvas.tag_bind(remove_x2, "<Button-1>", self.remove_clicked)
 
     def play_this_clicked(self, event):
-        print(event)
+        _ = event
         self.play_this()
 
     def stop_this_clicked(self, event):
-        print(event)
+        _ = event
         self.stop_this()
 
     def plus_clicked(self, event):
         self.choose_instrument(event)
 
     def settings_clicked(self, event):
-        print(event)
+        _ = event
         self.setup_instrument()
 
     def remove_clicked(self, event):
-        print(event)
+        _ = event
         self.destroy()
 
     def choose_instrument(self, event):
@@ -73,13 +75,13 @@ class Track:
         a window containing the list of
         available instrument opens up
         """
-        print(event)
+        _ = event
         listbox_window = tk.Toplevel()
         listbox_window.title("Instrument Selection")
         listbox_window.geometry("300x150")
 
         def on_listbox_select(event2):
-            print(event2)
+            _ = event2
             selected_index = instruments_listbox.curselection()
             if selected_index:
                 instrument_name = instruments_listbox.get(selected_index[0])
@@ -135,12 +137,13 @@ class Track:
 
     def play_this(self):
         if self.instrument_is_ready:
-            print("playing this track alone. disable play on all the others")
+            # print("playing this track alone. disable play on all the others")
             # Send START PLAY trigger
             if self.instr_name == "Drum Machine":
                 osc.oscDM.send_message("/play", 0)
             elif self.instr_name == "Melody Chat":
                 osc.oscCH.send_message("/play", 0)
+            self.postman.send_message("/message", "Hello from first window")
         elif self.instr_name is None:
             ErrorWindow("No Instrument", "Error: No Instrument")
         else:
@@ -162,7 +165,7 @@ class Track:
 
     def stop_this(self):
         if self.instrument_is_ready:
-            print("stop playing this track. unlocking all the others")
+            # print("stop playing this track. unlocking all the others")
             # Send STOP trigger
             if self.instr_name == "Drum Machine":
                 osc.oscDM.send_message("/stop", 0)
@@ -190,4 +193,3 @@ class Track:
                     tr.pos_y = tr.pos_y - (self.height + tr_dist)
             self.ls_parent.draw_all()
         del self
-        
