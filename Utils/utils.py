@@ -250,6 +250,7 @@ def safe_close_ls(ls_obj):
 
 
 def draw_shutdown_ls(ls_obj):
+    ls_obj.stop_all_tracks()
     ls_obj.canvas.delete("all")
     ls_obj.canvas.update()
     ls_obj.canvas.config(bg="#505050")

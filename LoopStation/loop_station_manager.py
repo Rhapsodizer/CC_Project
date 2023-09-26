@@ -4,10 +4,8 @@ from LoopStation.track import create_new_track
 from Utils.error_manager import ErrorWindow
 import Utils.osc_bridge as osc
 from Utils import utils
-import os
 import tkinter as tk
 import subprocess
-import sys
 import threading
 
 """
@@ -37,7 +35,10 @@ class LoopStationManager:
         self.bpm_is_valid = False
         self.steps_is_valid = False
         self.loop_duration = self.calculate_loop_duration
+        self.time_chunk = 60 / self.bpm
         self.ls_is_ready = False
+        self.play_all_thread = None
+        self.play_all_thread_is_running = False
 
     def draw_all(self):
         [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
@@ -106,6 +107,7 @@ class LoopStationManager:
         print(self.bpm)
         print(event)
         self.bpm_is_valid = True
+        self.time_chunk = 60 / self.bpm
         self.draw_all()
         osc.oscDM.send_message("/setBpm", self.bpm)
         osc.oscCH.send_message("/setBpm", self.bpm)
@@ -141,8 +143,9 @@ class LoopStationManager:
                     self.ls_is_ready = True
 
             if self.ls_is_ready:
-                play_all_thread = threading.Thread(target=self.play_all_tracks)
-                play_all_thread.start()
+                self.play_all_thread = threading.Thread(target=self.play_all_tracks)
+                self.play_all_thread.start()
+                self.play_all_thread_is_running = True
 
     def pause_clicked(self, event):
         print(event)
@@ -186,16 +189,19 @@ class LoopStationManager:
             self.stop_all_tracks()
 
     def play_all_tracks(self):
-        time_chunk = 60 / self.bpm
         cur_step = 0
-        while cur_step < self.steps:
-            for i, tr in enumerate(self.tracks):
-                print(f"playing track {i}")
-                tr.play_this()
-            time.sleep(time_chunk)
-            cur_step += 1
-            if cur_step == self.steps:
-                cur_step = 0  # loop
+        while self.play_all_thread_is_running:
+            # print(cur_step)  # threading test
+            # cur_step += 1
+            # time.sleep(1)
+            while cur_step < self.steps:
+                for i, tr in enumerate(self.tracks):
+                    print(f"playing track {i}")
+                    tr.play_this()
+                time.sleep(self.time_chunk)
+                cur_step += 1
+                if cur_step == self.steps:
+                    cur_step = 0  # loop
 
     def pause_all_tracks(self):
         for i, tr in enumerate(self.tracks):
@@ -203,9 +209,14 @@ class LoopStationManager:
             tr.pause_this()
 
     def stop_all_tracks(self):
-        for i, tr in enumerate(self.tracks):
-            print(f"stopping track {i}")
-            tr.stop_this()
+        if self.play_all_thread:
+            self.play_all_thread_is_running = False
+            self.play_all_thread.join()
+            print("Thread stopped and destroyed.")
+            self.play_all_thread = None
+            for i, tr in enumerate(self.tracks):
+                print(f"stopping track {i}")
+                tr.stop_this()
 
     def launch_interaction_layer(self):
         # Open layer interaction sketch
