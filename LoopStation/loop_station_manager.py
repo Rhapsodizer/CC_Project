@@ -1,3 +1,4 @@
+import json
 import time
 from LoopStation.track import create_new_track
 from Utils.error_manager import ErrorWindow
@@ -12,21 +13,21 @@ Main window manager
 """
 
 
-def create_loop_station_manager_window(root):
-    lsm = LoopStationManager(root)
+def create_loop_station_manager_window(root, user):
+    lsm = LoopStationManager(root, user)
     lsm.draw_all()
     lsm.launch_interaction_layer()
 
 
 class LoopStationManager:
-    def __init__(self, root):
+    def __init__(self, root, user):
         self.window = root
         self.window.title("Loop Station Manager")
         self.window.geometry("800x700")
         self.window.resizable(width=False, height=False)
         self.c_width = 800
         self.c_height = 700
-        self.canvas = tk.Canvas(self.window, width=self.c_width, height=self.c_height, bg="#505050")
+        self.canvas = tk.Canvas(self.window, width=self.c_width, height=self.c_height, bg="#808080")
         self.canvas.pack()
         self.tracks = []
         self.bpm = 120
@@ -39,6 +40,9 @@ class LoopStationManager:
         self.play_all_thread = None
         self.play_all_thread_is_running = False
         self.stop_has_been_pressed = False
+        self.jason_paths = ""
+        self.load_jason_paths()
+        self.current_user = user
 
     def draw_all(self):
         [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
@@ -59,6 +63,10 @@ class LoopStationManager:
         self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x1, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x2, "<Button-1>", self.safe_close_clicked)
+
+    def load_jason_paths(self):
+        with open('Utils/local_paths.json') as f:
+            self.jason_paths = json.load(f)
 
     def add_track_clicked(self, event):
         _ = event
@@ -139,11 +147,13 @@ class LoopStationManager:
                 else:
                     self.ls_is_ready = True
                     self.stop_has_been_pressed = False
+                    print("play thread is running...")
 
-            if self.ls_is_ready:
-                self.play_all_thread = threading.Thread(target=self.play_all_tracks)
-                self.play_all_thread.start()
-                self.play_all_thread_is_running = True
+        if self.ls_is_ready:
+            print("1")
+            self.play_all_thread_is_running = True
+            self.play_all_thread = threading.Thread(target=self.play_all_tracks)
+            self.play_all_thread.start()
 
     def pause_clicked(self, event):
         _ = event
@@ -155,12 +165,10 @@ class LoopStationManager:
             for tr in self.tracks:
                 if not tr.instr_name:
                     ErrorWindow("No Instrument", "Error: No Instrument")
-                    print("error")
                     self.ls_is_ready = False
                     break
                 elif not tr.instrument_is_ready:
                     ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    print("error")
                     self.ls_is_ready = False
                     break
                 else:
@@ -190,13 +198,11 @@ class LoopStationManager:
     def play_all_tracks(self):
         cur_step = 0
         while self.play_all_thread_is_running:
-            # print(cur_step)  # threading test
-            # cur_step += 1
-            # time.sleep(1)
-            while cur_step < self.steps and not self.stop_has_been_pressed:
+            print("1.5")
+            while not self.stop_has_been_pressed:
                 for i, tr in enumerate(self.tracks):
-                    print(f"playing track {i}")
                     tr.play_this()
+                    print("2")
                 time.sleep(self.time_chunk)
                 cur_step += 1
                 if cur_step == self.steps:
@@ -211,23 +217,19 @@ class LoopStationManager:
         if self.play_all_thread:
             self.play_all_thread_is_running = False
             self.play_all_thread.join()
-            print("Thread stopped and destroyed.")
+            print("Play thread stopped and destroyed.")
             self.play_all_thread = None
             for i, tr in enumerate(self.tracks):
                 print(f"stopping track {i}")
                 tr.stop_this()
 
     def launch_interaction_layer(self):
-        # Open layer interaction sketch
-        # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-        # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
-        processing_java_path = "H:\Software\processing\processing-java"
-        pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\LayerInteraction"
-        # processing_java_path = "processing-java"
-        # pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/LayerInteraction"
+        # noinspection PyTypeChecker
+        current_paths = self.jason_paths[self.current_user]
+        processing_java_path = current_paths[0]
+        pde_file_path = current_paths[1]
         pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
         subprocess.Popen(pde_open, shell=True)
-        # todo move this paths in jason file
 
     def safe_close_clicked(self, event):
         _ = event
@@ -235,6 +237,6 @@ class LoopStationManager:
         osc.oscLI.send_message("/terminate", 0)
         osc.oscDM.send_message("/terminate", 0)
         osc.oscCH.send_message("/terminate", 0)
-
+        time.sleep(0.001)
         utils.draw_shutdown_ls(self)
         # os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")

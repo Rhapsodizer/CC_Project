@@ -1,6 +1,4 @@
 from tkinter import filedialog
-import os
-import pygame
 from pydub import AudioSegment
 import numpy as np
 import threading
@@ -13,25 +11,23 @@ import time
 from Utils import utils
 from Utils.error_manager import ErrorWindow
 from pythonosc import dispatcher, osc_server
+import os
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
+import pygame
 
 
-def open_rap_window(using_root, bpm, steps):
-    rap_window = tk.Toplevel(using_root)
-    rap_window.geometry("1024x512")
-    rap_window.config(bg="#DCDCDC")
-    rap_window.resizable(width=False, height=False)
-    rap = RecorderAndPlayer(rap_window, bpm, steps)
+def open_rap_window(root, bpm, steps):
+    rap = RecorderAndPlayer(root, bpm, steps)
     rap.draw_all()
 
 
-def handle_osc_message(unused_addr, args):
-    _ = unused_addr
-    print("Received OSC message:", args)
-
-
 class RecorderAndPlayer:
-    def __init__(self, window, bpm, steps):
-        self.window = window
+    def __init__(self, root, bpm, steps):
+        self.window = tk.Toplevel(root)
+        self.window.geometry("1024x512")
+        self.window.config(bg="#DCDCDC")
+        self.window.title("Recorder and Player")
+        self.window.resizable(width=False, height=False)
         self.c_width = 1024
         self.c_tb_height = 200
         self.c_height = 256
@@ -60,7 +56,6 @@ class RecorderAndPlayer:
         self.recorder = None
         # self.expected_lag = 0.5
         dirname = os.path.dirname(__file__)
-        print(dirname)
         self.recorded_filename = "recorded_audio.wav"
         self.recorded_file_path = os.path.join(dirname, "./recorded_audio.wav")
         self.frame_length = 256
@@ -71,7 +66,8 @@ class RecorderAndPlayer:
         self.audio_time = 0.0
         self.zero_time = 0.0
         self.dispatcher_instance = dispatcher.Dispatcher()
-        self.dispatcher_instance.map("/message", handle_osc_message)
+        # devo mettermi in ascolto
+        self.msg = self.dispatcher_instance.map("/message", utils.handle_osc_message_rap)
         self.server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", 5006), self.dispatcher_instance)
         server_thread = Thread(target=self.server.serve_forever)
         server_thread.daemon = True
@@ -89,14 +85,15 @@ class RecorderAndPlayer:
 
     def record_clicked(self, event):
         _ = event
-        self.audio_data = []
-        self.show_audio_data = []
-        self.loaded = False
-        self.reset_time()
-        self.recorder = PvRecorder(device_index=-1, frame_length=self.frame_length)
-        self.recorder.start()
-        thread = Thread(target=self.record_mic)
-        thread.start()
+        if not self.is_recording:
+            self.audio_data = []
+            self.show_audio_data = []
+            self.loaded = False
+            self.reset_time()
+            self.recorder = PvRecorder(device_index=-1, frame_length=self.frame_length)
+            self.recorder.start()
+            thread = Thread(target=self.record_mic)
+            thread.start()
 
     # def calculate_loop_duration(self):
     #     loop_dur = 60/self.bpm * self.steps
@@ -104,12 +101,10 @@ class RecorderAndPlayer:
     #     return loop_dur
 
     def draw_toolbar(self):
-        [record_rect, record_circle, plus, p, s] = utils.draw_toolbar_rap(self)
+        [record_rect, record_circle, plus] = utils.draw_toolbar_rap(self)
         self.toolbar_canvas.tag_bind(record_rect, "<Button-1>", self.record_clicked)
         self.toolbar_canvas.tag_bind(record_circle, "<Button-1>", self.record_clicked)
         self.toolbar_canvas.tag_bind(plus, "<Button-1>", self.plus_clicked)
-        self.toolbar_canvas.tag_bind(p, "<Button-1>", self.pf)
-        self.toolbar_canvas.tag_bind(s, "<Button-1>", self.sf)
 
     def draw_time_bar(self):
         utils.draw_time_bar_rap(self)
@@ -142,15 +137,8 @@ class RecorderAndPlayer:
             audio_segment = AudioSegment.from_mp3(self.audio_file)
             self.values_of_audio_segment = audio_segment.get_array_of_samples()
             self.file_title = os.path.basename(self.audio_file)
-            # self.file_name = file_title
             self.loaded = True
             self.draw_all()
-
-    def pf(self, event):
-        self.play_file_in_thread()
-
-    def sf(self, event):
-        self.stop_file()
 
     def play_audio(self):
         pygame.mixer.music.load(self.audio_file)
@@ -194,6 +182,7 @@ class RecorderAndPlayer:
             ErrorWindow("Setup Error", "Error: Setup Error")
 
     def play_file_in_thread(self):
+        print("here2")
         self.reset_time()
         self.zero_time = time.time()
         if len(self.show_audio_data) > 0:

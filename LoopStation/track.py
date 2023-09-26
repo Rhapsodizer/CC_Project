@@ -1,3 +1,6 @@
+import threading
+import time
+
 from Utils import utils
 import tkinter as tk
 import subprocess
@@ -36,6 +39,9 @@ class Track:
         self.height = track_height
         self.color = "#B4B4B4"
         self.instr_name = None
+        self.play_this_thread = None
+        self.play_this_thread_is_running = False
+        self.stop_this_has_been_pressed = False
         self.postman = udp_client.SimpleUDPClient("127.0.0.1", 5006)
 
     def draw_track(self):
@@ -52,11 +58,25 @@ class Track:
 
     def play_this_clicked(self, event):
         _ = event
-        self.play_this()
+        self.stop_this_has_been_pressed = False
+        if self.instrument_is_ready:
+            self.play_this_thread_is_running = True
+            self.play_this_thread = threading.Thread(target=self.play_this)
+            self.play_this_thread.start()
+        elif self.instr_name is None:
+            ErrorWindow("No Instrument", "Error: No Instrument")
+        else:
+            ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
 
     def stop_this_clicked(self, event):
         _ = event
-        self.stop_this()
+        if self.instrument_is_ready:
+            self.stop_this_has_been_pressed = True
+            self.stop_this()
+        elif self.instr_name is None:
+            ErrorWindow("No Instrument", "Error: No Instrument")
+        else:
+            ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
 
     def plus_clicked(self, event):
         self.choose_instrument(event)
@@ -104,57 +124,54 @@ class Track:
         a window specific for the instrument pops up.
         This creates/opens/instantiate the instrument
         """
+        current_user = self.ls_parent.current_user
+        # noinspection PyTypeChecker
+        current_paths = self.ls_parent.jason_paths[current_user]
+
         if self.instr_name is None:
             ErrorWindow("Track Error", "No instrument selected")
         else:
             self.instrument_is_ready = True
             if self.instr_name == "Drum Machine":
-                # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-                # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
-                processing_java_path = "H:\Software\processing\processing-java"
-                pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\MDM_MinimalisticDrumMachine"
-                # processing_java_path = "processing-java"
-                # pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/Instruments/MDM_MinimalisticDrumMachine"
-
-
+                processing_java_path = current_paths[0]
+                pde_file_path = current_paths[2]
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
                 subprocess.Popen(pde_open, shell=True)
             if self.instr_name == "Melody Chat":
-                # processing_java_path = "/home/silvio/Documenti/Poli/processing42/processing-java"
-                # pde_file_path = "/home/silvio/Documenti/Poli/CC_Project/DM2"
-                processing_java_path = "H:\Software\processing\processing-java"
-                pde_file_path = "H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\Chat"
-                # processing_java_path = "processing-java"
-                # pde_file_path = "/Users/rischo95/Documents/STUDIO/POLIMI/MAGISTRALE/SECONDO_ANNO/PRIMO_SEMESTRE/CREATIVE_PROGRAMMING_AND_COMPUTING/CC_Project/Instruments/Chat"
-
+                processing_java_path = current_paths[0]
+                pde_file_path = current_paths[3]
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
                 subprocess.Popen(pde_open, shell=True)
-
             if self.instr_name == "Rec & Play":
                 rap_thread = Thread(target=open_rap_window,
                                     args=[self.window, self.ls_parent.bpm, self.ls_parent.steps])
                 rap_thread.start()
 
     def play_this(self):
-        if self.instrument_is_ready:
-            # print("playing this track alone. disable play on all the others")
-            # Send START PLAY trigger
-            if self.instr_name == "Drum Machine":
-                osc.oscDM.send_message("/play", 0)
-            elif self.instr_name == "Melody Chat":
-                osc.oscCH.send_message("/play", 0)
-            self.postman.send_message("/message", "Hello from first window")
-        elif self.instr_name is None:
-            ErrorWindow("No Instrument", "Error: No Instrument")
-        else:
-            ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+        print("3")
+        cur_step = 0
+        while self.play_this_thread_is_running or self.ls_parent.play_all_thread_is_running:
+            print("3+")
+            while not self.stop_this_has_been_pressed:
+                print("3.5")
+                # Send START PLAY trigger
+                if self.instr_name == "Drum Machine":
+                    osc.oscDM.send_message("/play", 0)
+                elif self.instr_name == "Melody Chat":
+                    osc.oscCH.send_message("/play", 0)
+                elif self.instr_name == "Rec & Play":
+                    self.postman.send_message("/message", "play")
+
+                time.sleep(self.ls_parent.time_chunk)
+                cur_step += 1
+                if cur_step == self.steps:
+                    cur_step = 0  # loop
 
     def pause_this(self):
         """
         Only available for *all tracks* not this alone
         """
         if self.instrument_is_ready:
-            print("Stopping this track alone. disable play on all the others")
             # Send broadcast PAUSE trigger
             osc.oscDM.send_message("/pause", 0)
             osc.oscDM.send_message("/pause", 0)
@@ -164,17 +181,18 @@ class Track:
             ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
 
     def stop_this(self):
-        if self.instrument_is_ready:
-            # print("stop playing this track. unlocking all the others")
+        if self.play_this_thread:
+            self.play_this_thread_is_running = False
+            self.play_this_thread.join()
+            print("Play_this thread stopped and destroyed.")
+            self.play_this_thread = None
             # Send STOP trigger
             if self.instr_name == "Drum Machine":
                 osc.oscDM.send_message("/stop", 0)
             elif self.instr_name == "Melody Chat":
                 osc.oscCH.send_message("/stop", 0)
-        elif self.instr_name is None:
-            ErrorWindow("No Instrument", "Error: No Instrument")
-        else:
-            ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+            elif self.instr_name == "Rec & Play":
+                self.postman.send_message("/message", "stop")
 
     def destroy(self):
         # Send trigger to exit target applet
@@ -182,7 +200,7 @@ class Track:
             osc.oscDM.send_message("/terminate", 0)
         elif self.instr_name == "Melody Chat":
             osc.oscCH.send_message("/terminate", 0)
-        
+
         tr_dist = 10
         if self in self.ls_parent.tracks:
             index = self.ls_parent.tracks.index(self)

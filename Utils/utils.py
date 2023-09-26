@@ -2,7 +2,8 @@ import sys
 import time
 import tkinter as tk
 import math
-from Utils import osc_bridge
+# from Utils import osc_bridge
+import Utils.osc_bridge as osc
 
 """
 Misc functions:
@@ -44,7 +45,7 @@ def create_hexagon(canvas, center_x, center_y, radius):
         x = center_x + radius * math.cos(angle_rad)
         y = center_y + radius * math.sin(angle_rad)
         hexagon_vertices.extend([x, y])
-    hexagon = canvas.create_polygon(hexagon_vertices, fill='#8C8C8C', outline='black')
+    hexagon = canvas.create_polygon(hexagon_vertices, fill='#606060', outline='black')
     # Draw the hexagon
     return hexagon
 
@@ -98,12 +99,12 @@ def draw_bpm_steps_ls(ls_obj):
         x_set_bpm, y_set_bpm - 2,
         x_set_bpm + side/2, y_set_bpm - height*0.866,
         x_set_bpm + side, y_set_bpm - 2,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
     down_bpm_triangle = ls_obj.canvas.create_polygon(
         x_set_bpm, y_set_bpm + 2,
         x_set_bpm + side / 2, y_set_bpm + height * 0.866,
         x_set_bpm + side, y_set_bpm + 2,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
 
     if ls_obj.bpm_is_valid:
         fill_bpm = "#006400"
@@ -122,12 +123,12 @@ def draw_bpm_steps_ls(ls_obj):
         x_set_steps, y_set_steps - 2,
         x_set_steps + side / 2, y_set_steps - height * 0.866,
         x_set_steps + side, y_set_steps - 2,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
     down_steps_triangle = ls_obj.canvas.create_polygon(
         x_set_steps, y_set_bpm + 2,
         x_set_steps + side / 2, y_set_steps + height * 0.866,
         x_set_steps + side, y_set_steps + 2,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
 
     if ls_obj.steps_is_valid:
         fill_steps = "#006400"
@@ -176,14 +177,14 @@ def draw_plus_ls(ls_obj):
         offset_x + 10, offset_y + track_height - 5,
         offset_x + 10, offset_y + track_height - 15,
         offset_x, offset_y + track_height - 15,
-        fill="#8C8C8C", outline="#000000"
+        fill="#606060", outline="#000000"
         )
 
     return plus_add_track
 
 
 def draw_play_pause_stop_ls(ls_obj):
-    side = 60
+    side = 50
     x_offset = 60
     y_offset = 30
     canvas = ls_obj.canvas
@@ -195,24 +196,24 @@ def draw_play_pause_stop_ls(ls_obj):
                                           width / 2 - side - x_offset * 0.866 + side * 0.866,
                                           height - side / 2 - y_offset,
                                           width / 2 - side - x_offset * 0.866, height - y_offset,
-                                          fill="#8C8C8C", outline="#000000")
+                                          fill="#606060", outline="#000000")
 
     # Draw pause icon
-    pr1 = canvas.create_rectangle(width / 2 - 30, height - side - y_offset,
+    pr1 = canvas.create_rectangle(width / 2 - 20, height - side - y_offset,
                                   width / 2 - 5, height - y_offset,
-                                  fill="#8C8C8C", outline="#000000")
+                                  fill="#606060", outline="#000000")
     pr2 = canvas.create_rectangle(width / 2 - 4, height - side - y_offset,
                                   width / 2 + 5, height - y_offset,
-                                  fill="#505050", outline="#505050")
+                                  fill="#808080", outline="#808080")
     pr3 = canvas.create_rectangle(width / 2 + 5, height - side - y_offset,
-                                  width / 2 + 30, height - y_offset,
-                                  fill="#8C8C8C", outline="#000000")
+                                  width / 2 + 20, height - y_offset,
+                                  fill="#606060", outline="#000000")
     p = [pr1, pr2, pr3]
 
     # Draw stop icon
     stop_rectangle = canvas.create_rectangle(width / 2 + x_offset, height - side - y_offset,
                                              width / 2 + side + x_offset, height - y_offset,
-                                             fill="#8C8C8C", outline="#000000")
+                                             fill="#606060", outline="#000000")
 
     return [play_triangle, p, stop_rectangle]
 
@@ -251,14 +252,17 @@ def safe_close_ls(ls_obj):
 
 def draw_shutdown_ls(ls_obj):
     ls_obj.stop_all_tracks()
+    time.sleep(0.001)
+    osc.oscCH.send_message("/terminate", 0)
+    osc.oscDM.send_message("/terminate", 0)
     ls_obj.canvas.delete("all")
     ls_obj.canvas.update()
-    ls_obj.canvas.config(bg="#505050")
+    ls_obj.canvas.config(bg="#808080")
     ls_obj.canvas.create_text(40, ls_obj.c_height / 2,
                               text="Shutting down, please wait. . .", font=("Arial", 20), anchor=tk.W)
     ls_obj.canvas.update()
     time.sleep(0.001)
-    osc_bridge.cleanup()
+    osc.cleanup()
     print("done.")
     sys.exit(0)
 
@@ -269,9 +273,9 @@ Track-related functions:
 
 
 def draw_track_elements_tr(track_obj):
-    side = 40
+    side = 30
     x_offset = 20
-    y_offset = 5
+    y_offset = 10
     # Draw rect container
     round_rectangle(track_obj.canvas,
                     track_obj.pos_x, track_obj.pos_y,
@@ -284,13 +288,13 @@ def draw_track_elements_tr(track_obj):
         track_obj.length / 2 - side * 0.866 + side * 0.866,
         track_obj.pos_y + track_obj.height - side / 2 - y_offset,
         track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - y_offset,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
 
     # Draw stop_this icon
     stop_this_rect = track_obj.canvas.create_rectangle(
         track_obj.length / 2 + x_offset, track_obj.pos_y + track_obj.height - side - y_offset,
         track_obj.length / 2 + side + x_offset, track_obj.pos_y + track_obj.height - y_offset,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
 
     if track_obj.instr_name is None:
         track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
@@ -321,7 +325,7 @@ def draw_track_elements_tr(track_obj):
                                                 horiz_plus + 10, track_obj.pos_y + track_obj.height - 5,
                                                 horiz_plus + 10, track_obj.pos_y + track_obj.height - 15,
                                                 horiz_plus, track_obj.pos_y + track_obj.height - 15,
-                                                fill="#8C8C8C", outline="#000000")
+                                                fill="#606060", outline="#000000")
 
     # Draw Remove icon
     x_offset = 80
@@ -334,21 +338,21 @@ def draw_track_elements_tr(track_obj):
         width - x_offset, y_offset - half_diagonal,
         width - x_offset + half_diagonal, y_offset,
         width - x_offset, y_offset + half_diagonal,
-        fill="#8C8C8C", outline="#000000")
+        fill="#606060", outline="#000000")
 
     remove_x1 = track_obj.canvas.create_polygon(
         width - x_offset - half_diagonal / 3 - 1, y_offset - half_diagonal / 3 + 1,
         width - x_offset - half_diagonal / 3 + 1, y_offset - half_diagonal / 3 - 1,
         width - x_offset + half_diagonal / 3 + 1, y_offset + half_diagonal / 3 - 1,
         width - x_offset + half_diagonal / 3 - 1, y_offset + half_diagonal / 3 + 1,
-        fill="#505050", outline="#505050")
+        fill="#000000", outline="#000000")
 
     remove_x2 = track_obj.canvas.create_polygon(
         width - x_offset + half_diagonal / 3 - 1, y_offset - half_diagonal / 3 - 1,
         width - x_offset + half_diagonal / 3 + 1, y_offset - half_diagonal / 3 + 1,
         width - x_offset - half_diagonal / 3 + 1, y_offset + half_diagonal / 3 + 1,
         width - x_offset - half_diagonal / 3 - 1, y_offset + half_diagonal / 3 - 1,
-        fill="#505050", outline="#505050")
+        fill="#000000", outline="#000000")
 
     return [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
             remove_button, remove_x1, remove_x2]
@@ -359,6 +363,22 @@ R&P-related functions:
 """
 
 
+def handle_osc_message_rap(unused_addr, args):
+    _ = unused_addr
+    msg = ""
+    print("ehjhehe")
+    if args == "play":
+        print("here1")
+        msg = "play"
+    elif args == "pause":
+        print("pause")
+        msg = "pause"
+    elif args == "stop":
+        msg = "stop"
+
+    return msg
+
+
 def draw_toolbar_rap(rap_obj):
     # Draw rect container
     round_rectangle(rap_obj.toolbar_canvas,
@@ -367,15 +387,6 @@ def draw_toolbar_rap(rap_obj):
                     rap_obj.toolbar_pos_x + rap_obj.toolbar_length,
                     rap_obj.toolbar_pos_y + rap_obj.toolbar_height,
                     radius=20, fill=rap_obj.toolbar_color)
-
-    play_rectangle = rap_obj.toolbar_canvas.create_rectangle(
-        rap_obj.toolbar_pos_x, rap_obj.toolbar_pos_y,
-        rap_obj.toolbar_pos_x + 40, rap_obj.toolbar_pos_y + 40,
-        fill="#8C8C8C", outline="#000000")
-    stop_rectangle = rap_obj.toolbar_canvas.create_rectangle(
-        rap_obj.toolbar_pos_x + 60, rap_obj.toolbar_pos_y,
-        rap_obj.toolbar_pos_x + 100, rap_obj.toolbar_pos_y + 40,
-        fill="#8C8C8C", outline="#000000")
 
     rect_side = 60
     rect_nw_x = rap_obj.c_width/2 - 80
@@ -427,7 +438,7 @@ def draw_toolbar_rap(rap_obj):
                                            text="Saving recording as: " + str(rap_obj.recorded_filename),
                                            font=("Arial", 12), anchor=tk.W)
 
-    return [rec_rectangle, rec_circle, plus_rect, play_rectangle, stop_rectangle]
+    return [rec_rectangle, rec_circle, plus_rect]
 
 
 def draw_time_bar_rap(rap_obj):

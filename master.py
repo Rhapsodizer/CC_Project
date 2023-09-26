@@ -9,7 +9,8 @@ Launch this script to open the main screen
 
 if __name__ == "__main__":
     root = tk.Tk()
-    create_loop_station_manager_window(root)
+    user = "SA_paths"  # SA_paths, AG_paths, RM_paths
+    create_loop_station_manager_window(root, user)
     root.mainloop()
 
 
