@@ -26,7 +26,7 @@ class Ball {
   // Manage collisions
   void collide() {
     for (int i = 0; i < numBalls; i++) {
-      if (others[i].status == true && (others[i].id != id && others[i].type != type)){
+      if (others[i].status == true && !(others[i].id == id && others[i].type == type)){
         de = new PVector(others[i].pos.x - pos.x, others[i].pos.y - pos.y);
         float distance = sqrt(de.x*de.x + de.y*de.y);
         if (distance < 2*r) {
