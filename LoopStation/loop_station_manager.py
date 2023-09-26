@@ -1,3 +1,5 @@
+import time
+
 from LoopStation.track import create_new_track
 from Utils.error_manager import ErrorWindow
 import Utils.osc_bridge as osc_bridge
@@ -139,7 +141,8 @@ class LoopStationManager:
                     self.ls_is_ready = True
 
             if self.ls_is_ready:
-                self.play_all_tracks()
+                play_all_thread = threading.Thread(target=self.play_all_tracks)
+                play_all_thread.start()
 
     def pause_clicked(self, event):
         print(event)
@@ -183,9 +186,16 @@ class LoopStationManager:
             self.stop_all_tracks()
 
     def play_all_tracks(self):
-        for i, tr in enumerate(self.tracks):
-            print(f"playing track {i}")
-            tr.play_this()
+        time_chunk = 60 / self.bpm
+        cur_step = 0
+        while cur_step < self.steps:
+            for i, tr in enumerate(self.tracks):
+                print(f"playing track {i}")
+                tr.play_this()
+            time.sleep(time_chunk)
+            cur_step += 1
+            if cur_step == self.steps:
+                cur_step = 0  # loop
 
     def pause_all_tracks(self):
         for i, tr in enumerate(self.tracks):
