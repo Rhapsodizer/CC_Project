@@ -45,7 +45,7 @@ The chat will simply be displayed on each user's device. On the canvas, however,
 - All words are normalized in a range of values between 1 and 14, which correspond to the degree values of the corresponding major scale in two octaves 3 and 4 (1 = I degree, 2 = II degree, ... , 8 = I degree (high octave), 9 = II degree (high octave), ...). These values will be transformed into frequency and will correspond to the created melody.
 - The first note of the melody always corresponds to the first degree of the corresponding scale.
 - Each word corresponds to a note that plays at each beat of the loop, made up of n beats (nSteps). If the number of words is less than nSteps, the melody will continue from the beginning until the loop is completed. If the number of words is greater than nStep, the melody will be truncated.
-- If the number of characters in a word has a value less than or equal to 2, there will be a rest/pause (P) and the corresponding frequency value will be 0.0 (inaudible). This cannot happen for the first note of the melody.
+- If the number of characters (including other symbols or punctuation marks) in a word has a value less than or equal to 2, there will be a rest/pause (P) and the corresponding frequency value will be 0.0 (inaudible). This cannot happen for the first note of the melody.
 - The key and melody are displayed on the canvas below each time a new sentence is created.
 
 The **Melody modifier** modifies the melody created in this way. The sentence written by the second user modifies the melody (effects) through parameters created in this way:
