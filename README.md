@@ -1,18 +1,38 @@
 # *Title CC_Project (CREATIVE LOOPER????)*
 (1-line description Creative Computing Project)
+This project aims to create a simple and user-friendly Loop Station
 
 ## 1. Description
 (A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
+This appllication has been built with the idea to be used as an artistic installation, in which one or more users can
+interact with it in a few clicks.
+It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
+to express themselves and enjoy the music they create.
 
 ## 2. Challenges, accomplishment and lessons learned
 (What kind of challenges did you run into for this projects, what kind of accomplishment are you proud of and and what did you learn during the project? Few lines for each question.)
+The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
+in which the Loop Station Manager dictates all the actions to perform.
+We have worked autonomously on the various instrument and together on the foundation of the looper.
+We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there
+that will be useful in the future.
 
 ## 3. Technology
 (just a plain list of the main technology you used, which include libraries, coding languages, concepts, etc.)
+The project is a combination of Python, Processing and Supercollider.
+As for Python tkinter and threading are the main libraries used to create the independent windows; osc messages
+are the main mean of communication among the parts
+As for Processing...
+As For Supercollider...
 
 ### 3.1 Loop Station
 ### 3.2 Instruments
 #### 3.2.1 Recorder and Player
+Recorder and player is a simple instrument. It allows the user to create a recording to use later in the loop as well as
+to load an mp3 or wav file to be played during the exhibition.
+In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above
+mentioned actions, while in the Lower section a real-time smplitude envelope is shown.
+
 #### 3.2.2 Minimalistic Drum Machine
 #### 3.2.3 Melody Chat
 
@@ -56,7 +76,7 @@ SCHEMA MESSAGGI OSC TRA PROCESSING-PHYTON-SUPERCOLLIDER-FIREBASE
 ## 4. Students
 (the members of the group with a sentence that explains for each person what was their main contribution to the project)
 
-**Attolini Silvio**: LoopStation
+**Attolini Silvio**: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
 
 **Gorni Alessandro**: DM, MelodyChat, sounds.scd, LayerInteraction
 

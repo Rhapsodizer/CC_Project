@@ -1,5 +1,6 @@
-from LoopStation.loop_station_manager import create_loop_station_manager_window
 import tkinter as tk
+from LoopStation.loop_station_manager import create_loop_station_manager_window
+from Utils.user import User
 
 
 """
@@ -9,8 +10,8 @@ Launch this script to open the main screen
 
 if __name__ == "__main__":
     root = tk.Tk()
-    user = "SA_paths"  # SA_paths, AG_paths, RM_paths
-    create_loop_station_manager_window(root, user)
+    user = User("SA")  # SA, AG, RM
+    create_loop_station_manager_window(root, user.get_user_paths())
     root.mainloop()
 
 

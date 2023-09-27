@@ -1,4 +1,3 @@
-import json
 import time
 from LoopStation.track import create_new_track
 from Utils.error_manager import ErrorWindow
@@ -13,14 +12,14 @@ Main window manager
 """
 
 
-def create_loop_station_manager_window(root, user):
-    lsm = LoopStationManager(root, user)
+def create_loop_station_manager_window(root, u_paths):
+    lsm = LoopStationManager(root, u_paths)
     lsm.draw_all()
     lsm.launch_interaction_layer()
 
 
 class LoopStationManager:
-    def __init__(self, root, user):
+    def __init__(self, root, u_paths):
         self.window = root
         self.window.title("Loop Station Manager")
         self.window.geometry("800x700")
@@ -40,9 +39,10 @@ class LoopStationManager:
         self.play_all_thread = None
         self.play_all_thread_is_running = False
         self.stop_has_been_pressed = False
-        self.jason_paths = ""
-        self.load_jason_paths()
-        self.current_user = user
+        self.play_is_able = False
+        self.pause_is_able = False
+        self.stop_is_able = False
+        self.user_paths = u_paths
 
     def draw_all(self):
         [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
@@ -63,10 +63,6 @@ class LoopStationManager:
         self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x1, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x2, "<Button-1>", self.safe_close_clicked)
-
-    def load_jason_paths(self):
-        with open('Utils/local_paths.json') as f:
-            self.jason_paths = json.load(f)
 
     def add_track_clicked(self, event):
         _ = event
@@ -136,24 +132,18 @@ class LoopStationManager:
             for tr in self.tracks:
                 if not tr.instr_name:
                     ErrorWindow("No Instrument", "Error: No Instrument")
-                    print("error")
                     self.ls_is_ready = False
                     break
                 elif not tr.instrument_is_ready:
                     ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    print("error")
-                    self.ls_is_ready = False
                     break
                 else:
-                    self.ls_is_ready = True
+                    self.disable_all()
                     self.stop_has_been_pressed = False
                     print("play thread is running...")
-
-        if self.ls_is_ready:
-            print("1")
-            self.play_all_thread_is_running = True
-            self.play_all_thread = threading.Thread(target=self.play_all_tracks)
-            self.play_all_thread.start()
+                    self.play_all_thread_is_running = True
+                    self.play_all_thread = threading.Thread(target=self.play_all_tracks)
+                    self.play_all_thread.start()
 
     def pause_clicked(self, event):
         _ = event
@@ -165,11 +155,9 @@ class LoopStationManager:
             for tr in self.tracks:
                 if not tr.instr_name:
                     ErrorWindow("No Instrument", "Error: No Instrument")
-                    self.ls_is_ready = False
                     break
                 elif not tr.instrument_is_ready:
                     ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    self.ls_is_ready = False
                     break
                 else:
                     print("pause")
@@ -184,24 +172,22 @@ class LoopStationManager:
             for tr in self.tracks:
                 if not tr.instr_name:
                     ErrorWindow("No Instrument", "Error: No Instrument")
-                    self.ls_is_ready = False
                     break
                 elif not tr.instrument_is_ready:
                     ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    self.ls_is_ready = False
                     break
                 else:
-                    self.ls_is_ready = False
                     self.stop_has_been_pressed = True
-            self.stop_all_tracks()
+                    print("stop has been pressed")
+                    self.stop_all_tracks()
 
     def play_all_tracks(self):
         cur_step = 0
         while self.play_all_thread_is_running:
-            print("1.5")
+            print("1")
             while not self.stop_has_been_pressed:
                 for i, tr in enumerate(self.tracks):
-                    tr.play_this()
+                    tr.play_this("lsm")
                     print("2")
                 time.sleep(self.time_chunk)
                 cur_step += 1
@@ -222,14 +208,29 @@ class LoopStationManager:
             for i, tr in enumerate(self.tracks):
                 print(f"stopping track {i}")
                 tr.stop_this()
+            self.enable_all()
 
     def launch_interaction_layer(self):
-        # noinspection PyTypeChecker
-        current_paths = self.jason_paths[self.current_user]
-        processing_java_path = current_paths[0]
-        pde_file_path = current_paths[1]
+        processing_java_path = self.user_paths[0]
+        pde_file_path = self.user_paths[1]
         pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
         subprocess.Popen(pde_open, shell=True)
+
+    def disable_all(self):
+        self.play_is_able = False
+        self.pause_is_able = True
+        self.stop_is_able = True
+        for tr in self.tracks:
+            tr.disable_all_this()
+        self.draw_all()
+
+    def enable_all(self):
+        self.play_is_able = True
+        self.pause_is_able = False
+        self.stop_is_able = False
+        for tr in self.tracks:
+            tr.enable_all_this()
+        self.draw_all()
 
     def safe_close_clicked(self, event):
         _ = event

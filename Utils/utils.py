@@ -192,28 +192,40 @@ def draw_play_pause_stop_ls(ls_obj):
     height = ls_obj.c_height
 
     # Draw play icon
+    if ls_obj.play_is_able:
+        play_c = "#606060"
+    else:
+        play_c = "#8F0000"
     play_triangle = canvas.create_polygon(width / 2 - side - x_offset * 0.866, height - side - y_offset,
                                           width / 2 - side - x_offset * 0.866 + side * 0.866,
                                           height - side / 2 - y_offset,
                                           width / 2 - side - x_offset * 0.866, height - y_offset,
-                                          fill="#606060", outline="#000000")
+                                          fill=play_c, outline="#000000")
 
     # Draw pause icon
+    if ls_obj.pause_is_able:
+        pause_c = "#606060"
+    else:
+        pause_c = "#8F0000"
     pr1 = canvas.create_rectangle(width / 2 - 20, height - side - y_offset,
                                   width / 2 - 5, height - y_offset,
-                                  fill="#606060", outline="#000000")
+                                  fill=pause_c, outline="#000000")
     pr2 = canvas.create_rectangle(width / 2 - 4, height - side - y_offset,
                                   width / 2 + 5, height - y_offset,
                                   fill="#808080", outline="#808080")
     pr3 = canvas.create_rectangle(width / 2 + 5, height - side - y_offset,
                                   width / 2 + 20, height - y_offset,
-                                  fill="#606060", outline="#000000")
+                                  fill=pause_c, outline="#000000")
     p = [pr1, pr2, pr3]
 
     # Draw stop icon
+    if ls_obj.stop_is_able:
+        stop_c = "#606060"
+    else:
+        stop_c = "#8F0000"
     stop_rectangle = canvas.create_rectangle(width / 2 + x_offset, height - side - y_offset,
                                              width / 2 + side + x_offset, height - y_offset,
-                                             fill="#606060", outline="#000000")
+                                             fill=stop_c, outline="#000000")
 
     return [play_triangle, p, stop_rectangle]
 
@@ -283,18 +295,26 @@ def draw_track_elements_tr(track_obj):
                     radius=20, fill=track_obj.color)
 
     # Draw play_this icon
+    if track_obj.this_play_is_able:
+        play_c = "#606060"
+    else:
+        play_c = "#8F0000"
     play_this_trg = track_obj.canvas.create_polygon(
         track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - side - y_offset,
         track_obj.length / 2 - side * 0.866 + side * 0.866,
         track_obj.pos_y + track_obj.height - side / 2 - y_offset,
         track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - y_offset,
-        fill="#606060", outline="#000000")
+        fill=play_c, outline="#000000")
 
     # Draw stop_this icon
+    if track_obj.this_stop_is_able:
+        stop_c = "#606060"
+    else:
+        stop_c = "#8F0000"
     stop_this_rect = track_obj.canvas.create_rectangle(
         track_obj.length / 2 + x_offset, track_obj.pos_y + track_obj.height - side - y_offset,
         track_obj.length / 2 + side + x_offset, track_obj.pos_y + track_obj.height - y_offset,
-        fill="#606060", outline="#000000")
+        fill=stop_c, outline="#000000")
 
     if track_obj.instr_name is None:
         track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
