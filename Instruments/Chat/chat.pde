@@ -415,7 +415,7 @@ void oscEvent(OscMessage trigger) {
       
         ArrayList<Character> word = new ArrayList<Character>();
         for (char c : inputBuffer2.toCharArray()) {
-          if (letterToNumber.containsKey(c)) {
+          if (c != ' '){
             word.add(c);
           }
         }
