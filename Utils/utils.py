@@ -267,6 +267,7 @@ def draw_shutdown_ls(ls_obj):
     time.sleep(0.001)
     osc.oscCH.send_message("/terminate", 0)
     osc.oscDM.send_message("/terminate", 0)
+    ls_obj.tracks = None
     ls_obj.canvas.delete("all")
     ls_obj.canvas.update()
     ls_obj.canvas.config(bg="#808080")
@@ -385,18 +386,8 @@ R&P-related functions:
 
 def handle_osc_message_rap(unused_addr, args):
     _ = unused_addr
-    msg = ""
-    print("ehjhehe")
-    if args == "play":
-        print("here1")
-        msg = "play"
-    elif args == "pause":
-        print("pause")
-        msg = "pause"
-    elif args == "stop":
-        msg = "stop"
-
-    return msg
+    print(args)
+    return args
 
 
 def draw_toolbar_rap(rap_obj):

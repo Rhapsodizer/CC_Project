@@ -1,3 +1,4 @@
+import datetime
 from tkinter import filedialog
 from pydub import AudioSegment
 import numpy as np
@@ -18,7 +19,16 @@ import pygame
 
 def open_rap_window(root, bpm, steps):
     rap = RecorderAndPlayer(root, bpm, steps)
-    rap.draw_all()
+
+    # Create a dispatcher instance
+    dispatcher_instance = dispatcher.Dispatcher()
+    dispatcher_instance.map("/action", lambda addr, *args: handle_osc_message(addr, args, rap))
+
+    # Start an OSC server to listen for messages
+    server = osc_server.ThreadingOSCUDPServer(('127.0.0.1', 5006), dispatcher_instance)
+    server_thread = Thread(target=server.serve_forever)
+    server_thread.daemon = True
+    server_thread.start()
 
 
 class RecorderAndPlayer:
@@ -65,15 +75,19 @@ class RecorderAndPlayer:
         self.time_canvas.place(x=self.c_width/2 - self.tc_width/2, y=201)
         self.audio_time = 0.0
         self.zero_time = 0.0
-        self.dispatcher_instance = dispatcher.Dispatcher()
-        # devo mettermi in ascolto
-        self.msg = self.dispatcher_instance.map("/message", utils.handle_osc_message_rap)
-        self.server = osc_server.ThreadingOSCUDPServer(("127.0.0.1", 5006), self.dispatcher_instance)
-        server_thread = Thread(target=self.server.serve_forever)
-        server_thread.daemon = True
-        server_thread.start()
+        self.draw_all()
         # Initialize pygame for audio playback
         pygame.mixer.init()
+
+    # def waiting_for_postman(self):
+    #     while True:
+    #         msg = self.dispatcher_instance.map("/message", utils.handle_osc_message_rap)
+    #         if msg == "play":
+    #             print("received play")
+    #         elif msg == "pause":
+    #             print("pause")
+    #         elif msg == "stop":
+    #             print("received stop")
 
     def plus_clicked(self, event):
         self.audio_data = []
@@ -267,3 +281,20 @@ class RecorderAndPlayer:
     def reset_time(self):
         self.audio_time = 0.0
         self.draw_time_bar()
+
+    def received_msg(self, action):
+        print(action)
+
+
+def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
+    print("5")
+    if address == '/action':
+        if args:
+            # new_color = args[0]  # Assuming the color is the first argument
+            rap.received_msg(args[0])
+            if args[0] == 'green':
+                now = datetime.datetime.now()
+                print("Current date and time : ")
+                print(now.strftime("%Y-%m-%d %H:%M:%S"))
+            else:
+                print("6")

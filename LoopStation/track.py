@@ -140,7 +140,7 @@ class Track:
         instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE)
         instruments_listbox.pack(expand=True, fill=tk.BOTH)
 
-        instrument_list = ["Drum Machine", "Melody Chat", "Rec & Play"]  # , "Midi Keyboard"]
+        instrument_list = ["Drum Machine", "Melody Chat", "Rec & Play", "Space Ship"]
         for instr in instrument_list:
             instruments_listbox.insert(tk.END, instr)
 
@@ -186,7 +186,8 @@ class Track:
                     elif self.instr_name == "Melody Chat":
                         osc.oscCH.send_message("/play", 0)
                     elif self.instr_name == "Rec & Play":
-                        self.postman.send_message("/message", "play")
+                        print("4")
+                        self.postman.send_message('/action', 'green')
 
                     time.sleep(self.ls_parent.time_chunk)
                     cur_step += 1
@@ -200,7 +201,7 @@ class Track:
             elif self.instr_name == "Melody Chat":
                 osc.oscCH.send_message("/play", 0)
             elif self.instr_name == "Rec & Play":
-                self.postman.send_message("/message", "play")
+                self.postman.send_message('/action', 'green')
 
     def pause_this(self):
         """
@@ -227,7 +228,7 @@ class Track:
             elif self.instr_name == "Melody Chat":
                 osc.oscCH.send_message("/stop", 0)
             elif self.instr_name == "Rec & Play":
-                self.postman.send_message("/message", "stop")
+                self.postman.send_message('/action', 'stop')
 
     def destroy(self):
         # Send trigger to exit target applet
