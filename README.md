@@ -17,7 +17,7 @@
 #### 3.2.3 Melody Chat (grammar)
 Melody Chat consists of a canvas created with *Processing* that represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release, ...???
 
-The chat will simply be displayed on each user's device. On the canvas, however, the writing of each character, the memorization of each word (separated by SPACE) and the sentence (after sending ENTER) will be displayed in real time. Each phrase of the **Melody maker** corresponds to a melody created in this way:
+The chat will simply be displayed on each user's device. On the canvas, however, the writing of each character, the memorization of each word (separated by SPACE) and the sentence (after sending ENTER) will be displayed in real time. Each sentence of the **Melody maker** corresponds to a melody created in this way:
 - Each character corresponds to a numerical value (a/A = 1, b/B = 2, ...).
 - Each word corresponds to the sum of the numerical values of the characters, appropriately normalized.
 - The first word sets the major key on which the melody is created. The sum of the numerical values of the characters is normalized between 0 and 11. Therefore each number corresponds to the tonic of the key (0 = C, 1 = C#, ...).
@@ -25,8 +25,9 @@ The chat will simply be displayed on each user's device. On the canvas, however,
 - The first note of the melody always corresponds to the first degree of the corresponding scale.
 - Each word corresponds to a note that plays at each beat of the loop, made up of n beats (nSteps). If the number of words is less than nSteps, the melody will continue from the beginning until the loop is completed. If the number of words is greater than nStep, the melody will be truncated.
 - If the number of characters in a word has a value less than or equal to 2, there will be a pause and the corresponding frequency value will be 0.0 (inaudible). This cannot happen for the first note of the melody.
+- The key and melody are displayed on the canvas below each time a new sentence is created.
 
-The **Melody modifier** modifies the melody created in this way. The phrase written by the second user modifies the melody (effects) through parameters created in this way:
+The **Melody modifier** modifies the melody created in this way. The sentence written by the second user modifies the melody (effects) through parameters created in this way:
 - The first parameter uses the key value (from 0 to 11), mapped in a range between 0.0 and 100.0.
 - The second is an arithmetic mean between the numerical values of the melody (without counting any pauses), mapped in a range between 0.0 and 50.0
 - The third parameter concerns the length of the melody (nSteps), mapped in a range between 0.0 and 100.0.
