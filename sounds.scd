@@ -74,7 +74,7 @@ SynthDef(\melody, {
 }).add;
 )
 
-Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 1]);
+Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 0.5]);
 
 //SE NON FUNZIONA IL SAMPLE RATE USARE:
 s.options.sampleRate = 48000;
@@ -179,5 +179,5 @@ OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
 OSCdef('snare',{Synth(\snare)},"/snare");
 OSCdef('collision',{Synth(\kick3)},"/collision");
 OSCdef('melody',{arg msg; var freq = msg[0]; var count = msg[1]; Synth(\melody, [freq: freq[count]])},"/melody");
-OSCdef('modifier', {arg msg; Synth(\melody, [tremoloFreq: msg[0]], [tremoloDepth: msg[1]], [release: msg[2]], [amp: msg[3]])}, "/melody");
+OSCdef('modifier', {arg msg; Synth(\melody, [tremoloFreq: msg[0]], [tremoloDepth: msg[1]], [release: msg[2]], [amp: msg[3]])}, "/modifier");
 )

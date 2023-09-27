@@ -217,7 +217,11 @@ void oscEvent(OscMessage trigger) {
       
       prima_frase = true;
       char stream1 = trigger.get(1).stringValue().toCharArray()[0];
-      inputBuffer1 += stream1;
+      if(stream1 == BACKSPACE && inputBuffer1.length() > 0) {
+        inputBuffer1 = inputBuffer1.substring(0, inputBuffer1.length() - 1);
+        } else if (stream1 != '%') {
+          inputBuffer1 += stream1;
+      }
       
       if(inputString1) {
         sumArray1.clear();
@@ -390,7 +394,11 @@ void oscEvent(OscMessage trigger) {
       
       prima_frase = false;
       char stream2 = trigger.get(1).stringValue().toCharArray()[0];
-      inputBuffer2 += stream2;
+      if(stream2 == BACKSPACE && inputBuffer2.length() > 0) {
+        inputBuffer2 = inputBuffer2.substring(0, inputBuffer2.length() - 1);
+        } else if (stream2 != '%') {
+          inputBuffer2 += stream2;
+      }
       
       if(inputString2){
         sumArray2.clear();
