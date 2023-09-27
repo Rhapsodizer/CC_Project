@@ -7,6 +7,7 @@ NetAddr("127.0.0.1", 57120);
 //
 //---------------------------------------------------------------------
 
+/*
 (
 SynthDef(\melody, {
     arg freq = 440, sustain = 1, amp = 0.2;
@@ -52,7 +53,28 @@ OSCdef('OSCreceiver', { arg msg;
 	playRoutine.play;
 }, "/melody");
 )
+*/
 
+
+(
+SynthDef(\melody, {
+    arg freq = 440, amp = 1, tremoloFreq = 0, tremoloDepth = 0, release = 1;
+    var triangle, env, mod, sig, tremolo, source, freqOctaveHigher, sigOctaveHigher;
+
+    tremolo = SinOsc.kr(tremoloFreq).range(1 - tremoloDepth, 1 + tremoloDepth);
+    triangle = LFTri.ar(freq);
+    source = SinOsc.ar(freq);
+    env = EnvGen.kr(Env.perc(0.01, release), doneAction: 2);
+    mod = SinOsc.kr(0.2).range(0.1, 2);
+    sig = amp * triangle * env * mod * tremolo * source;
+    freqOctaveHigher = freq*2 ;
+    sigOctaveHigher = amp * triangle * env * mod * tremolo * SinOsc.ar(freqOctaveHigher);
+    sig = sig + sigOctaveHigher;
+    Out.ar(0, sig ! 2);
+}).add;
+)
+
+Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 1]);
 
 //SE NON FUNZIONA IL SAMPLE RATE USARE:
 s.options.sampleRate = 48000;
@@ -156,5 +178,6 @@ OSCdef('kick',{arg msg; Synth(\kick1, [pitch: msg[1]]);}, "/kick");
 OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
 OSCdef('snare',{Synth(\snare)},"/snare");
 OSCdef('collision',{Synth(\kick3)},"/collision");
-OSCdef('melody',{Synth(\melody)},"/melody");
+OSCdef('melody',{arg msg; var freq = msg[0]; var count = msg[1]; Synth(\melody, [freq: freq[count]])},"/melody");
+OSCdef('modifier', {arg msg; Synth(\melody, [tremoloFreq: msg[0]], [tremoloDepth: msg[1]], [release: msg[2]], [amp: msg[3]])}, "/melody");
 )
