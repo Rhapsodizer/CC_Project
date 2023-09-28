@@ -162,6 +162,10 @@ void oscEvent(OscMessage trigger)
     pos = curr;
   }
   else if(trigger.checkAddrPattern("/nextStep")) {
+    if (curr == nStep-1){
+      curr = -1;
+      pos = curr;
+    }
     curr++;
     pos = curr;
     bHat.get(curr).sendOSC();

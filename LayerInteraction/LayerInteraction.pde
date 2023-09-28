@@ -13,17 +13,18 @@ int numBalls;
 PVector pos;
 PVector vel;
 PVector acc;
-float r = 25;
 float spring = 0.05;
+float springShip = 0.001;
 float gravity = 0.0;
-float friction = -0.9;
+float friction = -0.7;
 Ball[] balls;
+Agent ship;
 int time;
 
 String[] noteNames;
 String[] types = {"hat", "snare", "kick", "melody"};
 
-OscMessage collision = new OscMessage("/collision");
+//OscMessage collision = new OscMessage("/collision");
   
 //void settings() {  
 //  fullScreen();
@@ -37,7 +38,9 @@ void setup(){
   nLayers = 4;
   noteNames = new String[nSteps];
   numBalls = nSteps * nLayers;
+  // Create objects
   balls = new Ball[numBalls];
+  ship = new Agent();
   
   // Initialize ball object array
   for (int i=0; i<nSteps; i++) {
@@ -64,6 +67,13 @@ void draw() {
   time = millis();
   background(220);
   
+  // Update agent
+  if (ship.isActive){
+    ship.pos.x = mouseX;
+    ship.pos.y = mouseY;
+    ship.display();
+  }
+  
   // Update balls
   for (Ball ball : balls) {
     if (ball.status == true){
@@ -73,7 +83,7 @@ void draw() {
       for (int i=0; i<ball.animStart.length; i++) {
         if(time-ball.animStart[i]<1000){
           fill(255, 255-(time-ball.animStart[i]));
-          circle(ball.pos.x, ball.pos.y, 2*r+20);
+          circle(ball.pos.x, ball.pos.y, 2*ball.r+20);
         }
       }
     }
@@ -82,7 +92,7 @@ void draw() {
 
 // Collision triggers
 void collision_event(int id, int other_id, String type, String other_type) {
-  oscP5.send(collision, addressSC);
+  //oscP5.send(collision, addressSC);
   // Collision kick-kick
   if (type == "kick" && other_type == "kick") {
     OscMessage collisionKK = new OscMessage("/collision/kk");
@@ -136,6 +146,14 @@ void oscEvent(OscMessage theOscMessage) {
     int id = theOscMessage.get(0).intValue() + 2*nSteps;
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
+  }
+  // Activate/deactivate agent
+  else if(theOscMessage.checkAddrPattern("/triggerAgent")) {
+    if(ship.isActive){
+      ship.isActive = false;
+    } else {
+      ship.isActive = true;
+    }
   }
   // Exit applet
   else if(theOscMessage.checkAddrPattern("/terminate")) {

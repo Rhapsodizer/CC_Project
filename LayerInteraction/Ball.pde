@@ -48,6 +48,26 @@ class Ball {
           lastCollided[i] = false;
         }
       } 
+      // Collision with ship
+      if (ship.isActive == true){
+        de = new PVector(ship.pos.x - pos.x, ship.pos.y - pos.y);
+        float distance = sqrt(de.x*de.x + de.y*de.y);
+        if (distance < (r+ship.rInteraction)) {
+          float angle = atan2(de.y, de.x);
+          float targetX = pos.x + cos(angle) * (r+ship.rInteraction);
+          float targetY = pos.y + sin(angle) * (r+ship.rInteraction);
+          acc = new PVector((targetX - ship.pos.x) * springShip, (targetY - ship.pos.y) * springShip);
+          vel.sub(acc);
+          // Make event non-repetitive
+          collided[i] = true;
+          if (lastCollided[i]==false && collided[i]==true) {
+            lastCollided[i] = true;
+          }
+        } else {
+          collided[i] = false;
+          lastCollided[i] = false;
+        }
+      }
     }
   }
   
