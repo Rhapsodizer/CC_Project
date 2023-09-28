@@ -534,12 +534,14 @@ void oscEvent(OscMessage trigger) {
           
           if(sumArray2.size()>0){
             
-            //PRIMO ELEMENTO (elemento tonalità) da 0.0 a 100.0
+            //PRIMO ELEMENTO (elemento tonalità) da 0.1 a 1.5
+            //release
             int firstInteger = sumArray2.get(0);
-            float mappedFloat_1 = map(firstInteger, 0, 11, 0.0, 100.0); 
+            float mappedFloat_1 = map(firstInteger, 0, 11, 0.1, 1.5); 
             modifierArray2.add(mappedFloat_1);
             
-            //SECONDO ELEMENTO (media melodia) da 0.0 a 50.0 perchè primo elemento vale sempre 0
+            //SECONDO ELEMENTO (media melodia) da 2.0 a 20.0 (non arriva mai a 20 perchè primo elemento sempre 0)
+            //tremoloFreq
             int somma = 0;
             int melody_length = sumArray2.size() - 2;
             for(int i=1; i< sumArray2.size()-1;i++){
@@ -550,16 +552,18 @@ void oscEvent(OscMessage trigger) {
               }
             }
             float average = (float) somma / (melody_length);
-            float mappedFloat_2 = map(average, 0, 23, 0.0, 100.0); 
+            float mappedFloat_2 = map(average, 0, 23, 2.0, 20.0); 
             modifierArray2.add(mappedFloat_2);
             
-            //TERZO ELEMENTO (lunghezza melodia = nSteps) da 0.0 a 100.0
+            //TERZO ELEMENTO (lunghezza melodia = nSteps) da 0.5 a 1.0
+            //tremoloDepth
             int lastInteger = sumArray2.get(sumArray2.size() - 1);
-            float mappedFloat_3 = map(lastInteger, 1, 16, 0.0, 100.0);
+            float mappedFloat_3 = map(lastInteger, 1, 16, 0.5, 1.0);
             modifierArray2.add(mappedFloat_3);
             
             //QUARTO ELEMENTO (random)
-            modifierArray2.add(random(0.0, 100.0));
+            //amp
+            modifierArray2.add(random(0.1, 1.0));
           }
              
           println("OSC (1st el -> key, last el -> n°notes)" + sumArray2);

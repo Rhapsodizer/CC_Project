@@ -7,55 +7,6 @@ NetAddr("127.0.0.1", 57120);
 //
 //---------------------------------------------------------------------
 
-/*
-(
-SynthDef(\melody, {
-    arg freq = 440, sustain = 1, amp = 0.2;
-    var env, osc, padSound;
-    env = EnvGen.kr(Env.perc(0.1, sustain), doneAction: 2);
-    osc = Mix.ar([
-        SinOsc.ar(freq * [1, 1.005], 0.2),
-        Pulse.ar(freq * [0.5, 0.501], 0.15, 0.5)
-    ]);
-    padSound = osc * env * amp;
-    padSound = padSound * FreeVerb.ar(padSound, 0.1);
-    Out.ar(0, padSound);
-}).add;
-)
-Synth(\melody);
-
-(
-~playSound = { arg freq, amp;
-    Synth(\melody, [\freq, freq, \amp, amp, \sustain, 1]);
-};
-
-OSCdef('OSCreceiver', { arg msg;
-	var array = msg.copyRange(2, msg.size-5).asArray; //prendo array delle note della melodia
-	var tonalità = msg[1]; //prendo primo elemnto che setta la tonalità
-	var baseFreq = 261.63; //frequenza di base (C4)
-	var freqMultiplier = 2 ** (1 / 12); //moltiplicatore di frequenza per semitono
-
-	var amp = 0.2;
-
-	var playRoutine = Routine({
-		var dur = (60 * msg[msg.size-2] / msg[msg.size-3])/msg[msg.size-4]; //durata note: ((60/bpm)*nSteps)/numeroNote
-		array.do { arg noteIndex;
-			var freq = baseFreq * (freqMultiplier ** tonalità) * (freqMultiplier ** noteIndex); //frequenza della nota calcolata
-			if(noteIndex == 100,
-				{ amp = 0},
-				{ amp = 0.2}
-			);
-			~playSound.value(freq, amp, dur); //riproduci il suono con la frequenza calcolata
-			dur.wait; //attendere la durata delle note
-		}
-	});
-
-	playRoutine.play;
-}, "/melody");
-)
-*/
-
-
 (
 SynthDef(\melody, {
     arg freq = 440, amp = 1, tremoloFreq = 0, tremoloDepth = 0, release = 1;
@@ -75,9 +26,6 @@ SynthDef(\melody, {
 )
 
 Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 0.5]);
-
-//SE NON FUNZIONA IL SAMPLE RATE USARE:
-s.options.sampleRate = 48000;
 
 //---------------------------------------------------------------------
 //
@@ -179,5 +127,10 @@ OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
 OSCdef('snare',{Synth(\snare)},"/snare");
 OSCdef('collision',{Synth(\kick3)},"/collision");
 OSCdef('melody',{arg msg; var freq = msg[0]; var count = msg[1]; Synth(\melody, [freq: freq[count]])},"/melody");
-OSCdef('modifier', {arg msg; Synth(\melody, [tremoloFreq: msg[0]], [tremoloDepth: msg[1]], [release: msg[2]], [amp: msg[3]])}, "/modifier");
+OSCdef('modifier', {arg msg; Synth(\melody, [release: msg[0]], [tremoloFreq: msg[1]], [tremoloDepth: msg[2]], [amp: msg[3]])}, "/modifier");
 )
+
+//release: varia da 0.1 a 1
+//tremoloFreq: varia da 2 a 20
+//tremoloDepth: varia da 0.5 a 1
+//amp: random tra 0.1 a 1
