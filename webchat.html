@@ -121,7 +121,7 @@
           if (remoteUserChar === "%") {
             let chat = document.createElement("div");
             let chatUsername = document.createElement("b");
-            chatUsername.innerText = remoteUserName + " (🛠):";
+            chatUsername.innerText = remoteUserName + " (\u2692):";
             chat.appendChild(chatUsername);
             chat.innerHTML += " " + remoteSentence.join('');
             chat.className = "chat";
@@ -150,7 +150,7 @@
           if (remoteUserChar === "%") {
             let chat = document.createElement("div");
             let chatUsername = document.createElement("b");
-            chatUsername.innerText = remoteUserName + " (♫):";
+            chatUsername.innerText = remoteUserName + " (\u266B):";
             chat.appendChild(chatUsername);
             chat.innerHTML += " " + remoteSentence.join('');
             chat.className = "chat";
@@ -190,9 +190,9 @@
           let chat = document.createElement("div");
           let chatUsername = document.createElement("b");
           if (agentType === 1){
-            chatUsername.innerText = username.value + " (♫):";
+            chatUsername.innerText = username.value + " (\u266B):";
           } else {
-            chatUsername.innerText = username.value + " (🛠):";
+            chatUsername.innerText = username.value + " (\u2692):";
           }  
           chat.appendChild(chatUsername);
           chat.innerHTML += " " + printedSentence.join('');
@@ -204,9 +204,6 @@
           
           char = "%";
         } else {
-          if (char === 8) {
-            char = "&";
-          }
           printedSentence.push(char);
           console.log(char);
         }
@@ -247,9 +244,9 @@
       <div id = "choice">
         Select your agent:
         <br><br>
-        <input type="radio" id = "radio1" name="foo" checked=false>Melody maker (♫)</input>
+        <input type="radio" id = "radio1" name="foo" checked=false>Melody maker (&#9835;)</input>
         <br>
-        <input type="radio" id = "radio2" name="foo" checked=false>Melody modifier (🛠)</input>
+        <input type="radio" id = "radio2" name="foo" checked=false>Melody modifier (&#9874;)</input>
       </div>
     </div>
 	
