@@ -136,6 +136,8 @@ class Track:
                 self.instr_name = instrument_name
                 self.draw_track()
                 listbox_window.destroy()
+                time.sleep(0.5)
+                self.setup_instrument()
 
         instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE)
         instruments_listbox.pack(expand=True, fill=tk.BOTH)
@@ -157,20 +159,21 @@ class Track:
         if self.instr_name is None:
             ErrorWindow("Track Error", "No instrument selected")
         else:
-            self.instrument_is_ready = True
             if self.instr_name == "Drum Machine":
+                self.instrument_is_ready = True
                 processing_java_path = current_paths[0]
                 pde_file_path = current_paths[2]
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
                 subprocess.Popen(pde_open, shell=True)
             if self.instr_name == "Melody Chat":
+                self.instrument_is_ready = True
                 processing_java_path = current_paths[0]
                 pde_file_path = current_paths[3]
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
                 subprocess.Popen(pde_open, shell=True)
             if self.instr_name == "Rec & Play":
                 rap_thread = Thread(target=open_rap_window,
-                                    args=[self.window, self.ls_parent.bpm, self.ls_parent.steps])
+                                    args=[self])
                 rap_thread.start()
 
     def play_this(self, caller):
@@ -187,7 +190,7 @@ class Track:
                         osc.oscCH.send_message("/play", 0)
                     elif self.instr_name == "Rec & Play":
                         print("4")
-                        self.postman.send_message('/action', 'green')
+                        self.postman.send_message('/action', 'play')
 
                     time.sleep(self.ls_parent.time_chunk)
                     cur_step += 1
@@ -201,7 +204,7 @@ class Track:
             elif self.instr_name == "Melody Chat":
                 osc.oscCH.send_message("/play", 0)
             elif self.instr_name == "Rec & Play":
-                self.postman.send_message('/action', 'green')
+                self.postman.send_message('/action', 'play')
 
     def pause_this(self):
         """

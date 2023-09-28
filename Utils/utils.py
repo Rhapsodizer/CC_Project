@@ -10,7 +10,8 @@ Misc functions:
 """
 
 
-def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
+# def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
+def round_rectangle(canvas, x1, y1, x2, y2, radius, fill_color, outline_color):
 
     points = [x1 + radius, y1,
               x1 + radius, y1,
@@ -33,7 +34,8 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius, **kwargs):
               x1, y1 + radius,
               x1, y1]
 
-    return canvas.create_polygon(points, **kwargs, smooth=True)
+    # return canvas.create_polygon(points, **kwargs, smooth=True, outline= )
+    return canvas.create_polygon(points, fill=fill_color, smooth=True, outline=outline_color)
 
 
 def create_hexagon(canvas, center_x, center_y, radius):
@@ -293,7 +295,7 @@ def draw_track_elements_tr(track_obj):
     round_rectangle(track_obj.canvas,
                     track_obj.pos_x, track_obj.pos_y,
                     track_obj.pos_x + track_obj.length, track_obj.pos_y + track_obj.height,
-                    radius=20, fill=track_obj.color)
+                    radius=20, fill_color=track_obj.color, outline_color=track_obj.color)
 
     # Draw play_this icon
     if track_obj.this_play_is_able:
@@ -397,7 +399,7 @@ def draw_toolbar_rap(rap_obj):
                     rap_obj.toolbar_pos_y,
                     rap_obj.toolbar_pos_x + rap_obj.toolbar_length,
                     rap_obj.toolbar_pos_y + rap_obj.toolbar_height,
-                    radius=20, fill=rap_obj.toolbar_color)
+                    radius=20, fill_color=rap_obj.toolbar_color, outline_color="#000000")
 
     rect_side = 60
     rect_nw_x = rap_obj.c_width/2 - 80
