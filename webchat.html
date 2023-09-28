@@ -204,6 +204,9 @@
           
           char = "%";
         } else {
+          if (char === 8) {
+            char = "&";
+          }
           printedSentence.push(char);
           console.log(char);
         }

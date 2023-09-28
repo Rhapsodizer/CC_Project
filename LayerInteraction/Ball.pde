@@ -109,6 +109,10 @@ class Ball {
       text("KC",pos.x-10,pos.y+5);
     }
     else if (type == "melody") {
+      fill(240);
+      stroke(180);
+      circle(pos.x, pos.y, 2*r);
+      fill(128);
       text(noteNames[id], pos.x-10,pos.y+5);
     }
     noStroke();
