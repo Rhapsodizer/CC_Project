@@ -93,6 +93,8 @@
         appId: "1:990833384121:web:72d1040a139abd74655968"
       };
 
+      const alphabet = " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789,.;:-_@#[]\"\"&$!|£/òàùèé+'?";
+
       // Initialize Firebase
       const app = initializeApp(firebaseConfig);
       const db = getDatabase();
@@ -128,6 +130,10 @@
             area.appendChild(chat);
 
             remoteSentence = [];
+          } else if (remoteUserChar === ""){
+
+          } else if (remoteUserChar === "*"){
+            remoteSentence.pop();
           } else {
             remoteSentence.push(remoteUserChar);
           }
@@ -157,6 +163,10 @@
             area.appendChild(chat);
 
             remoteSentence = [];
+          } else if (remoteUserChar === ""){
+
+          } else if (remoteUserChar === "*"){
+            remoteSentence.pop();
           } else {
             remoteSentence.push(remoteUserChar);
           }
@@ -164,7 +174,7 @@
       }
 
       
-      
+      let sendChar = "";
       // Get username
       username.addEventListener('input', () => {
         const db = getDatabase();
@@ -182,7 +192,7 @@
 
       let printedSentence = [];
       // Get sentence
-      sentence.addEventListener('keypress', (e) => { 
+      sentence.addEventListener('keydown', (e) => { 
         let char = e.key;
         if (char === "Enter") {
           console.log(printedSentence);
@@ -203,10 +213,18 @@
           printedSentence = [];
           
           char = "%";
+          sendChar = char;
+        } else if (char === "Backspace") {
+            printedSentence.pop();
+            sendChar = "*";
+        } else if (alphabet.indexOf(char)>=0){
+            sendChar = char;
+            printedSentence.push(char);
+            console.log(char);
         } else {
-          printedSentence.push(char);
-          console.log(char);
+          sendChar = "";
         }
+
         // Send to firebase
         const db = getDatabase();
         if (agentType === 1){
@@ -214,14 +232,14 @@
             charStream1: "",
           })
           update(ref(db, 'table/'), {
-            charStream1: char,
+            charStream1: sendChar,
           })
         } else if (agentType === 2){
           update(ref(db, 'table/'), {
             charStream2: "",
           })
           update(ref(db, 'table/'), {
-            charStream2: char
+            charStream2: sendChar
           })
         }
       });
