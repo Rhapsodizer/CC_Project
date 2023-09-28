@@ -154,16 +154,16 @@ void draw() {
 
 //FUNZIONE getWordNumbersString
 String getWordNumbersString(ArrayList<Character> word) {
-  String numbersString = "";
+  String numString = "";
   for (char c : word) {
     if (letterToNumber.containsKey(c)) {
-      numbersString += letterToNumber.get(c) + " ";
+      numString += letterToNumber.get(c) + " ";
     }
   }
-  return numbersString.trim();
+  return numString.trim();
 }
-//FUNZIONE getWordNumbersSum
-int getWordNumbersSum(ArrayList<Character> word) {
+//FUNZIONE SOMMA LETTERE DELLA PAROLA
+int sumFunction(ArrayList<Character> word) {
   int sum = 0;
   for (char c : word) {
     if (letterToNumber.containsKey(c)) {
@@ -172,7 +172,7 @@ int getWordNumbersSum(ArrayList<Character> word) {
   }
   return sum;
 }
-//FUNZIONE convertToNoteKey
+//FUNZIONE TONALILTA'
 String convertToNoteKey(int number) {
   String[] notes = {"C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"};
   if (number >= 0 && number <= 11) {
@@ -181,7 +181,7 @@ String convertToNoteKey(int number) {
     return "Invalid";
   }
 }
-//FUNZIONE convertToNoteMelody
+//FUNZIONE MELLODIA
 String convertToNoteMelody(int number, int startingPoint) {  
   if (number == 100) {
     return "P";
@@ -238,25 +238,25 @@ void oscEvent(OscMessage trigger) {
       
         ArrayList<Character> word = new ArrayList<Character>();
         for (char c : inputBuffer1.toCharArray()) {
-          if (letterToNumber.containsKey(c)) {
+          if (c != ' '){
             word.add(c);
           }
         }
 
         int sum = 0;
         if (word.size() >= 3 || words1.size()==0) { //parole con più di 3 lettere eccetto la prima parola
-          sum = getWordNumbersSum(word);
+          sum = sumFunction(word);
           
           //SETTING TONALITA'
           if(sumArray1.size() == 0) {
-            int tonalità = sum-1;    
-            if (tonalità < 0) { //controllo se faccio solo spazio all'inizio
-              tonalità = 0;
+            int ton = sum-1;    
+            if (ton < 0) {
+              ton = 0;
             }    
-            while (tonalità>=12) { //finchè il numero non è tra 0 e 11, tolgo 12
-              tonalità = tonalità - 12;
+            while (ton>=12) {
+              ton = ton - 12;
             }       
-            sumArray1.add(tonalità);  
+            sumArray1.add(ton);  
           }
           
           //SETTING PRIMO ELEMENTO DELLA MELODIA
@@ -314,8 +314,8 @@ void oscEvent(OscMessage trigger) {
           sentences2.add("");
           
           if (sentences1.size() >= maxSentences) {
-            sentences1.remove(0); // Rimuovi la prima frase della prima chat
-            sentences2.remove(0); // Rimuovi la prima frase della prima chat
+            sentences1.remove(0);
+            sentences2.remove(0);
           }
        
           String wordsString = "";
@@ -415,25 +415,25 @@ void oscEvent(OscMessage trigger) {
       
         ArrayList<Character> word = new ArrayList<Character>();
         for (char c : inputBuffer2.toCharArray()) {
-          if (letterToNumber.containsKey(c)) {
+          if (c != ' '){
             word.add(c);
           }
         }
 
         int sum = 0;
         if (word.size() >= 3 || words2.size()==0) { //parole con più di 3 lettere eccetto la prima parola
-          sum = getWordNumbersSum(word);
+          sum = sumFunction(word);
           
           //SETTING TONALITA'
           if(sumArray2.size() == 0) {
-            int tonalità = sum-1;    
-            if (tonalità < 0) { //controllo se faccio solo spazio all'inizio
-              tonalità = 0;
+            int ton = sum-1;    
+            if (ton < 0) { //controllo se faccio solo spazio all'inizio
+              ton = 0;
             }    
-            while (tonalità>=12) { //finchè il numero non è tra 0 e 11, tolgo 12
-              tonalità = tonalità - 12;
+            while (ton>=12) { //finchè il numero non è tra 0 e 11, tolgo 12
+              ton = ton - 12;
             }       
-            sumArray2.add(tonalità);  
+            sumArray2.add(ton);  
           }
           
           //SETTING PRIMO ELEMENTO DELLA MELODIA
@@ -489,8 +489,8 @@ void oscEvent(OscMessage trigger) {
           sentences1.add("");
           
           if (sentences2.size() >= maxSentences) {
-            sentences2.remove(0); // Rimuovi la prima frase della prima chat
-            sentences1.remove(0); // Rimuovi la prima frase della prima chat
+            sentences2.remove(0);
+            sentences1.remove(0);
           }
        
           String wordsString = "";
