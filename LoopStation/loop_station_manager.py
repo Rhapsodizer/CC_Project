@@ -6,6 +6,7 @@ from Utils import utils
 import tkinter as tk
 import subprocess
 import threading
+from PIL import Image, ImageTk
 
 """
 Main window manager
@@ -43,6 +44,10 @@ class LoopStationManager:
         self.stop_is_able = False
         self.spaceship_is_running = False
         self.user_paths = u_paths
+        self.pil = Image.open(u_paths[5])
+        w, h = self.pil.size
+        self.pil = self.pil.resize((w // 2, h // 2))
+        self.image = ImageTk.PhotoImage(self.pil)
 
     def draw_all(self):
         [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,

@@ -217,7 +217,6 @@ class Track:
             elif self.instr_name == "Rec & Play":
                 self.postman.send_message('/action', 'play')
             elif self.instr_name == "Image Sonification":
-                print("4")
                 self.postman.send_message('/extract', 'start_routine')
 
     def pause_this(self):

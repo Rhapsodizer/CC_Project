@@ -34,7 +34,6 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius, fill_color, outline_color):
               x1, y1 + radius,
               x1, y1]
 
-    # return canvas.create_polygon(points, **kwargs, smooth=True, outline= )
     return canvas.create_polygon(points, fill=fill_color, smooth=True, outline=outline_color)
 
 
@@ -72,6 +71,10 @@ Loop_station-related functions:
 
 def draw_all_ls(ls_obj):
     ls_obj.canvas.delete("all")
+    if ls_obj.image:
+        ls_obj.canvas.create_image(ls_obj.c_width/2, ls_obj.c_height/2 + 10,
+                                   anchor=tk.CENTER, image=ls_obj.image)
+
     # Master text
     ls_obj.canvas.create_text(ls_obj.c_width / 2, 20, text="E.L.V.I.S.", font=("Arial", 20))
 
@@ -102,6 +105,7 @@ def draw_spaceship_ls(ls_obj):
     )
 
     return spaceship
+
 
 def draw_bpm_steps_ls(ls_obj):
     # trg
@@ -506,3 +510,73 @@ def draw_time_bar_rap(rap_obj):
     rap_obj.time_canvas.create_text(rap_obj.tc_width/2, rap_obj.tc_height/2,
                                     text="{:.2f}".format(rap_obj.audio_time) + " / " + str(rap_obj.loop_duration),
                                     font=("Arial", 12))
+
+
+"""
+Image Sonification-related functions:
+"""
+
+
+def draw_all_is(img_son_obj):
+    img_son_obj.canvas.delete("all")
+
+    # Draw plus icon
+    x_offset = 128
+    y_offset = 40
+    plus = img_son_obj.canvas.create_polygon(
+        x_offset,      y_offset - 15,
+        x_offset + 10, y_offset - 15,
+        x_offset + 10, y_offset - 25,
+        x_offset + 40, y_offset - 25,
+        x_offset + 40, y_offset - 15,
+        x_offset + 50, y_offset - 15,
+        x_offset + 50, y_offset + 15,
+        x_offset + 40, y_offset + 15,
+        x_offset + 40, y_offset + 25,
+        x_offset + 10, y_offset + 25,
+        x_offset + 10, y_offset + 15,
+        x_offset,      y_offset + 15,
+        fill="#606060", outline="#000000")
+
+    img_son_obj.canvas.create_text(img_son_obj.c_width / 2 + 20, 40,
+                                   text="Tonality: " + str(img_son_obj.ton), font=("Arial", 12), anchor=tk.W)
+
+    side = 20
+    x_set_ton = img_son_obj.c_width / 2 - 5
+    y_set_ton = 40
+    height = 20
+    up_ton_triangle = img_son_obj.canvas.create_polygon(
+        x_set_ton, y_set_ton - 2,
+        x_set_ton + side / 2, y_set_ton - height * 0.866,
+        x_set_ton + side, y_set_ton - 2,
+        fill="#606060", outline="#000000")
+    down_ton_triangle = img_son_obj.canvas.create_polygon(
+        x_set_ton, y_set_ton + 2,
+        x_set_ton + side / 2, y_set_ton + height * 0.866,
+        x_set_ton + side, y_set_ton + 2,
+        fill="#606060", outline="#000000")
+
+    if img_son_obj.ton_is_valid:
+        fill_ton = "#006400"
+    else:
+        fill_ton = "#8F0000"
+    ton_valid_rect = img_son_obj.canvas.create_rectangle(
+        x_set_ton - side + 10, y_set_ton - height / 2,
+        x_set_ton - side * 2 + 10, y_set_ton + height / 2,
+        fill=fill_ton, outline="#000000")
+
+    img_son_obj.canvas.create_rectangle(
+        img_son_obj.img_pos_x, img_son_obj.img_pos_y,
+        img_son_obj.img_pos_x + img_son_obj.img_sides, img_son_obj.img_pos_y + img_son_obj.img_sides,
+        fill="#808080", outline="#000000", width=10)
+
+    if img_son_obj.image:
+        img_son_obj.canvas.create_image(img_son_obj.c_width/2, img_son_obj.c_height/2,
+                                        anchor=tk.CENTER, image=img_son_obj.image)
+
+        for r in img_son_obj.extracted:
+            img_son_obj.canvas.create_rectangle(r[0] - 5, r[1] - 5,
+                                                r[0] + 5, r[1] + 5,
+                                                fill="#000000", outline="#000000")
+
+    return [plus, up_ton_triangle, down_ton_triangle, ton_valid_rect]
