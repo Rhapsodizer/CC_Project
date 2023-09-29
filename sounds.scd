@@ -27,11 +27,6 @@ SynthDef(\melody, {
 
 Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 0.5]);
 
-<<<<<<< Updated upstream
-=======
-//SE NON FUNZIONA IL SAMPLE RATE USARE:
-s.options.sampleRate = 48000;
-
 (
 ~counter = 0;
 
@@ -49,7 +44,6 @@ s.options.sampleRate = 48000;
 };
 )
 
->>>>>>> Stashed changes
 //---------------------------------------------------------------------
 //
 //                     DRUM MACHINE
@@ -144,22 +138,8 @@ Synth(\snare);
 //                     OSC MANAGEMENT
 //
 //---------------------------------------------------------------------
-(
-OSCdef('playTrigger', {~playSound.value;}, "/playStep");
-OSCdef('kick',{arg msg; Synth(\kick1, [pitch: msg[1]]);}, "/kick");
-OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
-OSCdef('snare',{Synth(\snare)},"/snare");
-OSCdef('collision',{Synth(\kick3)},"/collision");
-<<<<<<< Updated upstream
-OSCdef('melody',{arg msg; var freq = msg[0]; var count = msg[1]; Synth(\melody, [freq: freq[count]])},"/melody");
-OSCdef('modifier', {arg msg; Synth(\melody, [release: msg[0]], [tremoloFreq: msg[1]], [tremoloDepth: msg[2]], [amp: msg[3]])}, "/modifier");
-)
 
-//release: varia da 0.1 a 1
-//tremoloFreq: varia da 2 a 20
-//tremoloDepth: varia da 0.5 a 1
-//amp: random tra 0.1 a 1
-=======
+(
 OSCdef('melody',{arg msg; ~arrayFreq = Array.newClear(msg.size-1);
 	// Fill array
 	(msg.size-1).do({arg i; ~arrayFreq.put(i, msg[i+1]); });
@@ -167,10 +147,15 @@ OSCdef('melody',{arg msg; ~arrayFreq = Array.newClear(msg.size-1);
 	~arrayFreq.postln;
 },"/melody");
 OSCdef('modifier', {arg msg;
-	~tremoloFreq = msg[0];
-	~tremoloDepth= msg[1];
-	~release = msg[2];
+	~release = msg[0];
+	~tremoloFreq= msg[1];
+	~tremoloDepth = msg[2];
 	~amp = msg[3];
 }, "/modifier");
 )
->>>>>>> Stashed changes
+
+
+//release: varia da 0.1 a 1
+//tremoloFreq: varia da 2 a 20
+//tremoloDepth: varia da 0.5 a 1
+//amp: random tra 0.1 a 1
