@@ -14,6 +14,19 @@ class Agent {
   
   // Draw the agent
   void display() {
+    if (pos.x + r > width) {
+      pos.x = width - r;
+    }
+    else if (pos.x - r < 0) {
+      pos.x = r;
+    }
+    if (pos.y + r > height) {
+      pos.y = height - r;
+    } 
+    else if (pos.y - r < 0) {
+      pos.y = r;
+    }
+    noStroke();
     fill(240);
     circle(pos.x, pos.y, 2*rInteraction);
     fill(0);

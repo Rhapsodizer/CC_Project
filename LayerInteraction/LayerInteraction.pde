@@ -160,6 +160,12 @@ void oscEvent(OscMessage theOscMessage) {
   if (theOscMessage.checkAddrPattern("/left")){
     ship.pos.x-=10;
   }
+  if (theOscMessage.checkAddrPattern("/up")){
+    ship.pos.y-=10;
+  }
+  if (theOscMessage.checkAddrPattern("/down")){
+    ship.pos.y+=10;
+  }
   // Exit applet
   if(theOscMessage.checkAddrPattern("/terminate")) {
     exit();
