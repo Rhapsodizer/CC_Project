@@ -1,11 +1,9 @@
-# *Title CC_Project (CREATIVE LOOPER????)*
-(1-line description Creative Computing Project)
-This project aims to create a simple and user-friendly Loop Station
+# *E.L.V.I.S.*
+*Enhanched Looper with Visual Interaction and Sonification*
 
 ## 1. Description
 (A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
-This appllication has been built with the idea to be used as an artistic installation, in which one or more users can
-interact with it in a few clicks.
+This project aims to create a simple and user-friendly Loop Station. This appllication has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
 It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
 to express themselves and enjoy the music they create.
 
@@ -71,18 +69,22 @@ The sounds are created using *Super Collider*. As for the drum machine and melod
 ### 3.5 OSC structure
 SCHEMA MESSAGGI OSC TRA PROCESSING-PHYTON-SUPERCOLLIDER-FIREBASE
 
+## Contacts and contributions
+
+**Attolini Silvio** - silvio.attolini@mail.polimi.it
+UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
+**Gorni Alessandro** - alessandro.gorni@mail.polimi.it
+DM, MelodyChat, sounds.scd, LayerInteraction
+**Martinelli Riccardo** - riccardo.martineli@mail.polimi.it
+MelodyChat, sounds.scd
+
+Project link: https://github.com/Rhapsodizer/CC_Project
+
 ## 4. Students
 (the members of the group with a sentence that explains for each person what was their main contribution to the project)
 
-**Attolini Silvio**: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
-
-**Gorni Alessandro**: DM, MelodyChat, sounds.scd, LayerInteraction
-
-**Martinelli Riccardo**: MelodyChat, sounds.scd
-
 ## 5. links
 (available links such as github repo (mandatory), youtube videos, presentation, link for the web app.)
-https://github.com/Rhapsodizer/CC_Project.git
 
 ## 6. 1 thumbnail image related to the projects: format 1024x768
 
@@ -95,6 +97,8 @@ PER PRESENTAZIONE:
 - PRESENTATION: slides containing: context, motivation, concept, technical solutions and technical details. You will have 15' for the presentation at your disposal, including the demo session.
 - real-time running demo of the project:  In the case this is not feasible due to the virtual call, you are asked produce a video to share us
 - Github repo for the code: We will, potentially, ask you to take a look at the code. The Github should be self-explanatory on the project and on how to use the code.
+
+
 
 
 
