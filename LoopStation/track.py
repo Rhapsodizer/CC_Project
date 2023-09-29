@@ -186,9 +186,9 @@ class Track:
                     print("3.5")
                     # Send START PLAY trigger
                     if self.instr_name == "Drum Machine":
-                        osc.oscDM.send_message("/play", 0)
+                        osc.oscDM.send_message("/playStep", 0)
                     elif self.instr_name == "Melody Chat":
-                        osc.oscCH.send_message("/play", 0)
+                        osc.oscCH.send_message("/playStep", 0)
                     elif self.instr_name == "Rec & Play":
                         print("4")
                         self.postman.send_message('/action', 'play')
@@ -201,9 +201,9 @@ class Track:
             print("3.7")
             # Send START PLAY trigger
             if self.instr_name == "Drum Machine":
-                osc.oscDM.send_message("/play", 0)
+                osc.oscDM.send_message("/playStep", 0)
             elif self.instr_name == "Melody Chat":
-                osc.oscCH.send_message("/play", 0)
+                osc.oscCH.send_message("/playStep", 0)
             elif self.instr_name == "Rec & Play":
                 self.postman.send_message('/action', 'play')
 
