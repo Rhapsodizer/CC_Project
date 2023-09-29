@@ -56,7 +56,7 @@ mentioned actions, while in the Lower section a real-time smplitude envelope is 
 #### 3.2.2 Drum Machine
 #### 3.2.3 Melody Chat
 
-<img src="https://github.com/favicon.ico](https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="250">
+<img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="250">
 ![qrcode](https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2 = 250x250)
 
 Melody Chat consists of a canvas created with *Processing* that represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
