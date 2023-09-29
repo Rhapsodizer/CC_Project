@@ -1,6 +1,28 @@
 # *E.L.V.I.S.*
 *Enhanched Looper with Visual Interaction and Sonification*
 
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li><a href="#description">Description</a></li>
+    <li><a href="#cal">Challenges, accomplishment and lessons learned</a></li>
+    <li><a href="#technology">Technology</a></li>
+      <ul>
+        <li><a href="#loop-station">Loop Station</a></li>
+        <li><a href="#instruments">Instruments</a></li>
+        <ul>
+          <li><a href="#RP">Recorder and Player</a></li>
+          <li><a href="#DM">Drum Machine</a></li>
+          <li><a href="#MC">Melody Chat</a></li>
+        </ul>
+      </ul>
+    
+    </li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
+
 ## 1. Description
 (A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
 This project aims to create a simple and user-friendly Loop Station. This appllication has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
@@ -31,7 +53,7 @@ to load an mp3 or wav file to be played during the exhibition.
 In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above
 mentioned actions, while in the Lower section a real-time smplitude envelope is shown.
 
-#### 3.2.2 Minimalistic Drum Machine
+#### 3.2.2 Drum Machine
 #### 3.2.3 Melody Chat
 
 Melody Chat consists of a canvas created with *Processing* that represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
@@ -90,6 +112,8 @@ PER PRESENTAZIONE:
 - PRESENTATION: slides containing: context, motivation, concept, technical solutions and technical details. You will have 15' for the presentation at your disposal, including the demo session.
 - real-time running demo of the project:  In the case this is not feasible due to the virtual call, you are asked produce a video to share us
 - Github repo for the code: We will, potentially, ask you to take a look at the code. The Github should be self-explanatory on the project and on how to use the code.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
 
 
 
