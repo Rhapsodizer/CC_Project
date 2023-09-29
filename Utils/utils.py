@@ -73,9 +73,10 @@ Loop_station-related functions:
 def draw_all_ls(ls_obj):
     ls_obj.canvas.delete("all")
     # Master text
-    ls_obj.canvas.create_text(ls_obj.c_width / 2, 20, text="Loop Station Manager", font=("Arial", 20))
+    ls_obj.canvas.create_text(ls_obj.c_width / 2, 20, text="E.L.V.I.S.", font=("Arial", 20))
 
     # elements
+    spaceship = draw_spaceship_ls(ls_obj)
     [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
      bpm_valid_rect, steps_valid_rect] = draw_bpm_steps_ls(ls_obj)
     draw_all_tracks_ls(ls_obj)
@@ -83,10 +84,24 @@ def draw_all_ls(ls_obj):
     [play, pause, stop] = draw_play_pause_stop_ls(ls_obj)
     [safe_close_button, close_x1, close_x2] = safe_close_ls(ls_obj)
     ls_obj.canvas.update()
-    return [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
+    return [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
             bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop,
             safe_close_button, close_x1, close_x2]
 
+
+def draw_spaceship_ls(ls_obj):
+    # Draw spaceship icon
+    offset_x = 40
+    offset_y = 40
+    spaceship = ls_obj.canvas.create_polygon(
+        offset_x, offset_y,
+        offset_x - 20, offset_y - 30,
+        offset_x + 50, offset_y,
+        offset_x - 20, offset_y + 30,
+        fill="#606060", outline="#000000"
+    )
+
+    return spaceship
 
 def draw_bpm_steps_ls(ls_obj):
     # trg

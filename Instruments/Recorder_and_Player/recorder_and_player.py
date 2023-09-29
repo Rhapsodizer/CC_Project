@@ -11,7 +11,6 @@ import time
 from Utils import utils
 from Utils.error_manager import ErrorWindow
 from pythonosc import dispatcher, osc_server
-import sys
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
 import pygame
@@ -141,11 +140,10 @@ class RecorderAndPlayer:
                               self.ampl_c_pos_x + self.ampl_c_width, self.ampl_c_pos_y + self.ampl_c_height,
                               radius=20, fill_color=self.toolbar_color, outline_color="#000000")
         if self.loaded:
-            # self.canvas.delete("all")
             duration_time_in_ms = int(self.loop_duration * 1000)
             # cut the audio segment so that lasts N seconds
             cut_audio_segment = self.values_of_audio_segment[:duration_time_in_ms]
-            # Capture amplitude every 100 ms
+            # Capture amplitude every 10 ms
             for t in range(0, len(cut_audio_segment), self.waiting_time):
                 self.audio_data.append(np.max(np.abs(cut_audio_segment[t:t + self.waiting_time])))
 
@@ -187,6 +185,8 @@ class RecorderAndPlayer:
 
     def loop_file(self):
         self.has_already_received_play = False
+        self.audio_thread = None
+        self.display_thread = None
         self.reset_time()
         self.visualize_amplitude()
 
@@ -233,27 +233,25 @@ class RecorderAndPlayer:
 
     def draw_file(self, dim):
         if self.has_already_received_play:
-            amplitude = self.show_audio_data[self.discrete_time_instant]
-            x = self.ampl_c_pos_x + self.discrete_time_instant * dim
-            y = amplitude
-            self.canvas.create_rectangle(x, self.c_height * 0.5 - y / 2,
-                                         x + float(dim), self.c_height * 0.5 + y / 2, fill="#000000")
-            self.canvas.update()
-            i = self.audio_time * 100
-            while i < self.discrete_time_instant:
-                # time.sleep(0.01)
-                self.audio_time = round(round(time.time(), 2) - self.zero_time, 2)
-                i = self.audio_time * 100
-            self.discrete_time_instant += 1
-            # print(self.audio_time)
-            self.draw_time_bar()
-            if self.discrete_time_instant < len(self.show_audio_data):
-                # if self.audio_time < self.loop_duration:
-                self.draw_file(dim)
-            elif self.is_playing:
-                print("in else")
-                # in order to loop back, wait for the next "play" msg from the routine
-                self.loop_file()
+            while self.discrete_time_instant < len(self.show_audio_data) and self.is_playing:
+                amplitude = self.show_audio_data[self.discrete_time_instant]
+                x = self.ampl_c_pos_x + self.discrete_time_instant * dim
+                y = amplitude
+                self.canvas.create_rectangle(x, self.c_height * 0.5 - y / 2,
+                                             x + float(dim), self.c_height * 0.5 + y / 2, fill="#000000")
+                self.canvas.update()
+                i = self.audio_time * 1000
+                while i < self.discrete_time_instant*10:
+                    self.audio_time = round(round(time.time(), 2) - self.zero_time, 2)
+                    i = self.audio_time * 1000
+                self.discrete_time_instant += 1
+                self.draw_time_bar()
+        if self.is_playing:
+            print("in else")
+            # in order to loop back, wait for the next "play" msg from the routine
+            self.loop_file()
+        else:
+            self.stop_file()
 
     def record_mic(self):
         self.is_recording = True
@@ -264,7 +262,6 @@ class RecorderAndPlayer:
                               radius=20, fill_color=self.toolbar_color, outline_color="#000000")
         self.discrete_time_instant = 0
         dim = self.ampl_c_width / (self.loop_duration * 100)
-        # time.sleep(3)
         try:
             self.draw_while_recording(dim)
         finally:
@@ -320,6 +317,7 @@ def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
                 if not rap.has_already_received_play and not rap.is_recording:
                     rap.play_file_in_thread()
             elif args[0] == 'stop':
+                rap.is_playing = False
                 rap.audio_thread = None
                 rap.display_thread = None
                 rap.stop_file()
