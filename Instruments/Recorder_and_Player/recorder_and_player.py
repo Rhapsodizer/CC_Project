@@ -310,7 +310,6 @@ class RecorderAndPlayer:
 
 
 def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
-    # print("5")
     if address == '/action':
         if args:
             if args[0] == 'play':
