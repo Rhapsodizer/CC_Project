@@ -1,6 +1,6 @@
 # *E.L.V.I.S.*
 *Enhanched Looper with Visual Interaction and Sonification*
-
+<br />
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
