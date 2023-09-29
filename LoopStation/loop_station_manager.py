@@ -42,6 +42,7 @@ class LoopStationManager:
         self.play_is_able = False
         self.pause_is_able = False
         self.stop_is_able = False
+        self.track_currently_playing = []
         self.spaceship_is_running = False
         self.user_paths = u_paths
         self.pil = Image.open(u_paths[5])
@@ -69,91 +70,107 @@ class LoopStationManager:
         self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x1, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x2, "<Button-1>", self.safe_close_clicked)
+        for t in self.tracks:
+            if not self.track_currently_playing:
+                if not t.instrument_is_ready:
+                    self.play_is_able = False
+                    break
+                else:
+                    self.play_is_able = True
 
     def add_track_clicked(self, event):
         _ = event
-        if len(self.tracks) < 8:
-            if self.bpm_is_valid and self.steps_is_valid:
-                tr = create_new_track(self)
-                self.tracks.append(tr)
-                self.draw_all()
+        if not self.track_currently_playing:
+            if len(self.tracks) < 8:
+                if self.bpm_is_valid and self.steps_is_valid:
+                    tr = create_new_track(self)
+                    self.tracks.append(tr)
+                    self.draw_all()
+                else:
+                    ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
             else:
-                ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-        else:
-            ErrorWindow("Track Error", "Error: Maximum number of track reached")
+                ErrorWindow("Track Error", "Error: Maximum number of track reached")
 
     def up_bpm(self, event):
         _ = event
-        if self.bpm < 200:
-            self.bpm += 1
-        self.bpm_is_valid = False
-        self.draw_all()
+        if not self.track_currently_playing:
+            if self.bpm < 200:
+                self.bpm += 1
+            self.bpm_is_valid = False
+            self.draw_all()
 
     def down_bpm(self, event):
         _ = event
-        if self.bpm > 1:
-            self.bpm -= 1
-        self.bpm_is_valid = False
-        self.draw_all()
+        if not self.track_currently_playing:
+            if self.bpm > 1:
+                self.bpm -= 1
+            self.bpm_is_valid = False
+            self.draw_all()
 
     def up_steps(self, event):
         _ = event
-        if self.steps < 32:
-            self.steps += 1
-        self.steps_is_valid = False
-        self.draw_all()
+        if not self.track_currently_playing:
+            if self.steps < 32:
+                self.steps += 1
+            self.steps_is_valid = False
+            self.draw_all()
 
     def down_steps(self, event):
         _ = event
-        if self.steps > 1:
-            self.steps -= 1
-        self.steps_is_valid = False
-        self.draw_all()
+        if not self.track_currently_playing:
+            if self.steps > 1:
+                self.steps -= 1
+            self.steps_is_valid = False
+            self.draw_all()
 
     def calculate_loop_duration(self):
         return 60 / self.bpm * self.steps
 
     def on_bpm_set(self, event):
         _ = event
-        self.bpm_is_valid = True
-        self.time_chunk = 60 / self.bpm
-        self.draw_all()
-        osc.oscDM.send_message("/setBpm", self.bpm)
-        osc.oscCH.send_message("/setBpm", self.bpm)
+        if not self.track_currently_playing:
+            self.bpm_is_valid = True
+            self.time_chunk = 60 / self.bpm
+            self.draw_all()
+            osc.oscDM.send_message("/setBpm", self.bpm)
+            osc.oscCH.send_message("/setBpm", self.bpm)
 
     def on_steps_set(self, event):
         _ = event
-        self.steps_is_valid = True
-        self.draw_all()
-        osc.oscDM.send_message("/setSteps", self.steps)
-        osc.oscCH.send_message("/setSteps", self.steps)
+        if not self.track_currently_playing:
+            self.steps_is_valid = True
+            self.draw_all()
+            osc.oscDM.send_message("/setSteps", self.steps)
+            osc.oscCH.send_message("/setSteps", self.steps)
 
     def play_clicked(self, event):
         _ = event
         ready = False
-        if not self.bpm_is_valid or not self.steps_is_valid:
-            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-        elif not self.tracks:
-            ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-        else:
-            for tr in self.tracks:
-                if not tr.instr_name:
-                    ErrorWindow("No Instrument", "Error: No Instrument")
-                    ready = False
-                    break
-                elif not tr.instrument_is_ready:
-                    ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    ready = False
-                    break
-                else:
-                    ready = True
-            if ready:
-                self.disable_all()
-                self.stop_has_been_pressed = False
-                print("play thread is running...")
-                self.play_all_thread_is_running = True
-                self.play_all_thread = threading.Thread(target=self.play_all_tracks)
-                self.play_all_thread.start()
+        if not self.track_currently_playing:
+            if not self.bpm_is_valid or not self.steps_is_valid:
+                ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
+            elif not self.tracks:
+                ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+            else:
+                for tr in self.tracks:
+                    if not tr.instr_name:
+                        ErrorWindow("No Instrument", "Error: No Instrument")
+                        ready = False
+                        break
+                    elif not tr.instrument_is_ready:
+                        ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+                        ready = False
+                        break
+                    else:
+                        ready = True
+                if ready:
+                    self.disable_all()
+                    self.track_currently_playing = self.tracks
+                    self.stop_has_been_pressed = False
+                    print("play thread is running...")
+                    self.play_all_thread_is_running = True
+                    self.play_all_thread = threading.Thread(target=self.play_all_tracks)
+                    self.play_all_thread.start()
 
     def pause_clicked(self, event):
         _ = event
@@ -174,22 +191,24 @@ class LoopStationManager:
 
     def stop_clicked(self, event):
         _ = event
-        if not self.bpm_is_valid or not self.steps_is_valid:
-            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-        elif not self.tracks:
-            ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-        else:
-            for tr in self.tracks:
-                if not tr.instr_name:
-                    ErrorWindow("No Instrument", "Error: No Instrument")
-                    break
-                elif not tr.instrument_is_ready:
-                    ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    break
-                else:
-                    self.stop_has_been_pressed = True
-                    print("stop has been pressed")
-                    self.stop_all_tracks()
+        if self.track_currently_playing:
+            if not self.bpm_is_valid or not self.steps_is_valid:
+                ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
+            elif not self.tracks:
+                ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+            else:
+                for tr in self.tracks:
+                    if not tr.instr_name:
+                        ErrorWindow("No Instrument", "Error: No Instrument")
+                        break
+                    elif not tr.instrument_is_ready:
+                        ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+                        break
+                    else:
+                        self.stop_has_been_pressed = True
+                        self.track_currently_playing = []
+                        print("stop has been pressed")
+                        self.stop_all_tracks()
 
     def play_all_tracks(self):
         cur_step = 0
@@ -197,7 +216,7 @@ class LoopStationManager:
         if self.play_all_thread_is_running:
             print("1")
             while not self.stop_has_been_pressed:
-                for i, tr in enumerate(self.tracks):
+                for tr in self.tracks:
                     tr.play_this("lsm")
                     print("2")
                 time.sleep(self.time_chunk)
@@ -223,17 +242,18 @@ class LoopStationManager:
 
     def takeoff_land_spaceship(self, event):
         _ = event
-        if self.spaceship_is_running:
-            self.spaceship_is_running = False
-            print("landing")
-            osc.oscTA.send_message("/terminate", 0)
-        else:
-            print("launching")
-            self.spaceship_is_running = True
-            processing_java_path = self.user_paths[0]
-            pde_file_path = self.user_paths[4]
-            pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
-            subprocess.Popen(pde_open, shell=True)
+        if not self.track_currently_playing:
+            if self.spaceship_is_running:
+                self.spaceship_is_running = False
+                print("landing")
+                osc.oscTA.send_message("/terminate", 0)
+            else:
+                print("launching")
+                self.spaceship_is_running = True
+                processing_java_path = self.user_paths[0]
+                pde_file_path = self.user_paths[4]
+                pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
+                subprocess.Popen(pde_open, shell=True)
 
     def launch_interaction_layer(self):
         processing_java_path = self.user_paths[0]

@@ -107,23 +107,21 @@ class Track:
                 ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
 
     def plus_clicked(self, event):
-        self.ls_parent.stop_all_tracks()
-        self.choose_instrument(event)
+        if not self.ls_parent.track_currently_playing:
+            self.ls_parent.stop_all_tracks()
+            self.choose_instrument(event)
 
     def settings_clicked(self, event):
         _ = event
-        self.setup_instrument()
+        if not self.ls_parent.track_currently_playing:
+            self.setup_instrument()
 
     def remove_clicked(self, event):
         _ = event
-        self.destroy()
+        if not self.ls_parent.track_currently_playing:
+            self.destroy()
 
     def choose_instrument(self, event):
-        """
-        upon clicking on open_choose_instrument,
-        a window containing the list of
-        available instrument opens up
-        """
         _ = event
         self.this_play_is_able = True
         self.ls_parent.stop_all_tracks()
@@ -186,6 +184,7 @@ class Track:
 
     def play_this(self, caller):
         print("3")
+        self.ls_parent.track_currently_playing.append(self)
         cur_step = 0
         if caller == "this":
             while self.play_this_thread_is_running or self.ls_parent.play_all_thread_is_running:
@@ -201,7 +200,7 @@ class Track:
                         self.postman.send_message('/action', 'play')
                     elif self.instr_name == "Image Sonification":
                         print("4")
-                        self.postman.send_message('/extract', 'start_routine')
+                        self.postman.send_message('/extract', 'step')
 
                     time.sleep(self.ls_parent.time_chunk)
                     cur_step += 1
@@ -217,7 +216,7 @@ class Track:
             elif self.instr_name == "Rec & Play":
                 self.postman.send_message('/action', 'play')
             elif self.instr_name == "Image Sonification":
-                self.postman.send_message('/extract', 'start_routine')
+                self.postman.send_message('/extract', 'step')
 
     def pause_this(self):
         """
@@ -244,8 +243,10 @@ class Track:
             elif self.instr_name == "Image Sonification":
                 self.postman.send_message('/extract', 'stop')
 
+            index = self.ls_parent.track_currently_playing.index(self)
+            self.ls_parent.track_currently_playing.pop(index)
+
             self.play_this_thread_is_running = False
-            # self.play_this_thread.join()
             print("Play_this thread stopped and destroyed.")
             self.play_this_thread = None
 

@@ -211,7 +211,6 @@ def draw_play_pause_stop_ls(ls_obj):
     canvas = ls_obj.canvas
     width = ls_obj.c_width
     height = ls_obj.c_height
-
     # Draw play icon
     if ls_obj.play_is_able:
         play_c = "#606060"

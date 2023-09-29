@@ -64,6 +64,8 @@ class ImageSonification:
         self.duration = 60 / self.track_parent.ls_parent.bpm  # in secs
         self.harmonics_count = 10
         self.play_note_thread = None
+        self.is_playing = False
+        self.image_on_setup()
         self.draw_all_is()
 
     def draw_all_is(self):
@@ -75,50 +77,65 @@ class ImageSonification:
 
     def ton_up_clicked(self, event):
         _ = event
-        if self.curr_ton < len(self.tonalities):
-            self.curr_ton += 1
-            self.ton = self.tonalities[self.curr_ton]
-        self.ton_is_valid = False
-        self.draw_all_is()
+        if not self.is_playing:
+            if self.curr_ton < len(self.tonalities):
+                self.curr_ton += 1
+                self.ton = self.tonalities[self.curr_ton]
+            self.ton_is_valid = False
+            self.draw_all_is()
 
     def ton_down_clicked(self, event):
         _ = event
-        if self.curr_ton > 0:
-            self.curr_ton -= 1
-            self.ton = self.tonalities[self.curr_ton]
-        self.ton_is_valid = False
-        self.draw_all_is()
+        if not self.is_playing:
+            if self.curr_ton > 0:
+                self.curr_ton -= 1
+                self.ton = self.tonalities[self.curr_ton]
+            self.ton_is_valid = False
+            self.draw_all_is()
 
     def ton_valid_clicked(self, event):
         _ = event
-        self.ton_is_valid = True
-        self.draw_all_is()
+        if not self.is_playing:
+            self.ton_is_valid = True
+            if self.image:
+                self.track_parent.instrument_is_ready = True
+            self.draw_all_is()
 
     def restore_picture(self):
         self.extracted = []
+        self.play_note_thread = None
+        self.draw_all_is()
+
+    def image_on_setup(self):
+        self.pil = Image.open("Instruments/Image_Sonification/elvispic.jpeg")
+        self.pil = self.pil.resize((self.img_sides, self.img_sides))
+        self.image = ImageTk.PhotoImage(self.pil)
+        self.ton_is_valid = True
+        self.track_parent.instrument_is_ready = True
         self.draw_all_is()
 
     def load_image(self, event):
-        self.pil = None
-        self.image = None
-        self.draw_all_is()
-        _ = event
-
-        file_path = filedialog.askopenfilename(
-            parent=self.window,
-            filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.gif;*.bmp")])
-
-        if file_path and self.ton_is_valid:
-            self.pil = Image.open(file_path)
-            self.pil = self.pil.resize((self.img_sides, self.img_sides))
-            self.image = ImageTk.PhotoImage(self.pil)
+        if not self.is_playing:
+            self.pil = None
+            self.image = None
             self.draw_all_is()
-            self.track_parent.instrument_is_ready = True
-        else:
-            ErrorWindow("Tonality Error", "Set the tonality first")
+            _ = event
+
+            file_path = filedialog.askopenfilename(
+                parent=self.window,
+                filetypes=[("Image Files", "*.png;*.jpg;*.jpeg;*.gif;*.bmp")])
+
+            if file_path and self.ton_is_valid:
+                self.pil = Image.open(file_path)
+                self.pil = self.pil.resize((self.img_sides, self.img_sides))
+                self.image = ImageTk.PhotoImage(self.pil)
+                self.draw_all_is()
+                self.track_parent.instrument_is_ready = True
+            else:
+                ErrorWindow("Tonality Error", "Set the tonality first")
 
     def get_random_pixel_color(self):
-        if self.image:
+        if self.image and self.is_playing:
             random_x = random.randint(0, self.img_sides - 1)
             random_y = random.randint(0, self.img_sides - 1)
             self.extracted.append((self.img_pos_x + random_x, self.img_pos_y + random_y))
@@ -129,14 +146,14 @@ class ImageSonification:
             grey = int((rgb_color[0]+rgb_color[1]+rgb_color[2])/3)
             # print(grey)
             note_offset = int(interp(grey, [0, 255], [0, 24]))
-            print(note_offset)
+            # print(note_offset)
             if note_offset in self.major_scale_2oct:
-                print("ok")
+                # print("ok")
                 self.base_freq = self.fund_freq * pow(2, note_offset/12)
                 self.play_note_thread = Thread(target=self.play_note_given_value)
                 self.play_note_thread.start()
             else:
-                print("out")
+                # print("out")
                 self.play_note_thread = None
 
             self.curStep += 1
@@ -170,9 +187,11 @@ class ImageSonification:
 def handle_osc_message(address: str, args: tuple, img_son):
     if address == '/extract':
         if args:
-            if args[0] == 'start_routine':
+            if args[0] == 'step':
+                img_son.is_playing = True
                 img_son.get_random_pixel_color()
             if args[0] == 'stop':
+                img_son.is_playing = False
                 img_son.restore_picture()
             elif args[0] == 'destroy':
                 img_son.window.destroy()
