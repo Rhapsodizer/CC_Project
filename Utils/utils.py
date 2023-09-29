@@ -282,6 +282,7 @@ def safe_close_ls(ls_obj):
 def draw_shutdown_ls(ls_obj):
     ls_obj.stop_all_tracks()
     time.sleep(0.001)
+    osc.oscTA.send_message("/terminate", 0)
     osc.oscCH.send_message("/terminate", 0)
     osc.oscDM.send_message("/terminate", 0)
     ls_obj.tracks = None

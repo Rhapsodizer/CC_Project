@@ -22,7 +22,7 @@ Launch this script to open the main screen
 
 if __name__ == "__main__":
     root = tk.Tk()
-    user = User("AG")  # SA, AG, RM
+    user = User("SA")  # SA, AG, RM
     create_loop_station_manager_window(root, user.get_user_paths())
     root.mainloop()
 
