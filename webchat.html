@@ -282,6 +282,15 @@
           takenMod: false,
         });
       }
+      if(agentType == 1){
+        update(ref(db, 'table/'), {
+          charStream1: "",
+        });
+      } else if (agentType == 2){
+        update(ref(db, 'table/'), {
+          charStream2: "",
+        });
+      }
       return null;
     }     
     
