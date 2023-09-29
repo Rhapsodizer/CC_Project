@@ -1,3 +1,15 @@
+"""
+                                   G   __
+E nanched                          \\  ,,)_
+L ooper  with                       \'-\( /
+V isual                               \ | ,\\
+I nteraction and                          \|_/\\
+S onification                          / _ '.D
+                                      / / \ |
+                                     /_\  /_\\
+                                    '-    '-
+
+"""
 import tkinter as tk
 from LoopStation.loop_station_manager import create_loop_station_manager_window
 from Utils.user import User
@@ -10,7 +22,7 @@ Launch this script to open the main screen
 
 if __name__ == "__main__":
     root = tk.Tk()
-    user = User("SA")  # SA, AG, RM
+    user = User("AG")  # SA, AG, RM
     create_loop_station_manager_window(root, user.get_user_paths())
     root.mainloop()
 
