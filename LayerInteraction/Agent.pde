@@ -6,7 +6,7 @@ class Agent {
   boolean isActive;
 
   Agent() {
-    pos = new PVector();
+    pos = new PVector(width/2, height/2);
     r = 20;
     rInteraction = 100;
     isActive = false;

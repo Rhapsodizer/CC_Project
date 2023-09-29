@@ -69,8 +69,6 @@ void draw() {
   
   // Update agent
   if (ship.isActive){
-    ship.pos.x = mouseX;
-    ship.pos.y = mouseY;
     ship.display();
   }
   
@@ -148,15 +146,22 @@ void oscEvent(OscMessage theOscMessage) {
     balls[id].status = false;
   }
   // Activate/deactivate agent
-  else if(theOscMessage.checkAddrPattern("/triggerAgent")) {
+  if(theOscMessage.checkAddrPattern("/triggerAgent")) {
     if(ship.isActive){
       ship.isActive = false;
     } else {
       ship.isActive = true;
     }
   }
+  // Move agent
+  if (theOscMessage.checkAddrPattern("/right")){
+    ship.pos.x+=10;
+  }
+  if (theOscMessage.checkAddrPattern("/left")){
+    ship.pos.x-=10;
+  }
   // Exit applet
-  else if(theOscMessage.checkAddrPattern("/terminate")) {
+  if(theOscMessage.checkAddrPattern("/terminate")) {
     exit();
   }
 }
