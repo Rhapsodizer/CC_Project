@@ -3,7 +3,7 @@
 E nanched                          \\  ,,)_
 L ooper  with                       \'-\( /
 V isual                               \ | ,\\
-I nteraction and                          \|_/\\
+I nteraction and                       \|_/\\
 S onification                          / _ '.D
                                       / / \ |
                                      /_\  /_\\

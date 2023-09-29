@@ -218,10 +218,10 @@ class LoopStationManager:
     def launch_spaceship(self, event):
         _ = event
         print("spaceship")
-        # processing_java_path = self.user_paths[0]
-        # pde_file_path = self.user_paths[1]  # todo update this
-        # pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
-        # subprocess.Popen(pde_open, shell=True)
+        processing_java_path = self.user_paths[0]
+        pde_file_path = self.user_paths[4]
+        pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
+        subprocess.Popen(pde_open, shell=True)
 
     def launch_interaction_layer(self):
         processing_java_path = self.user_paths[0]
