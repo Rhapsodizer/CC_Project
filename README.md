@@ -25,7 +25,7 @@
   </ol>
 </details>
 
-## 1. Description
+## 1. Description <!-- {#description} -->
 (A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
 This project aims to create a simple and user-friendly Loop Station. This appllication has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
 It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
