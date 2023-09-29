@@ -7,6 +7,7 @@ import subprocess
 from Utils.error_manager import ErrorWindow
 from threading import Thread
 from Instruments.Recorder_and_Player.recorder_and_player import open_rap_window
+from Instruments.Image_Sonification.image_sonification import open_image_son_window
 import Utils.osc_bridge as osc
 from pythonosc import udp_client
 
@@ -46,6 +47,8 @@ class Track:
         self.this_stop_is_able = False
         self.port = random.randint(4000, 5000)
         self.postman = udp_client.SimpleUDPClient("127.0.0.1", self.port)
+        self.port2 = random.randint(3000, 4000)
+        self.postwoman = udp_client.SimpleUDPClient("127.0.0.1", self.port2)
 
     def draw_track(self):
         [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
@@ -143,7 +146,7 @@ class Track:
         instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE)
         instruments_listbox.pack(expand=True, fill=tk.BOTH)
 
-        instrument_list = ["Drum Machine", "Melody Chat", "Rec & Play", "Space Ship"]
+        instrument_list = ["Drum Machine", "Melody Chat", "Rec & Play", "Image Sonification"]
         for instr in instrument_list:
             instruments_listbox.insert(tk.END, instr)
 
@@ -176,6 +179,10 @@ class Track:
                 rap_thread = Thread(target=open_rap_window,
                                     args=[self])
                 rap_thread.start()
+            if self.instr_name == "Image Sonification":
+                img_son_thread = Thread(target=open_image_son_window,
+                                        args=[self])
+                img_son_thread.start()
 
     def play_this(self, caller):
         print("3")
@@ -192,6 +199,9 @@ class Track:
                     elif self.instr_name == "Rec & Play":
                         print("4")
                         self.postman.send_message('/action', 'play')
+                    elif self.instr_name == "Image Sonification":
+                        print("4")
+                        self.postman.send_message('/extract', 'start_routine')
 
                     time.sleep(self.ls_parent.time_chunk)
                     cur_step += 1
@@ -206,6 +216,9 @@ class Track:
                 osc.oscCH.send_message("/playStep", 0)
             elif self.instr_name == "Rec & Play":
                 self.postman.send_message('/action', 'play')
+            elif self.instr_name == "Image Sonification":
+                print("4")
+                self.postman.send_message('/extract', 'start_routine')
 
     def pause_this(self):
         """
@@ -229,6 +242,8 @@ class Track:
                 osc.oscCH.send_message("/stop", 0)
             elif self.instr_name == "Rec & Play":
                 self.postman.send_message('/action', 'stop')
+            elif self.instr_name == "Image Sonification":
+                self.postman.send_message('/extract', 'stop')
 
             self.play_this_thread_is_running = False
             # self.play_this_thread.join()
@@ -243,6 +258,8 @@ class Track:
             osc.oscCH.send_message("/terminate", 0)
         elif self.instr_name == "Rec & Play":
             self.postman.send_message('/action', 'destroy')
+        elif self.instr_name == "Image Sonification":
+            self.postman.send_message('/extract', 'destroy')
 
         tr_dist = 10
         if self in self.ls_parent.tracks:
