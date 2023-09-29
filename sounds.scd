@@ -140,6 +140,11 @@ Synth(\snare);
 //---------------------------------------------------------------------
 
 (
+OSCdef('playTrigger', {~playSound.value;}, "/playStep");
+OSCdef('kick',{arg msg; Synth(\kick1, [pitch: msg[1]]);}, "/kick");
+OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
+OSCdef('snare',{Synth(\snare)},"/snare");
+OSCdef('collision',{Synth(\kick3)},"/collision");
 OSCdef('melody',{arg msg; ~arrayFreq = Array.newClear(msg.size-1);
 	// Fill array
 	(msg.size-1).do({arg i; ~arrayFreq.put(i, msg[i+1]); });
