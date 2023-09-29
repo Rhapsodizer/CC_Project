@@ -41,12 +41,14 @@ String user2 = "";
 
 HashMap<Character, Integer> letterToNumber = new HashMap<Character, Integer>(); // Mappa per associare le lettere ai numeri
 
+PImage img;
+
 void setup() {
   size(900, 500);
   textSize(20);
   
-  nSteps = int(args[0]);
-  //nSteps = 16;
+  //nSteps = int(args[0]);
+  nSteps = 16;
   
   //OSC
   oscP5 = new OscP5(this, 12002);
@@ -62,12 +64,18 @@ void setup() {
     letterToNumber.put(lowercaseLetters[i], i + 1);
     letterToNumber.put(uppercaseLetters[i], i + 1);
   }  
+  
+  // Load image
+  img = loadImage("elvis.png");
+  imageMode(CENTER);
 }
 
 void draw() {
   
   background(220);
   textSize(20);
+  image(img,(width/2)-125,(height/2)+50,122,213);
+  image(img,(width)-125,(height/2)+50,122,213);
   
   //CHAT2 IN TEMPO REALE
   fill(128);
