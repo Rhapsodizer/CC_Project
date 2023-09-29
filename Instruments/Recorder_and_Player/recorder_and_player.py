@@ -11,6 +11,7 @@ import time
 from Utils import utils
 from Utils.error_manager import ErrorWindow
 from pythonosc import dispatcher, osc_server
+import sys
 import os
 os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = 'hide'
 import pygame
@@ -24,7 +25,7 @@ def open_rap_window(tr_parent):
     dispatcher_instance.map("/action", lambda addr, *args: handle_osc_message(addr, args, rap))
 
     # Start an OSC server to listen for messages
-    server = osc_server.ThreadingOSCUDPServer(('127.0.0.1', 5006), dispatcher_instance)
+    server = osc_server.ThreadingOSCUDPServer(('127.0.0.1', tr_parent.port), dispatcher_instance)
     server_thread = Thread(target=server.serve_forever)
     server_thread.daemon = True
     server_thread.start()
@@ -63,6 +64,7 @@ class RecorderAndPlayer:
         self.values_of_audio_segment = None
         self.waiting_time = 10  # ms
         self.discrete_time_instant = 0
+        self.recorded_audio = []
         self.audio_data = []
         self.show_audio_data = []
         self.is_playing = False
@@ -73,48 +75,60 @@ class RecorderAndPlayer:
         dirname = os.path.dirname(__file__)
         self.recorded_filename = "recorded_audio.wav"
         self.recorded_file_path = os.path.join(dirname, "./recorded_audio.wav")
-        self.frame_length = 256
+        self.frame_length = 128
         self.tc_height = 52
         self.tc_width = 256
-        self.time_canvas = tk.Canvas(self.window, width=self.tc_width, height=self.tc_height, bg="#B4B4B4")
-        self.time_canvas.place(x=self.c_width/2 - self.tc_width/2, y=201)
+        self.tc_pos_x = self.c_width/2 - self.tc_width/2
+        self.tc_pos_y = 201
+        self.time_canvas = tk.Canvas(self.window, width=self.tc_width, height=self.tc_height, bg="#DCDCDC")
+        self.time_canvas.place(x=self.tc_pos_x, y=self.tc_pos_y)
         self.audio_time = 0.00
         self.zero_time = 0.00
         self.has_already_received_play = False
+        self.audio_thread = None
+        self.display_thread = None
+        self.rec_thread = None
         self.draw_all()
         # Initialize pygame for audio playback
         pygame.mixer.init()
 
     def plus_clicked(self, event):
-        self.audio_data = []
-        self.show_audio_data = []
-        self.loaded = False
-        self.reset_time()
-        self.draw_all()
-        self.choose_file(event)
-
-    def record_clicked(self, event):
-        _ = event
-        if not self.is_recording:
+        if not self.is_playing and not self.is_recording:
             self.audio_data = []
             self.show_audio_data = []
             self.loaded = False
             self.reset_time()
+            self.draw_all()
+            self.choose_file(event)
+
+    def record_clicked(self, event):
+        _ = event
+        if not self.is_playing and not self.is_recording:
+            self.recorded_audio = []
+            self.remove_clicked(event=None)
+
             self.recorder = PvRecorder(device_index=-1, frame_length=self.frame_length)
             self.recorder.start()
-            thread = Thread(target=self.record_mic)
-            thread.start()
+            self.rec_thread = Thread(target=self.record_mic)
+            self.rec_thread.start()
 
-    # def calculate_loop_duration(self):
-    #     loop_dur = 60/self.bpm * self.steps
-    #     print(loop_dur)
-    #     return loop_dur
+    def remove_clicked(self, event):
+        if not self.is_playing and not self.is_recording:
+            _ = event
+            self.audio_data = []
+            self.show_audio_data = []
+            self.loaded = False
+            self.reset_time()
+            self.draw_all()
 
     def draw_toolbar(self):
-        [record_rect, record_circle, plus] = utils.draw_toolbar_rap(self)
+        [record_rect, record_circle, plus, remove_button, remove_x1, remove_x2] = utils.draw_toolbar_rap(self)
         self.toolbar_canvas.tag_bind(record_rect, "<Button-1>", self.record_clicked)
         self.toolbar_canvas.tag_bind(record_circle, "<Button-1>", self.record_clicked)
         self.toolbar_canvas.tag_bind(plus, "<Button-1>", self.plus_clicked)
+        self.toolbar_canvas.tag_bind(remove_button, "<Button-1>", self.remove_clicked)
+        self.toolbar_canvas.tag_bind(remove_x1, "<Button-1>", self.remove_clicked)
+        self.toolbar_canvas.tag_bind(remove_x2, "<Button-1>", self.remove_clicked)
 
     def draw_time_bar(self):
         utils.draw_time_bar_rap(self)
@@ -165,14 +179,16 @@ class RecorderAndPlayer:
 
     def stop_file(self):
         pygame.mixer.music.stop()
+        self.is_playing = False
         self.has_already_received_play = False
+        self.reset_time()
         self.reset_time()
         self.visualize_amplitude()
 
     def loop_file(self):
+        self.has_already_received_play = False
         self.reset_time()
         self.visualize_amplitude()
-        self.has_already_received_play = False
 
     def visualize_amplitude(self):
         if len(self.audio_data) > 0:
@@ -199,19 +215,19 @@ class RecorderAndPlayer:
             ErrorWindow("Setup Error", "Error: Setup Error")
 
     def play_file_in_thread(self):
+        self.has_already_received_play = True
+        self.is_playing = True
         self.reset_time()
-        self.zero_time = time.time()
         if len(self.show_audio_data) > 0:
             dim = self.ampl_c_width / len(self.show_audio_data)
             if self.audio_file != "":
-                self.is_playing = True
                 self.discrete_time_instant = 0
 
-                audio_thread = threading.Thread(target=self.play_audio)
-                audio_thread.start()
+                self.audio_thread = threading.Thread(target=self.play_audio)
+                self.audio_thread.start()
 
-                display_thread = threading.Thread(target=self.draw_file, args=[dim])
-                display_thread.start()
+                self.display_thread = threading.Thread(target=self.draw_file, args=[dim])
+                self.display_thread.start()
         else:
             ErrorWindow("Setup Error", "Error: Setup Error")
 
@@ -223,74 +239,76 @@ class RecorderAndPlayer:
             self.canvas.create_rectangle(x, self.c_height * 0.5 - y / 2,
                                          x + float(dim), self.c_height * 0.5 + y / 2, fill="#000000")
             self.canvas.update()
-            self.draw_time_bar()
             i = self.audio_time * 100
             while i < self.discrete_time_instant:
+                # time.sleep(0.01)
                 self.audio_time = round(round(time.time(), 2) - self.zero_time, 2)
                 i = self.audio_time * 100
-                print(i)
             self.discrete_time_instant += 1
+            # print(self.audio_time)
+            self.draw_time_bar()
             if self.discrete_time_instant < len(self.show_audio_data):
-                if self.audio_time < self.loop_duration:
-                    self.draw_file(dim)
-                else:
-                    print("in else")
-                    # in order to loop back, wait for the next "play" msg
-                    # from the routine
-                    self.loop_file()
+                # if self.audio_time < self.loop_duration:
+                self.draw_file(dim)
+            elif self.is_playing:
+                print("in else")
+                # in order to loop back, wait for the next "play" msg from the routine
+                self.loop_file()
 
     def record_mic(self):
-        self.canvas.delete("all")
-        self.loaded = False
-        self.draw_toolbar()
-        audio = []
         self.is_recording = True
-        self.draw_toolbar()
+        self.canvas.delete("all")
+        utils.round_rectangle(self.canvas,
+                              self.ampl_c_pos_x, self.ampl_c_pos_y,
+                              self.ampl_c_pos_x + self.ampl_c_width, self.ampl_c_pos_y + self.ampl_c_height,
+                              radius=20, fill_color=self.toolbar_color, outline_color="#000000")
+        self.discrete_time_instant = 0
+        dim = self.ampl_c_width / (self.loop_duration * 100)
+        # time.sleep(3)
         try:
-            # Wait for the expected lag time #
-            # time.sleep(self.expected_lag)
-
-            start_time = time.time()
-            i = 0
-            while time.time() - start_time < self.loop_duration:
-                frame = self.recorder.read()
-                audio.extend(frame)
-                self.draw_while_recording(dim=self.ampl_c_width/(self.loop_duration*100), frame=frame, i=i)
-                self.audio_time = time.time() - start_time
-                self.draw_time_bar()
-                i += 1
+            self.draw_while_recording(dim)
         finally:
             self.recorder.stop()
             with wave.open(self.recorded_file_path, 'w') as f:
                 f.setparams((1, 2, 16000, self.frame_length, "NONE", "NONE"))
-                f.writeframes(struct.pack("h" * len(audio), *audio))
+                f.writeframes(struct.pack("h" * len(self.recorded_audio), *self.recorded_audio))
 
+            self.rec_thread = None
             self.is_recording = False
             self.has_finished_recording = True
-            self.draw_toolbar()
+            self.reset_time()
+            self.draw_all()
             time.sleep(2)
             self.has_finished_recording = False
-            self.canvas.delete("all")
-            self.reset_time()
-            self.draw_toolbar()
+            self.draw_all()
 
-    def draw_while_recording(self, dim, frame, i):
-        amplitude = frame[0]
+    def draw_while_recording(self, dim):
+        self.draw_time_bar()
+        frame = self.recorder.read()
+        self.recorded_audio.extend(frame)
 
-        new_max = self.c_height * 0.5
-        new_min = 0
-        amplitude_normalized = amplitude * (new_max - new_min) / (self.c_height + new_min)
-
-        x = i * dim
-        y = amplitude_normalized
-        self.canvas.create_rectangle(x, self.c_height * 0.5 - y / 2,
-                                     x + float(dim), self.c_height * 0.5 + y / 2, fill="#000000")
-        self.canvas.update()  # Update the canvas to show the rectangle
-        time.sleep(self.waiting_time / 1000)  # in seconds
+        amplitude = abs(frame[0])
+        if amplitude >= self.ampl_c_height:
+            amplitude_normalized = self.ampl_c_height
+        else:
+            amplitude_normalized = amplitude / 2
+        x = self.ampl_c_pos_x + (self.discrete_time_instant * dim)
+        h = amplitude_normalized
+        self.canvas.create_rectangle(x, self.ampl_c_height / 2 - h / 2,
+                                     x + float(dim), self.ampl_c_height / 2 + h / 2, fill="#000000")
+        self.canvas.update()
+        i = round(self.audio_time, 2) * 100
+        while i < self.discrete_time_instant:
+            self.audio_time = round(round(time.time(), 2) - self.zero_time, 2)
+            i = self.audio_time * 100
+        self.discrete_time_instant += 1
+        if self.discrete_time_instant < self.loop_duration * 100:
+            self.draw_while_recording(dim)
 
     def reset_time(self):
         self.audio_time = 0.00
-        self.discrete_time_instant = 0.00
+        self.discrete_time_instant = 0
+        self.zero_time = time.time()
         self.draw_time_bar()
 
 
@@ -298,11 +316,12 @@ def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
     # print("5")
     if address == '/action':
         if args:
-            # new_color = args[0]  # Assuming the color is the first argument
-            # rap.received_msg(args[0])
             if args[0] == 'play':
-                if not rap.has_already_received_play:
-                    rap.has_already_received_play = True
+                if not rap.has_already_received_play and not rap.is_recording:
                     rap.play_file_in_thread()
-            else:
+            elif args[0] == 'stop':
+                rap.audio_thread = None
+                rap.display_thread = None
                 rap.stop_file()
+            elif args[0] == 'destroy':
+                rap.window.destroy()

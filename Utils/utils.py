@@ -436,26 +436,57 @@ def draw_toolbar_rap(rap_obj):
         )
 
     if not rap_obj.loaded and not rap_obj.is_recording and not rap_obj.has_finished_recording:
-        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 60, rap_obj.toolbar_pos_y + 100,
                                            text="No file selected", font=("Arial", 12), anchor=tk.W)
     elif rap_obj.loaded:
         rap_obj.toolbar_canvas.create_text(
-            rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+            rap_obj.toolbar_pos_x + 60, rap_obj.toolbar_pos_y + 100,
             text="File name = " + rap_obj.file_title, font=("Arial", 12), anchor=tk.W)
     elif rap_obj.is_recording:
-        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 60, rap_obj.toolbar_pos_y + 100,
                                            text="Recording for " + str(rap_obj.loop_duration) + " seconds",
                                            font=("Arial", 12), anchor=tk.W)
     elif rap_obj.has_finished_recording:
-        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 20, rap_obj.toolbar_pos_y + 100,
+        rap_obj.toolbar_canvas.create_text(rap_obj.toolbar_pos_x + 60, rap_obj.toolbar_pos_y + 100,
                                            text="Saving recording as: " + str(rap_obj.recorded_filename),
                                            font=("Arial", 12), anchor=tk.W)
 
-    return [rec_rectangle, rec_circle, plus_rect]
+    # Draw Remove icon
+    x_offset = rap_obj.toolbar_pos_x + 30
+    y_offset = rap_obj.toolbar_pos_y + 100
+    half_diagonal = 20
+    # Draw close icon
+    remove_button = rap_obj.toolbar_canvas.create_polygon(
+        x_offset - half_diagonal, y_offset,
+        x_offset, y_offset - half_diagonal,
+        x_offset + half_diagonal, y_offset,
+        x_offset, y_offset + half_diagonal,
+        fill="#606060", outline="#000000")
+
+    remove_x1 = rap_obj.toolbar_canvas.create_polygon(
+        x_offset - half_diagonal / 3 - 1, y_offset - half_diagonal / 3 + 1,
+        x_offset - half_diagonal / 3 + 1, y_offset - half_diagonal / 3 - 1,
+        x_offset + half_diagonal / 3 + 1, y_offset + half_diagonal / 3 - 1,
+        x_offset + half_diagonal / 3 - 1, y_offset + half_diagonal / 3 + 1,
+        fill="#000000", outline="#000000")
+
+    remove_x2 = rap_obj.toolbar_canvas.create_polygon(
+        x_offset + half_diagonal / 3 - 1, y_offset - half_diagonal / 3 - 1,
+        x_offset + half_diagonal / 3 + 1, y_offset - half_diagonal / 3 + 1,
+        x_offset - half_diagonal / 3 + 1, y_offset + half_diagonal / 3 + 1,
+        x_offset - half_diagonal / 3 - 1, y_offset + half_diagonal / 3 - 1,
+        fill="#000000", outline="#000000")
+
+    return [rec_rectangle, rec_circle, plus_rect, remove_button, remove_x1, remove_x2]
 
 
 def draw_time_bar_rap(rap_obj):
     rap_obj.time_canvas.delete("all")
+    # Draw rect container
+    round_rectangle(rap_obj.time_canvas,
+                    5, 5,
+                    rap_obj.tc_width - 5, rap_obj.tc_height - 5,
+                    radius=20, fill_color=rap_obj.toolbar_color, outline_color="#000000")
     rap_obj.time_canvas.create_text(rap_obj.tc_width/2, rap_obj.tc_height/2,
                                     text="{:.2f}".format(rap_obj.audio_time) + " / " + str(rap_obj.loop_duration),
                                     font=("Arial", 12))

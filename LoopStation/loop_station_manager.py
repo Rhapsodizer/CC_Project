@@ -35,7 +35,6 @@ class LoopStationManager:
         self.steps_is_valid = False
         self.loop_duration = self.calculate_loop_duration
         self.time_chunk = 60 / self.bpm
-        self.ls_is_ready = False
         self.play_all_thread = None
         self.play_all_thread_is_running = False
         self.stop_has_been_pressed = False
@@ -124,6 +123,7 @@ class LoopStationManager:
 
     def play_clicked(self, event):
         _ = event
+        ready = False
         if not self.bpm_is_valid or not self.steps_is_valid:
             ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
         elif not self.tracks:
@@ -132,18 +132,21 @@ class LoopStationManager:
             for tr in self.tracks:
                 if not tr.instr_name:
                     ErrorWindow("No Instrument", "Error: No Instrument")
-                    self.ls_is_ready = False
+                    ready = False
                     break
                 elif not tr.instrument_is_ready:
                     ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
+                    ready = False
                     break
                 else:
-                    self.disable_all()
-                    self.stop_has_been_pressed = False
-                    print("play thread is running...")
-                    self.play_all_thread_is_running = True
-                    self.play_all_thread = threading.Thread(target=self.play_all_tracks)
-                    self.play_all_thread.start()
+                    ready = True
+            if ready:
+                self.disable_all()
+                self.stop_has_been_pressed = False
+                print("play thread is running...")
+                self.play_all_thread_is_running = True
+                self.play_all_thread = threading.Thread(target=self.play_all_tracks)
+                self.play_all_thread.start()
 
     def pause_clicked(self, event):
         _ = event
@@ -183,7 +186,8 @@ class LoopStationManager:
 
     def play_all_tracks(self):
         cur_step = 0
-        while self.play_all_thread_is_running:
+        # while self.play_all_thread_is_running:
+        if self.play_all_thread_is_running:
             print("1")
             while not self.stop_has_been_pressed:
                 for i, tr in enumerate(self.tracks):
@@ -201,13 +205,13 @@ class LoopStationManager:
 
     def stop_all_tracks(self):
         if self.play_all_thread:
+            for i, tr in enumerate(self.tracks):
+                print(f"stopping track {i}")
+                tr.stop_this()
             self.play_all_thread_is_running = False
             self.play_all_thread.join()
             print("Play thread stopped and destroyed.")
             self.play_all_thread = None
-            for i, tr in enumerate(self.tracks):
-                print(f"stopping track {i}")
-                tr.stop_this()
             self.enable_all()
 
     def launch_interaction_layer(self):

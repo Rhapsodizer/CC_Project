@@ -1,6 +1,6 @@
 import threading
 import time
-
+import random
 from Utils import utils
 import tkinter as tk
 import subprocess
@@ -44,7 +44,8 @@ class Track:
         self.stop_this_has_been_pressed = False
         self.this_play_is_able = False
         self.this_stop_is_able = False
-        self.postman = udp_client.SimpleUDPClient("127.0.0.1", 5006)
+        self.port = random.randint(4000, 5000)
+        self.postman = udp_client.SimpleUDPClient("127.0.0.1", self.port)
 
     def draw_track(self):
         [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
@@ -221,10 +222,6 @@ class Track:
 
     def stop_this(self):
         if self.play_this_thread or self.ls_parent.play_all_thread:
-            self.play_this_thread_is_running = False
-            self.play_this_thread.join()
-            print("Play_this thread stopped and destroyed.")
-            self.play_this_thread = None
             # Send STOP trigger
             if self.instr_name == "Drum Machine":
                 osc.oscDM.send_message("/stop", 0)
@@ -233,18 +230,24 @@ class Track:
             elif self.instr_name == "Rec & Play":
                 self.postman.send_message('/action', 'stop')
 
+            self.play_this_thread_is_running = False
+            # self.play_this_thread.join()
+            print("Play_this thread stopped and destroyed.")
+            self.play_this_thread = None
+
     def destroy(self):
         # Send trigger to exit target applet
         if self.instr_name == "Drum Machine":
             osc.oscDM.send_message("/terminate", 0)
         elif self.instr_name == "Melody Chat":
             osc.oscCH.send_message("/terminate", 0)
+        elif self.instr_name == "Rec & Play":
+            self.postman.send_message('/action', 'destroy')
 
         tr_dist = 10
         if self in self.ls_parent.tracks:
             index = self.ls_parent.tracks.index(self)
             self.ls_parent.tracks.pop(index)
-            # self.ls_parent.tracks.remove(self)
             for i, tr in enumerate(self.ls_parent.tracks):
                 if i >= index:
                     tr.pos_y = tr.pos_y - (self.height + tr_dist)
