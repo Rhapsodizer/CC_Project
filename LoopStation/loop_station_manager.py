@@ -21,7 +21,7 @@ def create_loop_station_manager_window(root, u_paths):
 class LoopStationManager:
     def __init__(self, root, u_paths):
         self.window = root
-        self.window.title("Loop Station Manager")
+        self.window.title("E.L.V.I.S")
         self.window.geometry("800x700")
         self.window.resizable(width=False, height=False)
         self.c_width = 800
@@ -44,9 +44,10 @@ class LoopStationManager:
         self.user_paths = u_paths
 
     def draw_all(self):
-        [up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
+        [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
          bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop,
          safe_close, close_x1, close_x2] = utils.draw_all_ls(self)
+        self.canvas.tag_bind(spaceship, "<Button-1>", self.launch_spaceship)
         self.canvas.tag_bind(up_bpm_triangle, "<Button-1>", self.up_bpm)
         self.canvas.tag_bind(down_bpm_triangle, "<Button-1>", self.down_bpm)
         self.canvas.tag_bind(up_steps_triangle, "<Button-1>", self.up_steps)
@@ -213,6 +214,14 @@ class LoopStationManager:
             print("Play thread stopped and destroyed.")
             self.play_all_thread = None
             self.enable_all()
+
+    def launch_spaceship(self, event):
+        _ = event
+        print("spaceship")
+        # processing_java_path = self.user_paths[0]
+        # pde_file_path = self.user_paths[1]  # todo update this
+        # pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
+        # subprocess.Popen(pde_open, shell=True)
 
     def launch_interaction_layer(self):
         processing_java_path = self.user_paths[0]
