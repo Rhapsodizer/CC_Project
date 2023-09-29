@@ -3,20 +3,22 @@ import firebase_admin
 from firebase_admin import db
 import os
 
-# OSC definitions
+# OSC definitions -----------------------------------------------------------------------------------------------
 ip_addr = "127.0.0.1"
 port_SC = 57120  # towards supercollider
 port_LI = 12000  # towards layer interaction sketch
 port_DM = 12001  # towards drum machine
 port_CH = 12002  # towards melody chat
-port_RP = 12003  # towards  record and play
+port_RP = 12003  # towards record and play
+port_TA = 12004  # towards agent ship
 oscSC = udp_client.SimpleUDPClient(ip_addr, port_SC)
 oscLI = udp_client.SimpleUDPClient(ip_addr, port_LI)
 oscDM = udp_client.SimpleUDPClient(ip_addr, port_DM)
 oscCH = udp_client.SimpleUDPClient(ip_addr, port_CH)
 oscRP = udp_client.SimpleUDPClient(ip_addr, port_RP)
+oscTA = udp_client.SimpleUDPClient(ip_addr, port_TA)
 
-
+# Retrieve chat data from client and send to processing ----------------------------------------------------------
 # Connect to firebase
 dirname = os.path.dirname(__file__)
 filename = os.path.join(dirname, './certificate.json')
@@ -30,18 +32,14 @@ default_app = firebase_admin.initialize_app(credential, {
 def listener_un1(event):
     oscCH.send_message("/username", [1, event.data])
 
-
 def listener_cs1(event):
     oscCH.send_message("/char", [1, event.data])
-
 
 def listener_un2(event):
     oscCH.send_message("/username", [2, event.data])
 
-
 def listener_cs2(event):
     oscCH.send_message("/char", [2, event.data])
-
 
 # Bind listeners
 un1 = db.reference('table/username1').listen(listener_un1)
