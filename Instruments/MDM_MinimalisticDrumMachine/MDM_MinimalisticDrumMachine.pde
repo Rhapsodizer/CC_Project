@@ -15,6 +15,8 @@ ArrayList<Step> bHat = new ArrayList<Step>();
 ArrayList<Step> bSnr = new ArrayList<Step>();
 ArrayList<Step> bKik = new ArrayList<Step>();
 
+PImage img;
+
 
 class Step
 {
@@ -112,14 +114,21 @@ void setup()
     bKik.add( new Step(100+i*50, 150, i, "kick", kikRow ) );
   }
   
+  // Set initial step and marker position
   curr = 0;
   pos = curr;
+  
+  // Load image
+  img = loadImage("elvis.png");
 }
 
 void draw()
 {
   background(220);
   fill(255);
+  
+  // Draw image
+  image(img,717,0,186,200);
   
   // Labels
   textSize(textHeight);
@@ -139,8 +148,6 @@ void draw()
   fill(180);
   triangle(100 + pos*50, 20, 90 + pos*50, 10, 110 + pos*50, 10);
   
-  // Play
-  pos = curr;
 }
 
 // Toggle step
@@ -157,20 +164,24 @@ void mousePressed()
 // Receive OSC triggers
 void oscEvent(OscMessage trigger)
 {
-  if(trigger.checkAddrPattern("/start")) {
+  if(trigger.checkAddrPattern("/stop")) {
     curr = 0;
     pos = curr;
   }
-  else if(trigger.checkAddrPattern("/nextStep")) {
-    if (curr == nStep-1){
-      curr = -1;
-      pos = curr;
-    }
-    curr++;
+  else if(trigger.checkAddrPattern("/playStep")) {
+    // Sync marker
     pos = curr;
+    // Play Sound
     bHat.get(curr).sendOSC();
     bSnr.get(curr).sendOSC();
     bKik.get(curr).sendOSC();
+    // Move one step forward
+    curr++;
+    // Return to first step
+    if (curr == nStep){
+      curr = 0;
+    }
+    
   }
   else if(trigger.checkAddrPattern("/setSteps")) {
     nStep = trigger.get(0).intValue();
