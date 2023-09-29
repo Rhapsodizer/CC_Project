@@ -75,9 +75,21 @@ void draw() {
   // Update balls
   for (Ball ball : balls) {
     if (ball.status == true){
+      
       ball.collide();
       ball.move();
       ball.display();
+      
+      if (dist(ball.pos.x, ball.pos.y, mouseX, mouseY) < ball.r) {
+        cursor(HAND);
+      } else {
+        cursor(ARROW);
+      }
+      
+      if (ball.popup){
+        ball.drawPopup();
+      }
+
       for (int i=0; i<ball.animStart.length; i++) {
         if(time-ball.animStart[i]<1000){
           fill(255, 255-(time-ball.animStart[i]));
@@ -88,6 +100,20 @@ void draw() {
   }
 }
 
+// Toggle popup
+void mouseClicked(){
+  for (Ball ball : balls) {
+    if (ball.status == true){
+      if ( (dist(ball.pos.x, ball.pos.y, mouseX, mouseY) < ball.r) ){
+        ball.popup = true;
+        println("Clicked: " +  ball.id + " " + ball.type);
+      } else {
+        ball.popup = false;
+      }
+    }
+  }
+}
+      
 // Collision triggers
 void collision_event(int id, int other_id, String type, String other_type) {
   //oscP5.send(collision, addressSC);

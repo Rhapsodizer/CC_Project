@@ -13,10 +13,12 @@ class Ball {
   boolean collided[] = new boolean[numBalls];
   int animStart[] = new int[numBalls];
   Ball[] others;
+  boolean popup;
   
   
   Ball(int _id, String _type, boolean _status, Ball[] _others) {
     r = 25;
+    popup = false;
     id = _id;
     status = _status;
     others = _others;
@@ -117,5 +119,17 @@ class Ball {
     }
     noStroke();
   }
+  
+  void drawPopup() {
+    stroke(0);
+    fill(200);
+    rect(50,50,300,300);
+    fill(128);
+    text("Type: " + type, 100, 100);
+    text("ID: " + id, 100, 130);
+    text("Vel: [" + pos.x + ", " + pos.y + "]", 100, 160);
+    line(pos.x, pos.y, 100,150);
+  }
+  
   
 }

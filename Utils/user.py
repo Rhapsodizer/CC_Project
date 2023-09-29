@@ -22,7 +22,7 @@ class User:
                         "\"H:\\Documenti\\POLIMI\\\\2_1\\CC\\Project\\GitHub\\CC_Project\\Instruments\\MDM_MinimalisticDrumMachine\"",
                         "\"H:\\Documenti\\POLIMI\\\\2_1\\CC\\Project\\GitHub\\CC_Project\\Instruments\\Chat\"",
                         "\"H:\\Documenti\\POLIMI\\\\2_1\\CC\\Project\\GitHub\\CC_Project\\LayerInteraction\\controlAgent\"",
-                        "LoopStation\\elvis.png"
+                        "H:\\Documenti\\POLIMI\\\\2_1\\CC\\Project\\GitHub\\CC_Project\\LoopStation\\elvis.png"
                         ]
         elif self.u == "RM":
             u_paths = [
