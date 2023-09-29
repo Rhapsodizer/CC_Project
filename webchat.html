@@ -44,7 +44,6 @@
       padding: 5%;
     }
     
-    
     input[type=text]{
         -webkit-border-radius: 20px;
         -moz-border-radius: 20px;
@@ -69,7 +68,6 @@
     #sentence {
       width: 80%;
     }
-
     </style>
   </head>
 
@@ -80,7 +78,7 @@
     
       // Import the functions you need from the SDKs you need
       import { initializeApp } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-app.js";
-      import { getDatabase, ref, set, child, push, update, onValue } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-database.js";
+      import { getDatabase, ref, set, child, push, update, onValue, get } from "https://www.gstatic.com/firebasejs/9.20.0/firebase-database.js";
 
       // Your web app's Firebase configuration
       const firebaseConfig = {
@@ -99,16 +97,39 @@
       const app = initializeApp(firebaseConfig);
       const db = getDatabase();
 
+      let takenMel, takenMod;
       let agentType;
       let remoteUser;
       let remoteChar;
       let remoteUserName;
       let remoteSentence = [];
 
+      // Control if chat is already taken
+      get(child(ref(db), 'table/takenMel')).then((snapshot) => {
+        takenMel = snapshot.val();
+        if (takenMel) {
+          radio1.style.display = "None";
+        }
+      });
+      get(child(ref(db), 'table/takenMod')).then((snapshot) => {
+        takenMod = snapshot.val();
+        if (takenMod) {
+          radio2.style.display = "None";
+        }
+      });
+      
+
       // Prompt agent choice
+
+      // MELODY
       radio1.onclick = function() {
         agentType = 1;
         popup.style.display = "None";
+
+        // Send taken trigger
+        update(ref(db, 'table/'), {
+            takenMel: true,
+          });
 
         // Retrieve other user data
         remoteUser = ref(db, 'table/username2');
@@ -139,9 +160,16 @@
           }
         });
       }
+
+      // MODIFIER
       radio2.onclick = function() {
         agentType = 2;
         popup.style.display = "None";
+
+        // Send taken trigger
+        update(ref(db, 'table/'), {
+            takenMod: true,
+          });
 
         // Retrieve other user data
         remoteUser = ref(db, 'table/username1');
@@ -177,7 +205,6 @@
       let sendChar = "";
       // Get username
       username.addEventListener('input', () => {
-        const db = getDatabase();
         if (agentType === 1){
           update(ref(db, 'table/'), {
           username1: username.value
@@ -226,7 +253,6 @@
         }
 
         // Send to firebase
-        const db = getDatabase();
         if (agentType === 1){
           update(ref(db, 'table/'), {
             charStream1: "",
@@ -244,7 +270,21 @@
         }
       });
 
-
+    window.onbeforeunload = closingCode;
+    
+    function closingCode(){
+      if(agentType == 1){
+        update(ref(db, 'table/'), {
+          takenMel: false,
+        });
+      } else if (agentType == 2){
+        update(ref(db, 'table/'), {
+          takenMod: false,
+        });
+      }
+      return null;
+    }     
+    
   </script>
 
     <div id="rcorners">
@@ -265,6 +305,8 @@
         <input type="radio" id = "radio1" name="foo" checked=false>Melody maker (&#9835;)</input>
         <br>
         <input type="radio" id = "radio2" name="foo" checked=false>Melody modifier (&#9874;)</input>
+        <br><br>
+        (You may wait until the resource is freed)
       </div>
     </div>
 	
