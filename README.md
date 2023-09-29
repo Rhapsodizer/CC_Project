@@ -31,7 +31,7 @@ This project aims to create a simple and user-friendly Loop Station. This applli
 It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
 to express themselves and enjoy the music they create.
 
-## 1.1. Challenges, accomplishment and lessons learned
+### 1.1. Challenges, accomplishment and lessons learned
 (What kind of challenges did you run into for this projects, what kind of accomplishment are you proud of and and what did you learn during the project? Few lines for each question.)
 The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
 in which the Loop Station Manager dictates all the actions to perform.
