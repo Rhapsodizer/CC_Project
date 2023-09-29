@@ -71,20 +71,13 @@ SCHEMA MESSAGGI OSC TRA PROCESSING-PHYTON-SUPERCOLLIDER-FIREBASE
 
 ## Contacts and contributions
 
-**Attolini Silvio** - silvio.attolini@mail.polimi.it
-UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
-**Gorni Alessandro** - alessandro.gorni@mail.polimi.it
-DM, MelodyChat, sounds.scd, LayerInteraction
-**Martinelli Riccardo** - riccardo.martineli@mail.polimi.it
-MelodyChat, sounds.scd
+- **Attolini Silvio** - silvio.attolini@mail.polimi.it: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
+- **Gorni Alessandro** - alessandro.gorni@mail.polimi.it: DM, MelodyChat, sounds.scd, LayerInteraction
+- **Martinelli Riccardo** - riccardo.martineli@mail.polimi.it: MelodyChat, sounds.scd
 
 Project link: https://github.com/Rhapsodizer/CC_Project
+OTHER LINKSSSSS???????????????????? (youtube videos, presentation, link for the web app.)
 
-## 4. Students
-(the members of the group with a sentence that explains for each person what was their main contribution to the project)
-
-## 5. links
-(available links such as github repo (mandatory), youtube videos, presentation, link for the web app.)
 
 ## 6. 1 thumbnail image related to the projects: format 1024x768
 
