@@ -21,7 +21,7 @@
       <li><a href="#layer-interaction">Layer Interaction</a></li>
       <li><a href="#sounds">Sounds</a></li>
       <li><a href="#osc">Osc Structures</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact">Contacts and contributions</a></li>
   </ol>
 </details>
 
@@ -31,7 +31,7 @@ This project aims to create a simple and user-friendly Loop Station. This applli
 It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
 to express themselves and enjoy the music they create.
 
-### 1.1. Challenges, accomplishment and lessons learned
+### 1.1. Challenges, accomplishment and lessons learned <a name="cal"></a>
 (What kind of challenges did you run into for this projects, what kind of accomplishment are you proud of and and what did you learn during the project? Few lines for each question.)
 The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
 in which the Loop Station Manager dictates all the actions to perform.
@@ -39,7 +39,7 @@ We have worked autonomously on the various instrument and together on the founda
 We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there
 that will be useful in the future.
 
-## 2. Technology
+## 2. Technology <a name="technology"></a>
 (just a plain list of the main technology you used, which include libraries, coding languages, concepts, etc.)
 The project is a combination of Python, Processing and Supercollider.
 As for Python tkinter and threading are the main libraries used to create the independent windows; osc messages
@@ -47,16 +47,16 @@ are the main mean of communication among the parts
 As for Processing...
 As For Supercollider...
 
-## 3. Loop Station
-## 4. Instruments
-### 4.1 Recorder and Player
+## 3. Loop Station <a name="loop-station"></a>
+## 4. Instruments <a name="instruments"></a>
+### 4.1 Recorder and Player <a name="RP"></a>
 Recorder and player is a simple instrument. It allows the user to create a recording to use later in the loop as well as
 to load an mp3 or wav file to be played during the exhibition.
 In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above
 mentioned actions, while in the Lower section a real-time smplitude envelope is shown.
 
-### 4.2 Drum Machine
-### 4.3 Melody Chat
+### 4.2 Drum Machine <a name="DM"></a>
+### 4.3 Melody Chat <a name="MC"></a>
 
 <img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="250">
 
@@ -78,24 +78,24 @@ The **Melody modifier** modifies the melody created in this way. The sentence wr
 - The third parameter concerns the length of the melody (nSteps) and maps the *\tremoloDepth* in a range between 0.5 and 1.0.
 - The fourth is instead a random number between 0.1 and 1.0 and modifies the *\amp* of the sound.
 
-### 4.4 Ship agent
+### 4.4 Ship agent <a name="ship"></a>
 
 
 
-## 5. Layer Interaction
+## 5. Layer Interaction <a name="layer-interaction"></a>
 
 The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text and size (or color????).
 
 COSA SUCCEDE SE LE PALLINE COLLIDONO??
 
-## 6. Sounds
+## 6. Sounds <a name="sounds"></a>
 
 The sounds are created using *Super Collider*. As for the drum machine and melody chat, each percussive sound (\kick, \snare, \hat) or each note (\melody) corresponds to a single *Synthdef*. At each collision of the balls, the state of some parameters defined within each tool changes.
 
-## 7. OSC structure
+## 7. OSC structure <a name="osc"></a>
 SCHEMA MESSAGGI OSC TRA PROCESSING-PHYTON-SUPERCOLLIDER-FIREBASE
 
-## 8. Contacts and contributions
+## 8. Contacts and contributions <a name="contact"></a>
 
 - **Attolini Silvio** - silvio.attolini@mail.polimi.it: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
 - **Gorni Alessandro** - alessandro.gorni@mail.polimi.it: DM, MelodyChat, sounds.scd, LayerInteraction
