@@ -34,7 +34,8 @@ void setup(){
 //  surface.setSize((int)sizeApplet.x, (int)sizeApplet.y);
 //  surface.setResizable(false);
 //  surface.setLocation(0, 2*(int)sizeApplet.y);
-  nSteps = int(args[0]);
+  //nSteps = int(args[0]);
+  nSteps = 16;
   nLayers = 4;
   noteNames = new String[nSteps];
   numBalls = nSteps * nLayers;
@@ -67,6 +68,15 @@ void draw() {
   time = millis();
   background(220);
   
+  // Display link
+  for (Ball ball : balls) {
+    if (ball.status == true){
+      if (ball.popup){
+        ball.drawLink();
+      }
+    }
+  }
+  
   // Update agent
   if (ship.isActive){
     ship.display();
@@ -80,16 +90,7 @@ void draw() {
       ball.move();
       ball.display();
       
-      if (dist(ball.pos.x, ball.pos.y, mouseX, mouseY) < ball.r) {
-        cursor(HAND);
-      } else {
-        cursor(ARROW);
-      }
-      
-      if (ball.popup){
-        ball.drawPopup();
-      }
-      
+       // Collision animation
       for (int i=0; i<ball.animStart.length; i++) {
         if(time-ball.animStart[i]<1000){
           fill(255, 255-(time-ball.animStart[i]));
@@ -98,6 +99,15 @@ void draw() {
       }
     }
   }
+  // Display popup over all layers
+  for (Ball ball : balls) {
+    if (ball.status == true){
+      if (ball.popup){
+        ball.drawPopup();
+      }
+    }
+  }
+  
 }
 
 // Toggle popup
@@ -147,7 +157,7 @@ void oscEvent(OscMessage theOscMessage) {
     balls[id].pos = new PVector(random(width), random(height));
     balls[id].vel = new PVector(random(1,3), random(1,3));
   }
-  if(theOscMessage.checkAddrPattern("/noteChars")){  
+  if(theOscMessage.checkAddrPattern("/noteChars")){
     for (int i = 0; i<nSteps; i++){
       int id = i + 3*nSteps;
       noteNames[i] = theOscMessage.get(i).stringValue();
@@ -162,14 +172,21 @@ void oscEvent(OscMessage theOscMessage) {
     int id = theOscMessage.get(0).intValue();
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
-  } else if(theOscMessage.checkAddrPattern("/snare/off")) {
+  }
+  if(theOscMessage.checkAddrPattern("/snare/off")) {
     int id = theOscMessage.get(0).intValue() + 1*nSteps;
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
-  } else if(theOscMessage.checkAddrPattern("/kick/off")) {
+  }
+  if(theOscMessage.checkAddrPattern("/kick/off")) {
     int id = theOscMessage.get(0).intValue() + 2*nSteps;
     balls[id].lastStatus = balls[id].status;
     balls[id].status = false;
+  }
+  if(theOscMessage.checkAddrPattern("/melodyClear")) {
+    for (int i=0; i<nSteps; i++) {
+      balls[i + 3*nSteps].status = false;
+    }
   }
   // Activate/deactivate agent
   if(theOscMessage.checkAddrPattern("/triggerAgent")) {

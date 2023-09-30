@@ -5,7 +5,7 @@ OscP5 osc;
 NetAddress oscSC, oscLI;
 
 // variables
-int nStep;
+int nSteps;
 int curr, pos;
 int textHeight = 20;
 int t;
@@ -18,84 +18,14 @@ ArrayList<Step> bKik = new ArrayList<Step>();
 PImage img;
 
 
-class Step
-{
-  int x,y,d;
-  int id;
-  float pitchKick;
-  String type;
-  boolean[] isActive;
-  
-  public Step(int _x, int _y, int _id, String _type, boolean[] _isActive)
-  {
-    x = _x;
-    y = _y;
-    d = 40;
-    id = _id;
-    type = _type;
-    isActive = _isActive;
-    pitchKick = 800;
-  }
-  
-  public void draw()
-  {
-    if (isActive[id]) {
-      fill(220);
-      circle(x,y,d);
-      fill(180);
-      circle(x,y, 0.8*d);
-    }
-    else {
-      fill(220);
-      circle(x,y,d);
-    }
-    
-    
-  }
-  
-  public void mousePressed()
-  {
-    if ( mouseX >= x-d/2 && mouseX <= x+d/2 && mouseY >= y-d/2 && mouseY <= y+d/2 )
-    {
-      if (isActive[id]){
-        // Manage balls [off]
-        OscMessage msg2 = new OscMessage("/" + type + "/off");
-        msg2.add(id);
-        osc.send(msg2, oscLI);
-      } else {
-        // Manage balls [on]
-        OscMessage msg1 = new OscMessage("/" + type + "/on");
-        msg1.add(id);
-        osc.send(msg1, oscLI);
-      }
-      
-      isActive[id] = !isActive[id];
-      sendOSC();
-    }
-  }
-  
-  public void sendOSC()
-  {
-    if (isActive[id]){
-      // Trigger sound
-      OscMessage msg0 = new OscMessage("/" + type);
-      msg0.add(pitchKick);
-      osc.send(msg0, oscSC);
-    }
-  }
-  
-}
-
-
-
 void setup()
 {
   size(900, 200);
-  nStep = int(args[0]);
+  nSteps = int(args[0]);
   
-  boolean[] hatRow = new boolean[nStep];
-  boolean[] snrRow = new boolean[nStep];
-  boolean[] kikRow = new boolean[nStep];
+  boolean[] hatRow = new boolean[nSteps];
+  boolean[] snrRow = new boolean[nSteps];
+  boolean[] kikRow = new boolean[nSteps];
   
   // OSC
   osc = new OscP5(this,12001);
@@ -103,11 +33,11 @@ void setup()
   oscLI = new NetAddress("127.0.0.1",12000);
   
   OscMessage numSteps = new OscMessage("/nStep");
-  numSteps.add(nStep);
+  numSteps.add(nSteps);
   osc.send(numSteps, oscLI);
   
   // construct grid
-  for (int i = 0; i < nStep; i++)
+  for (int i = 0; i < nSteps; i++)
   {
     bHat.add( new Step(100+i*50, 50, i, "hat", hatRow) );
     bSnr.add( new Step(100+i*50, 100, i, "snare", snrRow ) );
@@ -132,12 +62,12 @@ void draw()
   
   // Labels
   textSize(textHeight);
-  fill(128);
+  fill(80);
   text("HAT", 20, 50 + textHeight/2);
   text("SNR", 20, 100 + textHeight/2);
   text("KIK", 20, 150 + textHeight/2);
   
-  for(int i = 0; i < nStep; ++i)
+  for(int i = 0; i < nSteps; ++i)
   {
     bHat.get(i).draw();
     bSnr.get(i).draw();
@@ -153,7 +83,7 @@ void draw()
 // Toggle step
 void mousePressed()
 {
-  for(int i = 0; i < nStep; ++i)
+  for(int i = 0; i < nSteps; ++i)
   {
     bHat.get(i).mousePressed();
     bSnr.get(i).mousePressed();
@@ -178,13 +108,13 @@ void oscEvent(OscMessage trigger)
     // Move one step forward
     curr++;
     // Return to first step
-    if (curr == nStep){
+    if (curr == nSteps){
       curr = 0;
     }
     
   }
   else if(trigger.checkAddrPattern("/setSteps")) {
-    nStep = trigger.get(0).intValue();
+    nSteps = trigger.get(0).intValue();
   }
   // Collisions
   else if(trigger.checkAddrPattern("/collision/kk")) {
@@ -193,6 +123,20 @@ void oscEvent(OscMessage trigger)
   }
   // Exit applet
   else if(trigger.checkAddrPattern("/terminate")) {
+    for (int i=0; i<nSteps; i++){
+        // Manage balls [off]
+        OscMessage terminateHat = new OscMessage("/hat/off");
+        terminateHat.add(i);
+        osc.send(terminateHat, oscLI);
+        
+        OscMessage terminateSnare = new OscMessage("/snare/off");
+        terminateSnare.add(i);
+        osc.send(terminateSnare, oscLI);
+        
+        OscMessage terminateKick = new OscMessage("/kick/off");
+        terminateKick.add(i);
+        osc.send(terminateKick, oscLI);
+    }
     exit();
   }
 }

@@ -47,8 +47,8 @@ void setup() {
   size(900, 500);
   textSize(20);
   
-  //nSteps = int(args[0]);
-  nSteps = 16;
+  nSteps = int(args[0]);
+  //nSteps = 16;
   
   //OSC
   oscP5 = new OscP5(this, 12002);
@@ -219,6 +219,8 @@ void oscEvent(OscMessage trigger) {
   
   // Exit applet
   if(trigger.checkAddrPattern("/terminate")) {
+    OscMessage clearBalls = new OscMessage("/melodyClear");
+    oscP5.send(clearBalls, addressIL);
     exit();
   }
   

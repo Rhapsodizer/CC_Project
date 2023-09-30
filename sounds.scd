@@ -28,12 +28,14 @@ SynthDef(\melody, {
 Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 0.5]);
 
 (
-~counter = 0;
+~reassignMod = {
+	~counter = 0;
 
-~amp = 0.5;
-~release = 2;
-~tremoloFreq = 8;
-~tremoloDepth = 0.5;
+	~amp = 0.5;
+	~release = 2;
+	~tremoloFreq = 8;
+	~tremoloDepth = 0.5;
+    };
 )
 (
 ~playSound = { var release, amp, tremoloFreq, tremoloDepth;
@@ -133,7 +135,6 @@ SynthDef(\snare, {
 )
 Synth(\snare);
 
-~playSound.value;
 //---------------------------------------------------------------------
 //
 //                     OSC MANAGEMENT
@@ -147,6 +148,8 @@ OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
 OSCdef('snare',{Synth(\snare)},"/snare");
 OSCdef('collision',{Synth(\kick3)},"/collision");
 OSCdef('melody',{arg msg; ~arrayFreq = Array.newClear(msg.size-1);
+	// Reassign melody modifiers values
+	~reassignMod.value;
 	// Fill array
 	(msg.size-1).do({arg i; ~arrayFreq.put(i, msg[i+1]); });
 	// Print array
@@ -157,7 +160,6 @@ OSCdef('modifier', {arg msg;
 	~tremoloFreq= msg[1];
 	~tremoloDepth = msg[2];
 	~amp = msg[3];
-
 }, "/modifier");
 )
 

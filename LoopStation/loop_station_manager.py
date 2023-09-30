@@ -205,9 +205,11 @@ class LoopStationManager:
                 self.spaceship_is_running = False
                 print("landing")
                 osc.oscTA.send_message("/terminate", 0)
+                osc.oscLI.send_message("/triggerAgent", 0)
             else:
                 print("launching")
                 self.spaceship_is_running = True
+                osc.oscLI.send_message("/triggerAgent", 0)
                 processing_java_path = self.user_paths[0]
                 pde_file_path = self.user_paths[4]
                 pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)

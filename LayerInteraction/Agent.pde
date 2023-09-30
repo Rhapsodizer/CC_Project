@@ -4,12 +4,17 @@ class Agent {
   float r;
   float rInteraction;
   boolean isActive;
+  PImage elvis;
+  ParticleNoteSystem pns;
 
   Agent() {
     pos = new PVector(width/2, height/2);
     r = 20;
     rInteraction = 100;
     isActive = false;
+    elvis = loadImage("elvis.png");
+    elvis.resize(100,140);
+    pns = new ParticleNoteSystem(pos);
   } 
   
   // Draw the agent
@@ -26,11 +31,11 @@ class Agent {
     else if (pos.y - r < 0) {
       pos.y = r;
     }
-    noStroke();
-    fill(240);
-    circle(pos.x, pos.y, 2*rInteraction);
-    fill(0);
-    circle(pos.x, pos.y, 2*r);
+    pns.pos = pos;
+    pns.addParticle();
+    pns.run();
+
+    image(elvis, pos.x-elvis.width/2, pos.y-elvis.height/2);
   }
   
 }

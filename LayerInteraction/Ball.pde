@@ -121,16 +121,23 @@ class Ball {
   }
   
   void drawPopup() {
-    stroke(0);
     fill(200);
-    rect(50,50,300,300);
+    rect(width-220, 20, 200, 200);
+    stroke(180);
+    rect(width-215, 25, 190, 190);
+    noStroke();
     fill(128);
-    text("Type: " + type, 100, 100);
-    text("ID: " + id, 100, 130);
-    text("Pos: [" + pos.x + ", " + pos.y + "]", 100, 160);
-    text("Vel: " + vel.mag(), 100, 190);
-    stroke(0);
-    line(pos.x, pos.y, 300, 300);
+    text("Type: " + type, width-200, 60);
+    text("ID: " + id, width-200, 90);
+    text("Pos: [" + int(pos.x) + ", " + int(pos.y) + "]", width-200, 120);
+    text("Vel: " + vel.mag(), width-200, 150);
+    if (type == "melody") {
+      text("Note: " + noteNames[id], width-200, 180);
+    }
+  }
+  void drawLink() {
+    stroke(180);
+    line(pos.x, pos.y, width-120, 220);
   }
   
   

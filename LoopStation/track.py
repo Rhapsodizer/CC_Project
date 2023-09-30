@@ -106,7 +106,7 @@ class Track:
                 time.sleep(0.5)
                 self.setup_instrument()
 
-        instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE)
+        instruments_listbox = tk.Listbox(listbox_window, selectmode=tk.SINGLE, bg="#808080")
         instruments_listbox.pack(expand=True, fill=tk.BOTH)
 
         instrument_list = ["Drum Machine", "Melody Chat", "Rec & Play", "Image Sonification"]
