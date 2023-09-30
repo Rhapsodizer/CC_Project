@@ -76,7 +76,8 @@ class Track:
 
     def plus_clicked(self, event):
         if not self.ls_parent.track_currently_playing:
-            self.choose_instrument(event)
+            if not self.instr_name:
+                self.choose_instrument(event)
 
     def settings_clicked(self, event):
         _ = event
@@ -142,7 +143,7 @@ class Track:
                 img_son_thread.start()
 
     def play_this(self):
-        print("sending messages")
+        print("sending messages to " + str(self))
         # self.ls_parent.track_currently_playing.append(self)
         # Send START PLAY trigger
         if self.instr_name == "Drum Machine":
@@ -168,6 +169,8 @@ class Track:
         if self in self.ls_parent.track_currently_playing:
             index = self.ls_parent.track_currently_playing.index(self)
             self.ls_parent.track_currently_playing.pop(index)
+
+        self.this_is_booked = False
 
     def destroy(self):
         # Send trigger to exit target applet

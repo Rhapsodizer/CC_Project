@@ -70,7 +70,6 @@ class RecorderAndPlayer:
         self.is_recording = False
         self.has_finished_recording = False
         self.recorder = None
-        # self.expected_lag = 0.5
         dirname = os.path.dirname(__file__)
         self.recorded_filename = "recorded_audio.wav"
         self.recorded_file_path = os.path.join(dirname, "./recorded_audio.wav")
@@ -83,7 +82,9 @@ class RecorderAndPlayer:
         self.time_canvas.place(x=self.tc_pos_x, y=self.tc_pos_y)
         self.audio_time = 0.00
         self.zero_time = 0.00
+        self.dim_draw = 0
         self.has_already_received_play = False
+        self.has_received_stop = False
         self.audio_thread = None
         self.display_thread = None
         self.rec_thread = None
@@ -169,11 +170,18 @@ class RecorderAndPlayer:
             self.draw_all()
 
     def play_audio(self):
-        print("in play audio")
+        # print("in play audio")
         pygame.mixer.music.load(self.audio_file)
         pygame.mixer.music.play()
 
     def stop_file(self):
+        pygame.mixer.music.stop()
+        # print("in stop file")
+        self.has_received_stop = True
+        self.visualize_amplitude()
+        self.is_playing = False
+        self.audio_thread = None
+        self.display_thread = None
         pygame.mixer.music.stop()
         self.is_playing = False
         self.audio_thread = None
@@ -220,39 +228,51 @@ class RecorderAndPlayer:
         self.is_playing = True
         self.reset_time()
         if len(self.show_audio_data) > 0:
-            dim = self.ampl_c_width / len(self.show_audio_data)
+            self.dim_draw = self.ampl_c_width / len(self.show_audio_data)
             if self.audio_file != "":
                 self.discrete_time_instant = 0
 
                 self.audio_thread = threading.Thread(target=self.play_audio)
                 self.audio_thread.start()
 
-                self.display_thread = threading.Thread(target=self.draw_file, args=[dim])
+                self.display_thread = threading.Thread(target=self.draw_file)
                 self.display_thread.start()
         else:
             ErrorWindow("Setup Error", "Error: Setup Error")
 
-    def draw_file(self, dim):
-        if self.has_already_received_play:
-            while self.discrete_time_instant < len(self.show_audio_data) and self.is_playing:
-                amplitude = self.show_audio_data[self.discrete_time_instant]
-                x = self.ampl_c_pos_x + self.discrete_time_instant * dim
-                y = amplitude
-                self.canvas.create_rectangle(x, self.c_height * 0.5 - y / 2,
-                                             x + float(dim), self.c_height * 0.5 + y / 2, fill="#000000")
-                self.canvas.update()
+    def draw_file(self):
+        # print("in draw file")
+        if self.is_playing and self.discrete_time_instant < len(self.show_audio_data):
+            self.draw_loop()
+        else:
+            # print("in else draw file")
+            pygame.mixer.music.stop()
+            self.stop_file()
+
+    def draw_loop(self):
+        # print("i draw loop")
+        if not self.has_received_stop:
+            amplitude = self.show_audio_data[self.discrete_time_instant]
+            x = self.ampl_c_pos_x + self.discrete_time_instant * self.dim_draw
+            y = amplitude
+            self.canvas.create_rectangle(x, self.c_height * 0.5 - y / 2,
+                                         x + float(self.dim_draw), self.c_height * 0.5 + y / 2, fill="#000000")
+            self.canvas.update()
+            i = self.audio_time * 1000
+            while i < self.discrete_time_instant * 10:
+                self.audio_time = round(round(time.time(), 2) - self.zero_time, 2)
                 i = self.audio_time * 1000
-                while i < self.discrete_time_instant*10:
-                    self.audio_time = round(round(time.time(), 2) - self.zero_time, 2)
-                    i = self.audio_time * 1000
-                self.discrete_time_instant += 1
-                self.draw_time_bar()
-        if self.is_playing:
-            print("in else")
-            # in order to loop back, wait for the next "play" msg from the routine
-            # self.loop_file()
-            self.has_already_received_play = False
-        elif not self.is_playing:
+            self.discrete_time_instant += 1
+            self.draw_time_bar()
+            if self.discrete_time_instant < len(self.show_audio_data):
+                if self.is_playing:
+                    # print("in else draw loop ok")
+                    self.draw_loop()
+            else:
+                pygame.mixer.music.stop()
+                self.stop_file()
+        else:
+            pygame.mixer.music.stop()
             self.stop_file()
 
     def record_mic(self):
@@ -316,11 +336,11 @@ def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
         if args:
             if args[0] == 'play':
                 if not rap.has_already_received_play and not rap.is_recording:
+                    rap.has_received_stop = False
                     rap.play_file_in_thread()
             elif args[0] == 'stop':
-                rap.stop_file()
+                rap.has_received_stop = True
                 rap.is_playing = False
-                rap.audio_thread = None
-                rap.display_thread = None
+                rap.stop_file()
             elif args[0] == 'destroy':
                 rap.window.destroy()

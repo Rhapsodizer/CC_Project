@@ -180,6 +180,7 @@ class ImageSonification:
             harmonic_wave += (1 / harmonic) * np.sin(2 * np.pi * self.base_freq * harmonic * t)
         # Normalize the waveform to be in the range [-1, 1]
         harmonic_wave /= np.max(np.abs(harmonic_wave))
+        harmonic_wave /= 10
 
         return harmonic_wave
 

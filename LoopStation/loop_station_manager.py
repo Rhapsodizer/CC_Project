@@ -46,6 +46,7 @@ class LoopStationManager:
         self.stop_is_able = False
         self.play_is_able = False
         self.play_thread = None
+        self.stop_thread = None
         self.play_all_booked_thread = None
         self.play_all_booked_thread_is_running = False
         self.stop_has_been_pressed = False
@@ -138,6 +139,7 @@ class LoopStationManager:
 
     def play_clicked(self, event):
         _ = event
+        print("in play clicked")
         if self.play_is_able:
             if not self.bpm_is_valid or not self.steps_is_valid:
                 ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
@@ -153,6 +155,7 @@ class LoopStationManager:
                 self.play_all_booked_thread.start()
 
     def play_all_booked_tracks(self):
+        print("in play all booked")
         self.stop_is_able = True
         self.play_is_able = False
         self.draw_all()
@@ -160,18 +163,15 @@ class LoopStationManager:
             self.loop()
 
     def loop(self):
-        print("in loop")
-        for i, t in enumerate(self.booked_tracks):
-            self.play_thread = threading.Thread(target=t.play_this)
-            self.play_thread.start()
-            time.sleep(self.time_chunk)
-            # self.play_thread.join()
-            self.play_thread = None
-        if not self.stop_has_been_pressed:
-            self.loop()
-        else:
-            print(self.booked_tracks)
-            self.stop_all_booked_tracks()
+        if self.booked_tracks:
+            print("in loop")
+            for i, t in enumerate(self.booked_tracks):
+                self.play_thread = threading.Thread(target=t.play_this)
+                self.play_thread.start()
+                self.play_thread = None
+            if self.play_all_booked_thread_is_running and not self.stop_has_been_pressed:
+                time.sleep(self.time_chunk)  # wait 60/bpm to send the next step message
+                self.loop()
 
     def stop_clicked(self, event):
         _ = event
@@ -182,17 +182,19 @@ class LoopStationManager:
 
     def stop_all_booked_tracks(self):
         if self.play_all_booked_thread:
+            self.play_all_booked_thread_is_running = False
+            self.play_all_booked_thread = None
             print(self.booked_tracks)
             for i, tr in enumerate(self.booked_tracks):
                 print(f"stopping track {i}")
-                tr.stop_this()
-                tr.this_is_booked = False
-            self.play_thread = []
+                self.stop_thread = threading.Thread(target=tr.stop_this)
+                self.stop_thread.start()
+                self.stop_thread = None
+            time.sleep(0.001)
+            self.play_thread = None
             self.booked_tracks = []
             self.track_currently_playing = []
-            print("Play thread stopped and destroyed.")
-            self.play_all_booked_thread_is_running = False
-            self.play_all_booked_thread = None
+            # print("Play thread stopped and destroyed.")
             self.stop_is_able = False
             self.draw_all()
 
