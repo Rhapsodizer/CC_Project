@@ -10,7 +10,7 @@
       <li><a href="#cal">Challenges, accomplishment and lessons learned</a></li>
     </ul>
     <li><a href="#technology">Technology</a></li>
-      <li><a href="#loop-station">Loop Station</a></li>
+      <li><a href="#loop-station">Loop Station Manager</a></li>
       <li><a href="#instruments">Instruments</a></li>
       <ul>
         <li><a href="#RP">Recorder and Player</a></li>
@@ -27,35 +27,38 @@
 
 ## 1. Description <a name="description"></a>
 (A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
-This project aims to create a simple and user-friendly Loop Station. This appllication has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
+This project aims to create a simple and user-friendly Loop Station. This application has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
 It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
 to express themselves and enjoy the music they create.
 
 ### 1.1. Challenges, accomplishment and lessons learned <a name="cal"></a>
 (What kind of challenges did you run into for this projects, what kind of accomplishment are you proud of and and what did you learn during the project? Few lines for each question.)
 The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
-in which the Loop Station Manager dictates all the actions to perform.
+in which the **Loop Station Manager** dictates all the actions to perform.
 We have worked autonomously on the various instrument and together on the foundation of the looper.
-We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there
-that will be useful in the future.
+We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there that will be useful in the future.
 
 ## 2. Technology <a name="technology"></a>
 (just a plain list of the main technology you used, which include libraries, coding languages, concepts, etc.)
-The project is a combination of Python, Processing and Supercollider.
-As for Python tkinter and threading are the main libraries used to create the independent windows; osc messages
-are the main mean of communication among the parts
+The project is a combination of *Python*, *Processing* and *Supercollider* languages. It has been optimized for Windows, Linux and MacOS operating system.
+As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages
+are the main mean of communication among the parts.
 As for Processing...
 As For Supercollider...
 
-## 3. Loop Station <a name="loop-station"></a>
+## 3. Loop Station Manager <a name="loop-station"></a>
+
+In the main page, we can choose many options and actions. We can set the number of beats of the loop and the bpm velocity. These parameters allow you to change the loop size for each instrument. On this main page you can choose the instruments, open them and create a track. Finally, all instruments can be played simultaneously.
+
 ## 4. Instruments <a name="instruments"></a>
 ### 4.1 Recorder and Player <a name="RP"></a>
-Recorder and player is a simple instrument. It allows the user to create a recording to use later in the loop as well as
-to load an mp3 or wav file to be played during the exhibition.
+Recorder and Player is a simple instrument. It allows the user to create a recording to use later in the loop as well as
+to load an *mp3* or *wav* file to be played during the exhibition.
 In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above
-mentioned actions, while in the Lower section a real-time smplitude envelope is shown.
+mentioned actions, while in the lower section a real-time amplitude envelope is shown.
 
 ### 4.2 Drum Machine <a name="DM"></a>
+
 ### 4.3 Melody Chat <a name="MC"></a>
 
 <img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="250">
