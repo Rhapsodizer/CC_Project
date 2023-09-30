@@ -36,23 +36,24 @@ class LoopStationManager:
         self.steps_is_valid = False
         self.loop_duration = self.calculate_loop_duration
         self.time_chunk = 60 / self.bpm
-        self.play_all_thread = None
-        self.play_all_thread_is_running = False
-        self.stop_has_been_pressed = False
-        self.play_is_able = False
-        self.pause_is_able = False
-        self.stop_is_able = False
-        self.track_currently_playing = []
         self.spaceship_is_running = False
         self.user_paths = u_paths
         self.pil = Image.open(u_paths[5])
         w, h = self.pil.size
         self.pil = self.pil.resize((w // 2, h // 2))
         self.image = ImageTk.PhotoImage(self.pil)
+        self.booked_tracks = []
+        self.stop_is_able = False
+        self.play_is_able = False
+        self.play_thread = None
+        self.play_all_booked_thread = None
+        self.play_all_booked_thread_is_running = False
+        self.stop_has_been_pressed = False
+        self.track_currently_playing = []
 
     def draw_all(self):
         [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-         bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop,
+         bpm_valid_rect, steps_valid_rect, plus_add_track, play, stop,
          safe_close, close_x1, close_x2] = utils.draw_all_ls(self)
         self.canvas.tag_bind(spaceship, "<Button-1>", self.takeoff_land_spaceship)
         self.canvas.tag_bind(up_bpm_triangle, "<Button-1>", self.up_bpm)
@@ -63,20 +64,12 @@ class LoopStationManager:
         self.canvas.tag_bind(steps_valid_rect, "<Button-1>", self.on_steps_set)
         self.canvas.tag_bind(plus_add_track, "<Button-1>", self.add_track_clicked)
         self.canvas.tag_bind(play, "<Button-1>", self.play_clicked)
-        self.canvas.tag_bind(pause[0], "<Button-1>", self.pause_clicked)
-        self.canvas.tag_bind(pause[1], "<Button-1>", self.pause_clicked)
-        self.canvas.tag_bind(pause[2], "<Button-1>", self.pause_clicked)
         self.canvas.tag_bind(stop, "<Button-1>", self.stop_clicked)
         self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x1, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x2, "<Button-1>", self.safe_close_clicked)
         for t in self.tracks:
-            if not self.track_currently_playing:
-                if not t.instrument_is_ready:
-                    self.play_is_able = False
-                    break
-                else:
-                    self.play_is_able = True
+            t.draw_track()
 
     def add_track_clicked(self, event):
         _ = event
@@ -145,100 +138,63 @@ class LoopStationManager:
 
     def play_clicked(self, event):
         _ = event
-        ready = False
-        if not self.track_currently_playing:
+        if self.play_is_able:
             if not self.bpm_is_valid or not self.steps_is_valid:
                 ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
             elif not self.tracks:
                 ErrorWindow("Empty Tracks Error", "Error: No Tracks")
             else:
-                for tr in self.tracks:
-                    if not tr.instr_name:
-                        ErrorWindow("No Instrument", "Error: No Instrument")
-                        ready = False
-                        break
-                    elif not tr.instrument_is_ready:
-                        ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                        ready = False
-                        break
-                    else:
-                        ready = True
-                if ready:
-                    self.disable_all()
-                    self.track_currently_playing = self.tracks
-                    self.stop_has_been_pressed = False
-                    print("play thread is running...")
-                    self.play_all_thread_is_running = True
-                    self.play_all_thread = threading.Thread(target=self.play_all_tracks)
-                    self.play_all_thread.start()
+                print("play thread is running...")
+                self.stop_has_been_pressed = False
+                self.track_currently_playing = self.booked_tracks
+                print(self.booked_tracks)
+                self.play_all_booked_thread_is_running = True
+                self.play_all_booked_thread = threading.Thread(target=self.play_all_booked_tracks)
+                self.play_all_booked_thread.start()
 
-    def pause_clicked(self, event):
-        _ = event
-        if not self.bpm_is_valid or not self.steps_is_valid:
-            ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-        elif not self.tracks:
-            ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+    def play_all_booked_tracks(self):
+        self.stop_is_able = True
+        self.play_is_able = False
+        self.draw_all()
+        if self.play_all_booked_thread_is_running and not self.stop_has_been_pressed:
+            self.loop()
+
+    def loop(self):
+        print("in loop")
+        for i, t in enumerate(self.booked_tracks):
+            self.play_thread = threading.Thread(target=t.play_this)
+            self.play_thread.start()
+            time.sleep(self.time_chunk)
+            # self.play_thread.join()
+            self.play_thread = None
+        if not self.stop_has_been_pressed:
+            self.loop()
         else:
-            for tr in self.tracks:
-                if not tr.instr_name:
-                    ErrorWindow("No Instrument", "Error: No Instrument")
-                    break
-                elif not tr.instrument_is_ready:
-                    ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                    break
-                else:
-                    print("pause")
+            print(self.booked_tracks)
+            self.stop_all_booked_tracks()
 
     def stop_clicked(self, event):
         _ = event
-        if self.track_currently_playing:
-            if not self.bpm_is_valid or not self.steps_is_valid:
-                ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
-            elif not self.tracks:
-                ErrorWindow("Empty Tracks Error", "Error: No Tracks")
-            else:
-                for tr in self.tracks:
-                    if not tr.instr_name:
-                        ErrorWindow("No Instrument", "Error: No Instrument")
-                        break
-                    elif not tr.instrument_is_ready:
-                        ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
-                        break
-                    else:
-                        self.stop_has_been_pressed = True
-                        self.track_currently_playing = []
-                        print("stop has been pressed")
-                        self.stop_all_tracks()
+        if self.stop_is_able:
+            print("stop has been pressed")
+            self.stop_has_been_pressed = True
+            self.stop_all_booked_tracks()
 
-    def play_all_tracks(self):
-        cur_step = 0
-        # while self.play_all_thread_is_running:
-        if self.play_all_thread_is_running:
-            print("1")
-            while not self.stop_has_been_pressed:
-                for tr in self.tracks:
-                    tr.play_this("lsm")
-                    print("2")
-                time.sleep(self.time_chunk)
-                cur_step += 1
-                if cur_step == self.steps:
-                    cur_step = 0  # loop
-
-    def pause_all_tracks(self):
-        for i, tr in enumerate(self.tracks):
-            print(f"stopping track {i}")
-            tr.pause_this()
-
-    def stop_all_tracks(self):
-        if self.play_all_thread:
-            for i, tr in enumerate(self.tracks):
+    def stop_all_booked_tracks(self):
+        if self.play_all_booked_thread:
+            print(self.booked_tracks)
+            for i, tr in enumerate(self.booked_tracks):
                 print(f"stopping track {i}")
                 tr.stop_this()
-            self.play_all_thread_is_running = False
-            self.play_all_thread.join()
+                tr.this_is_booked = False
+            self.play_thread = []
+            self.booked_tracks = []
+            self.track_currently_playing = []
             print("Play thread stopped and destroyed.")
-            self.play_all_thread = None
-            self.enable_all()
+            self.play_all_booked_thread_is_running = False
+            self.play_all_booked_thread = None
+            self.stop_is_able = False
+            self.draw_all()
 
     def takeoff_land_spaceship(self, event):
         _ = event
@@ -261,28 +217,7 @@ class LoopStationManager:
         pde_open = processing_java_path + " --sketch=" + pde_file_path + " --run " + str(self.steps)
         subprocess.Popen(pde_open, shell=True)
 
-    def disable_all(self):
-        self.play_is_able = False
-        self.pause_is_able = True
-        self.stop_is_able = True
-        for tr in self.tracks:
-            tr.disable_all_this()
-        self.draw_all()
-
-    def enable_all(self):
-        self.play_is_able = True
-        self.pause_is_able = False
-        self.stop_is_able = False
-        for tr in self.tracks:
-            tr.enable_all_this()
-        self.draw_all()
-
     def safe_close_clicked(self, event):
         _ = event
-
-        osc.oscLI.send_message("/terminate", 0)
-        osc.oscDM.send_message("/terminate", 0)
-        osc.oscCH.send_message("/terminate", 0)
         time.sleep(0.001)
         utils.draw_shutdown_ls(self)
-        # os.remove("Instruments/Recorder_and_Player/recorder_audio.wav")

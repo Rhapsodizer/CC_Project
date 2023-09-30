@@ -84,11 +84,11 @@ def draw_all_ls(ls_obj):
      bpm_valid_rect, steps_valid_rect] = draw_bpm_steps_ls(ls_obj)
     draw_all_tracks_ls(ls_obj)
     plus_add_track = draw_plus_ls(ls_obj)
-    [play, pause, stop] = draw_play_pause_stop_ls(ls_obj)
+    [play, stop] = draw_play_stop_ls(ls_obj)
     [safe_close_button, close_x1, close_x2] = safe_close_ls(ls_obj)
     ls_obj.canvas.update()
     return [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-            bpm_valid_rect, steps_valid_rect, plus_add_track, play, pause, stop,
+            bpm_valid_rect, steps_valid_rect, plus_add_track, play, stop,
             safe_close_button, close_x1, close_x2]
 
 
@@ -204,13 +204,19 @@ def draw_plus_ls(ls_obj):
     return plus_add_track
 
 
-def draw_play_pause_stop_ls(ls_obj):
+def draw_play_stop_ls(ls_obj):
     side = 50
-    x_offset = 60
+    x_offset = 30
     y_offset = 30
     canvas = ls_obj.canvas
     width = ls_obj.c_width
     height = ls_obj.c_height
+
+    if ls_obj.booked_tracks and not ls_obj.track_currently_playing:
+        ls_obj.play_is_able = True
+    else:
+        ls_obj.play_is_able = False
+
     # Draw play icon
     if ls_obj.play_is_able:
         play_c = "#606060"
@@ -222,22 +228,6 @@ def draw_play_pause_stop_ls(ls_obj):
                                           width / 2 - side - x_offset * 0.866, height - y_offset,
                                           fill=play_c, outline="#000000")
 
-    # Draw pause icon
-    if ls_obj.pause_is_able:
-        pause_c = "#606060"
-    else:
-        pause_c = "#8F0000"
-    pr1 = canvas.create_rectangle(width / 2 - 20, height - side - y_offset,
-                                  width / 2 - 5, height - y_offset,
-                                  fill=pause_c, outline="#000000")
-    pr2 = canvas.create_rectangle(width / 2 - 4, height - side - y_offset,
-                                  width / 2 + 5, height - y_offset,
-                                  fill="#808080", outline="#808080")
-    pr3 = canvas.create_rectangle(width / 2 + 5, height - side - y_offset,
-                                  width / 2 + 20, height - y_offset,
-                                  fill=pause_c, outline="#000000")
-    p = [pr1, pr2, pr3]
-
     # Draw stop icon
     if ls_obj.stop_is_able:
         stop_c = "#606060"
@@ -247,7 +237,7 @@ def draw_play_pause_stop_ls(ls_obj):
                                              width / 2 + side + x_offset, height - y_offset,
                                              fill=stop_c, outline="#000000")
 
-    return [play_triangle, p, stop_rectangle]
+    return [play_triangle, stop_rectangle]
 
 
 def safe_close_ls(ls_obj):
@@ -283,11 +273,12 @@ def safe_close_ls(ls_obj):
 
 
 def draw_shutdown_ls(ls_obj):
-    ls_obj.stop_all_tracks()
+    ls_obj.stop_all_booked_tracks()
     time.sleep(0.001)
-    osc.oscTA.send_message("/terminate", 0)
-    osc.oscCH.send_message("/terminate", 0)
+    osc.oscLI.send_message("/terminate", 0)
     osc.oscDM.send_message("/terminate", 0)
+    osc.oscCH.send_message("/terminate", 0)
+    osc.oscTA.send_message("/terminate", 0)
     ls_obj.tracks = None
     ls_obj.canvas.delete("all")
     ls_obj.canvas.update()
@@ -307,36 +298,30 @@ Track-related functions:
 
 
 def draw_track_elements_tr(track_obj):
-    side = 30
-    x_offset = 20
-    y_offset = 10
     # Draw rect container
     round_rectangle(track_obj.canvas,
                     track_obj.pos_x, track_obj.pos_y,
                     track_obj.pos_x + track_obj.length, track_obj.pos_y + track_obj.height,
                     radius=20, fill_color=track_obj.color, outline_color=track_obj.color)
 
-    # Draw play_this icon
-    if track_obj.this_play_is_able:
-        play_c = "#606060"
+    # draw book this
+    if track_obj.this_is_booked:
+        book_c = "#DE970B"
     else:
-        play_c = "#8F0000"
-    play_this_trg = track_obj.canvas.create_polygon(
-        track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - side - y_offset,
-        track_obj.length / 2 - side * 0.866 + side * 0.866,
-        track_obj.pos_y + track_obj.height - side / 2 - y_offset,
-        track_obj.length / 2 - side * 0.866, track_obj.pos_y + track_obj.height - y_offset,
-        fill=play_c, outline="#000000")
-
-    # Draw stop_this icon
-    if track_obj.this_stop_is_able:
-        stop_c = "#606060"
-    else:
-        stop_c = "#8F0000"
-    stop_this_rect = track_obj.canvas.create_rectangle(
-        track_obj.length / 2 + x_offset, track_obj.pos_y + track_obj.height - side - y_offset,
-        track_obj.length / 2 + side + x_offset, track_obj.pos_y + track_obj.height - y_offset,
-        fill=stop_c, outline="#000000")
+        book_c = "#606060"
+    side = 20
+    x_offset = track_obj.length / 2 - side
+    y_offset = track_obj.pos_y + 5
+    book_this = track_obj.canvas.create_polygon(
+        x_offset,                     y_offset + side,
+        x_offset + side / 3,          y_offset + side / 3,
+        x_offset + side,              y_offset,
+        x_offset + side + side * 2/3, y_offset + side / 3,
+        x_offset + side * 2,          y_offset + side,
+        x_offset + side + side * 2/3, y_offset + side + side * 2 / 3,
+        x_offset + side,              y_offset + side * 2,
+        x_offset + side / 3,          y_offset + side + side * 2 / 3,
+        fill=book_c, outline="#000000")
 
     if track_obj.instr_name is None:
         track_obj.canvas.create_text(track_obj.pos_x + 20, track_obj.pos_y + 25,
@@ -396,7 +381,7 @@ def draw_track_elements_tr(track_obj):
         width - x_offset - half_diagonal / 3 - 1, y_offset + half_diagonal / 3 - 1,
         fill="#000000", outline="#000000")
 
-    return [play_this_trg, stop_this_rect, settings_hexagon, settings_circle, plus_rect,
+    return [book_this, settings_hexagon, settings_circle, plus_rect,
             remove_button, remove_x1, remove_x2]
 
 

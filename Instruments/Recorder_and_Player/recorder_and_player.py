@@ -172,11 +172,12 @@ class RecorderAndPlayer:
         print("in play audio")
         pygame.mixer.music.load(self.audio_file)
         pygame.mixer.music.play()
-        # pygame.mixer.music.pause()
-        # pygame.mixer.music.unpause()
 
     def stop_file(self):
         pygame.mixer.music.stop()
+        self.is_playing = False
+        self.audio_thread = None
+        self.display_thread = None
         self.is_playing = False
         self.has_already_received_play = False
         self.reset_time()
@@ -249,8 +250,9 @@ class RecorderAndPlayer:
         if self.is_playing:
             print("in else")
             # in order to loop back, wait for the next "play" msg from the routine
-            self.loop_file()
-        else:
+            # self.loop_file()
+            self.has_already_received_play = False
+        elif not self.is_playing:
             self.stop_file()
 
     def record_mic(self):
@@ -316,9 +318,9 @@ def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
                 if not rap.has_already_received_play and not rap.is_recording:
                     rap.play_file_in_thread()
             elif args[0] == 'stop':
+                rap.stop_file()
                 rap.is_playing = False
                 rap.audio_thread = None
                 rap.display_thread = None
-                rap.stop_file()
             elif args[0] == 'destroy':
                 rap.window.destroy()
