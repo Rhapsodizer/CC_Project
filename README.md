@@ -41,10 +41,9 @@ We learnt how to deal with threading problems, connections issues and local mess
 ## 2. Technology <a name="technology"></a>
 (just a plain list of the main technology you used, which include libraries, coding languages, concepts, etc.)
 The project is a combination of *Python*, *Processing* and *Supercollider* languages. It has been optimized for Windows, Linux and MacOS operating system.
-As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages
-are the main mean of communication among the parts.
-As for Processing...
-As For Supercollider...
+- As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages are the main mean of communication among the parts.
+- As for Processing...
+- As For Supercollider...
 
 ## 3. Loop Station Manager <a name="loop-station"></a>
 
@@ -52,12 +51,15 @@ In the main page, we can choose many options and actions. We can set the number 
 
 ## 4. Instruments <a name="instruments"></a>
 ### 4.1 Recorder and Player <a name="RP"></a>
+
 Recorder and Player is a simple instrument. It allows the user to create a recording to use later in the loop as well as
 to load an *mp3* or *wav* file to be played during the exhibition.
 In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above
 mentioned actions, while in the lower section a real-time amplitude envelope is shown.
 
 ### 4.2 Drum Machine <a name="DM"></a>
+
+The **Minimalistic Drum Machine** is made up of three rows of instruments: kick, hat and snare. Each pulse is characterized by a dot which, when selected, is colored and a ball is generated in the Layer Interaction, with the relative label of the instrument, together with the reproduction of the single sound. The columns are equal to the number of beats in a loop, which can be changed directly from the Loop Station Manager. If any space is deselected, the ball disappears from the Layer Interaction.
 
 ### 4.3 Melody Chat <a name="MC"></a>
 
@@ -93,7 +95,7 @@ COSA SUCCEDE SE LE PALLINE COLLIDONO??
 
 ## 6. Sounds <a name="sounds"></a>
 
-The sounds are created using *Super Collider*. As for the drum machine and melody chat, each percussive sound (\kick, \snare, \hat) or each note (\melody) corresponds to a single *Synthdef*. At each collision of the balls, the state of some parameters defined within each tool changes.
+The Drum Machine and Melody Chat sounds are created using *Super Collider*. Each percussive sound (\kick, \snare, \hat) and each note (\melody) corresponds to a particular *SynthDef*. The parameters that change the states of each sound are sent via OSC messages. At each collision of the spheres the state of some parameters defined within each user changes.
 
 ## 7. OSC structure <a name="osc"></a>
 SCHEMA MESSAGGI OSC TRA PROCESSING-PHYTON-SUPERCOLLIDER-FIREBASE
