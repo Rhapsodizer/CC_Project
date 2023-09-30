@@ -23,7 +23,6 @@ OscMessage right = new OscMessage("/right");
 OscMessage left = new OscMessage("/left");
 OscMessage up = new OscMessage("/up");
 OscMessage down = new OscMessage("/down");
-OscMessage triggerAgent = new OscMessage("/triggerAgent");
 
 void setup()
 {
@@ -43,9 +42,7 @@ void setup()
   osc = new OscP5(this,12004);
   addressLI = new NetAddress("127.0.0.1",12000);
   
-  osc.send(triggerAgent, addressLI);
-  
-  println(fftPortionLen);
+  println("FFT length: " + fftPortionLen);
 }
 
 void draw()
@@ -128,7 +125,6 @@ void oscEvent(OscMessage trigger)
 {
   // Exit applet
   if(trigger.checkAddrPattern("/terminate")) {
-    osc.send(triggerAgent, addressLI);
     exit();
   }
 }

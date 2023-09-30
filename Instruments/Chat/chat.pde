@@ -572,12 +572,12 @@ void oscEvent(OscMessage trigger) {
             
             //QUARTO ELEMENTO (random)
             //amp
-            modifierArray2.add(random(0.1, 1.0));
+            modifierArray2.add(random(0.2, 0.5));
           }
              
           println("OSC (1st el -> key, last el -> n°notes)" + sumArray2);
           println("MODIFIER" + modifierArray2);
-          OscMessage newPadMessage = new OscMessage("/melody");
+          OscMessage newPadMessage = new OscMessage("/modifier");
           for (float i : modifierArray2) {
             newPadMessage.add(i);
           }

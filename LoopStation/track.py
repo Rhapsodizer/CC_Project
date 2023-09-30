@@ -149,7 +149,7 @@ class Track:
         if self.instr_name == "Drum Machine":
             osc.oscDM.send_message("/playStep", 0)
         elif self.instr_name == "Melody Chat":
-            osc.oscCH.send_message("/playStep", 0)
+            osc.oscSC.send_message("/playStep", 0)
         elif self.instr_name == "Rec & Play":
             self.postman.send_message('/action', 'play')
         elif self.instr_name == "Image Sonification":
@@ -160,7 +160,7 @@ class Track:
         if self.instr_name == "Drum Machine":
             osc.oscDM.send_message("/stop", 0)
         elif self.instr_name == "Melody Chat":
-            osc.oscCH.send_message("/stop", 0)
+            osc.oscSC.send_message("/stop", 0)
         elif self.instr_name == "Rec & Play":
             self.postman.send_message('/action', 'stop')
         elif self.instr_name == "Image Sonification":

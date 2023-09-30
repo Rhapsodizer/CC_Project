@@ -36,7 +36,7 @@ Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 
 ~tremoloDepth = 0.5;
 )
 (
-~playSound = {
+~playSound = { var release, amp, tremoloFreq, tremoloDepth;
 	Synth(\melody, [\freq, ~arrayFreq[~counter], \release, ~release, \amp, ~amp, \tremoloFreq, ~tremoloFreq, \tremoloDepth, ~tremoloDepth]);
 	//~counter.postln;
 	~counter = ~counter + 1;
@@ -133,6 +133,7 @@ SynthDef(\snare, {
 )
 Synth(\snare);
 
+~playSound.value;
 //---------------------------------------------------------------------
 //
 //                     OSC MANAGEMENT
@@ -156,6 +157,7 @@ OSCdef('modifier', {arg msg;
 	~tremoloFreq= msg[1];
 	~tremoloDepth = msg[2];
 	~amp = msg[3];
+
 }, "/modifier");
 )
 

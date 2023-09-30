@@ -127,8 +127,10 @@ class Ball {
     fill(128);
     text("Type: " + type, 100, 100);
     text("ID: " + id, 100, 130);
-    text("Vel: [" + pos.x + ", " + pos.y + "]", 100, 160);
-    line(pos.x, pos.y, 100,150);
+    text("Pos: [" + pos.x + ", " + pos.y + "]", 100, 160);
+    text("Vel: " + vel.mag(), 100, 190);
+    stroke(0);
+    line(pos.x, pos.y, 300, 300);
   }
   
   

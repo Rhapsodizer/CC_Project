@@ -89,7 +89,7 @@ void draw() {
       if (ball.popup){
         ball.drawPopup();
       }
-
+      
       for (int i=0; i<ball.animStart.length; i++) {
         if(time-ball.animStart[i]<1000){
           fill(255, 255-(time-ball.animStart[i]));
