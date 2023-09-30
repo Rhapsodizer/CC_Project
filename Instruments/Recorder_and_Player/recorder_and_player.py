@@ -9,6 +9,7 @@ import wave
 import struct
 import time
 from Utils import utils
+from PIL import Image, ImageTk
 from Utils.error_manager import ErrorWindow
 from pythonosc import dispatcher, osc_server
 import os
@@ -88,6 +89,10 @@ class RecorderAndPlayer:
         self.audio_thread = None
         self.display_thread = None
         self.rec_thread = None
+        self.pil = Image.open(tr_parent.ls_parent.user_paths[6])
+        self.w, self.h = self.pil.size
+        self.pil = self.pil.resize((self.w // 10, self.h // 10))
+        self.image = ImageTk.PhotoImage(self.pil)
         self.draw_all()
         # Initialize pygame for audio playback
         pygame.mixer.init()

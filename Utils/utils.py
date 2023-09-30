@@ -405,6 +405,10 @@ def draw_toolbar_rap(rap_obj):
                     rap_obj.toolbar_pos_y + rap_obj.toolbar_height,
                     radius=20, fill_color=rap_obj.toolbar_color, outline_color="#000000")
 
+    if rap_obj.image:
+        rap_obj.toolbar_canvas.create_image(rap_obj.toolbar_length - rap_obj.w//10, rap_obj.toolbar_pos_y,
+                                            anchor=tk.NW, image=rap_obj.image)
+
     rect_side = 60
     rect_nw_x = rap_obj.c_width/2 - 80
     rect_nw_y = rap_obj.toolbar_pos_y + 5

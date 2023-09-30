@@ -104,7 +104,7 @@ class LoopStationManager:
     def up_steps(self, event):
         _ = event
         if not self.track_currently_playing:
-            if self.steps < 32:
+            if self.steps < 16:
                 self.steps += 1
             self.steps_is_valid = False
             self.draw_all()
@@ -145,6 +145,8 @@ class LoopStationManager:
                 ErrorWindow("BPM or Steps", "Error: BPM or Steps are not valid")
             elif not self.tracks:
                 ErrorWindow("Empty Tracks Error", "Error: No Tracks")
+            elif not self.booked_tracks:
+                ErrorWindow("Booked Tracks Error", "Error: No Tracks to play")
             else:
                 print("play thread is running...")
                 self.stop_has_been_pressed = False
@@ -185,16 +187,18 @@ class LoopStationManager:
             self.play_all_booked_thread_is_running = False
             self.play_all_booked_thread = None
             print(self.booked_tracks)
-            for i, tr in enumerate(self.booked_tracks):
-                print(f"stopping track {i}")
-                self.stop_thread = threading.Thread(target=tr.stop_this)
+
+            while self.booked_tracks:
+                t = self.booked_tracks[0]
+                print("stopping track " + str(t))
+                self.stop_thread = threading.Thread(target=t.stop_this)
                 self.stop_thread.start()
+                # time.sleep(0.001)
                 self.stop_thread = None
-            time.sleep(0.001)
+                self.booked_tracks = self.booked_tracks[1:]
             self.play_thread = None
             self.booked_tracks = []
             self.track_currently_playing = []
-            # print("Play thread stopped and destroyed.")
             self.stop_is_able = False
             self.draw_all()
 
