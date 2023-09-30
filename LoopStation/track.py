@@ -55,6 +55,10 @@ class Track:
         self.canvas.tag_bind(remove_button, "<Button-1>", self.remove_clicked)
         self.canvas.tag_bind(remove_x1, "<Button-1>", self.remove_clicked)
         self.canvas.tag_bind(remove_x2, "<Button-1>", self.remove_clicked)
+        if not self.this_is_booked and self in self.ls_parent.booked_tracks:
+            index = self.ls_parent.booked_tracks.index(self)
+            self.ls_parent.booked_tracks.pop(index)
+            self.ls_parent.draw_all()
 
     def book_this_clicked(self, event):
         _ = event
@@ -63,12 +67,20 @@ class Track:
                 if self.instrument_is_ready:
                     if self.this_is_booked:
                         self.this_is_booked = False
-                        index = self.ls_parent.booked_tracks.index(self)
-                        self.ls_parent.booked_tracks.pop(index)
+                        if self in self.ls_parent.booked_tracks:
+                            index = self.ls_parent.booked_tracks.index(self)
+                            self.ls_parent.booked_tracks.pop(index)
                     else:
-                        self.this_is_booked = True
-                        self.ls_parent.booked_tracks.append(self)
+                        if self not in self.ls_parent.booked_tracks:
+                            self.this_is_booked = True
+                            self.ls_parent.booked_tracks.append(self)
+                        else:
+                            index = self.ls_parent.booked_tracks.index(self)
+                            self.ls_parent.booked_tracks.pop(index)
                     self.ls_parent.draw_all()
+                elif self in self.ls_parent.booked_tracks:
+                    index = self.ls_parent.booked_tracks.index(self)
+                    self.ls_parent.booked_tracks.pop(index)
                 else:
                     ErrorWindow("Instrument not set up", "Error: Use Settings to set up the instrument")
             else:

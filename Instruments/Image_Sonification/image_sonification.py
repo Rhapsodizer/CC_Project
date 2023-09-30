@@ -81,7 +81,14 @@ class ImageSonification:
             if self.curr_ton < len(self.tonalities):
                 self.curr_ton += 1
                 self.ton = self.tonalities[self.curr_ton]
+                self.fund_freq = self.fundamental_frequencies[self.curr_ton]
             self.ton_is_valid = False
+            self.track_parent.instrument_is_ready = False
+            self.track_parent.this_is_booked = False
+            if self in self.track_parent.ls_parent.booked_tracks:
+                index = self.track_parent.ls_parent.booked_tracks.index(self)
+                self.track_parent.ls_parent.booked_tracks.pop(index)
+            self.track_parent.draw_track()
             self.draw_all_is()
 
     def ton_down_clicked(self, event):
@@ -90,7 +97,11 @@ class ImageSonification:
             if self.curr_ton > 0:
                 self.curr_ton -= 1
                 self.ton = self.tonalities[self.curr_ton]
+                self.fund_freq = self.fundamental_frequencies[self.curr_ton]
             self.ton_is_valid = False
+            self.track_parent.instrument_is_ready = False
+            self.track_parent.this_is_booked = False
+            self.track_parent.draw_track()
             self.draw_all_is()
 
     def ton_valid_clicked(self, event):
@@ -180,7 +191,7 @@ class ImageSonification:
             harmonic_wave += (1 / harmonic) * np.sin(2 * np.pi * self.base_freq * harmonic * t)
         # Normalize the waveform to be in the range [-1, 1]
         harmonic_wave /= np.max(np.abs(harmonic_wave))
-        harmonic_wave /= 10
+        harmonic_wave /= 5
 
         return harmonic_wave
 
