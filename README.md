@@ -84,22 +84,25 @@ The **Melody modifier** modifies the melody created in this way. The sentence wr
 - The third parameter concerns the length of the melody (nSteps) and maps the *\tremoloDepth* in a range between 0.5 and 1.0.
 - The fourth is instead a random number between 0.1 and 1.0 and modifies the *\amp* of the sound.
 
-### 4.4 Ship agent <a name="ship"></a>
-
-
+### 4.4 Control agent <a name="ship"></a>
+Balls inside Layer Interaction sketch reduce their speed because of the friction and finally stop. In order to make them collide again a new agent (class *Agent*) can be called inside the sketch. It's an image with a radius of interaction that can be moved by the user. The controls are coded in the sketch named *controlAgent*. The controls are simple:
++ **Up** and **Down** are controlled via microphone by the pitch computed
++ **Left** and **Right** are controlled by the averaged optical flow amount computed from the left and region of the webcam stream
+The collision with the agent give momentum to the ball, causing cascading collisions.
 
 ## 5. Layer Interaction <a name="layer-interaction"></a>
 
-The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text and size (or color????).
+The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text, size and color.
 
-COSA SUCCEDE SE LE PALLINE COLLIDONO??
+If two balls representing the same instrument of the drum machine collide, their pitch is modified randomly in a certain predefined range of values.
 
 ## 6. Sounds <a name="sounds"></a>
 
-The Drum Machine and Melody Chat sounds are created using *Super Collider*. Each percussive sound (\kick, \snare, \hat) and each note (\melody) corresponds to a particular *SynthDef*. The parameters that change the states of each sound are sent via OSC messages. At each collision of the spheres the state of some parameters defined within each user changes.
+The Drum Machine, Melody Chat and Image Sonification sounds are created using *Super Collider*. Each percussive sound (\kick, \snare, \hat) and each note (\melody) corresponds to a particular *SynthDef*. The parameters that change the states of each sound are sent via OSC messages. At each collision of the spheres the state of some parameters defined within each user changes.
 
 ## 7. OSC structure <a name="osc"></a>
-SCHEMA MESSAGGI OSC TRA PROCESSING-PHYTON-SUPERCOLLIDER-FIREBASE
+![immagine](https://github.com/Rhapsodizer/CC_Project/assets/92687497/d2911156-d38a-47f6-970b-1ecb26c28d9c)
+
 
 ## 8. Contacts and contributions <a name="contact"></a>
 
