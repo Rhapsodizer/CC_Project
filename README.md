@@ -1,6 +1,6 @@
 # *E.L.V.I.S.*
 *Enhanched Looper with Visual Interaction and Sonification*
-<br />
+<a name="top"></a>
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
@@ -26,13 +26,11 @@
 </details>
 
 ## 1. Description <a name="description"></a>
-(A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
 
 This project aims to create a simple and user-friendly Loop Station. This application has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
 It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able to express themselves and enjoy the music they create.
 
 ### 1.1. Challenges, accomplishment and lessons learned <a name="cal"></a>
-(What kind of challenges did you run into for this projects, what kind of accomplishment are you proud of and and what did you learn during the project? Few lines for each question.)
 
 The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
 in which the **Loop Station Manager** dictates all the actions to perform.
@@ -40,7 +38,7 @@ We have worked autonomously on the various instrument and together on the founda
 We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there that will be useful in the future.
 
 ## 2. Technology <a name="technology"></a>
-(just a plain list of the main technology you used, which include libraries, coding languages, concepts, etc.)
+
 The project is a combination of *Python*, *Processing* and *Supercollider* languages. It has been optimized for Windows, Linux and MacOS operating system.
 - As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages are the main mean of communication among the parts.
 - As for Processing, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
@@ -64,7 +62,7 @@ The **Minimalistic Drum Machine** is made up of three rows of instruments: kick,
 
 ### 4.3 Melody Chat <a name="MC"></a>
 
-<img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="250">
+<img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="200">
 
 Melody Chat consists of a canvas created with *Processing* that represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
 
@@ -103,28 +101,17 @@ The Drum Machine, Melody Chat and Image Sonification sounds are created using *S
 ## 7. OSC structure <a name="osc"></a>
 ![immagine](https://github.com/Rhapsodizer/CC_Project/assets/92687497/d2911156-d38a-47f6-970b-1ecb26c28d9c)
 
-
 ## 8. Contacts and contributions <a name="contact"></a>
 
 - **Attolini Silvio** - silvio.attolini@mail.polimi.it: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
 - **Gorni Alessandro** - alessandro.gorni@mail.polimi.it: DM, MelodyChat, sounds.scd, LayerInteraction
 - **Martinelli Riccardo** - riccardo.martineli@mail.polimi.it: MelodyChat, sounds.scd
 
-Project link: https://github.com/Rhapsodizer/CC_Project
-OTHER LINKSSSSS???????????????????? (youtube videos, presentation, link for the web app.)
+Project link: https: //github.com/Rhapsodizer/CC_Project
+Youtube video demo: 
 
 
-## 6. 1 thumbnail image related to the projects: format 1024x768
 
-## 7. Pictures
-(3 pictures of the project (format 1024x768): use screenshots or pictures of you using the demo, rather than block diagrams)
-
-## Video: provide a video showing the demo (edited)
-
-PER PRESENTAZIONE:
-- PRESENTATION: slides containing: context, motivation, concept, technical solutions and technical details. You will have 15' for the presentation at your disposal, including the demo session.
-- real-time running demo of the project:  In the case this is not feasible due to the virtual call, you are asked produce a video to share us
-- Github repo for the code: We will, potentially, ask you to take a look at the code. The Github should be self-explanatory on the project and on how to use the code.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
