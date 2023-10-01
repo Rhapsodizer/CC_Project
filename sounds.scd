@@ -64,7 +64,7 @@ SynthDef(\kick1, { arg pitch = 800;
 }).add;
 )
 
-Synth(\kick1, [amp: 0.8, pitch: 800]);
+Synth(\kick1, [amp: 0.8, pitch: 4000]);
 
 (
 SynthDef(\kick2, {
@@ -111,14 +111,14 @@ SynthDef(\hat, { arg amp = 1, startPan = -1, endPan = 1, pitch = 10000, release 
   Out.ar(0, Pan2.ar(BBandPass.ar(whiteNoise, freq: pitch, bw: 1), pos: Line.kr(startPan, endPan, 4)) * amp);
 }).add;
 )
-Synth(\hat);
+Synth(\hat, [amp: 1, pitch: 1000]);
 
 (
-SynthDef(\snare, {
+SynthDef(\snare, { arg pitch;
 
 	var drumosc, filterenv, volenv, drumoutput, snaposc, snapenv, fulloutput;
 
-	drumosc = {Pulse.ar(100)};
+	drumosc = {Pulse.ar(pitch)};
 	filterenv = {Line.ar(1, 0, 0.2, doneAction: 0)};
 	volenv = {Line.ar(1, 0, 0.6, doneAction: 2)};
 	drumoutput = {LPF.ar(drumosc,(filterenv *1000) + 30)};
@@ -133,7 +133,7 @@ SynthDef(\snare, {
 	)
 }).add;
 )
-Synth(\snare);
+Synth(\snare, [amp: 1, pitch: 1]);
 
 //---------------------------------------------------------------------
 //
