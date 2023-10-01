@@ -205,6 +205,10 @@ String convertToNoteMelody(int number, int startingPoint) {
 
 // Receive OSC triggers
 void oscEvent(OscMessage trigger) {
+  // Change nSteps
+  if(trigger.checkAddrPattern("/setSteps")) {
+    nSteps = trigger.get(0).intValue();
+  }
   
   // Manage username  /username 1 Riccardo
   if(trigger.checkAddrPattern("/username")) {
@@ -569,7 +573,7 @@ void oscEvent(OscMessage trigger) {
             //TERZO ELEMENTO (lunghezza melodia = nSteps) da 0.5 a 1.0
             //tremoloDepth
             int lastInteger = sumArray2.get(sumArray2.size() - 1);
-            float mappedFloat_3 = map(lastInteger, 1, 16, 0.5, 1.0);
+            float mappedFloat_3 = map(lastInteger, 1, nSteps, 0.5, 1.0);
             modifierArray2.add(mappedFloat_3);
             
             //QUARTO ELEMENTO (random)
