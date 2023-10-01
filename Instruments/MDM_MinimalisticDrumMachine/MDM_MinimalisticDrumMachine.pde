@@ -112,20 +112,33 @@ void oscEvent(OscMessage trigger)
   
   // Set number of Steps dinamically
   if(trigger.checkAddrPattern("/setSteps")) {
+    int prevNSteps = nSteps;
     nSteps = trigger.get(0).intValue();
-    int diff = nSteps - bHat.size();
+    int diff = nSteps - prevNSteps;
     if (diff > 0) {
-      for (int i = nSteps; i <= nSteps + diff; i++) {
+      for (int i = prevNSteps; i < prevNSteps + diff; i++) {
+        hatRow[i] = false;
+        snrRow[i] = false;
+        kikRow[i] = false;
         bHat.add( new Step(100+i*50, 50, i, "hat", hatRow) );
         bSnr.add( new Step(100+i*50, 100, i, "snare", snrRow ) );
         bKik.add( new Step(100+i*50, 150, i, "kick", kikRow ) );
       }
     }
     else if (diff < 0) {
-      for (int i = nSteps-1; i > nSteps-diff; i--) {
+      for (int i = prevNSteps-1; i >= prevNSteps-diff; i--) {
         hatRow[i] = false;
         snrRow[i] = false;
         kikRow[i] = false;
+        OscMessage terminateHat = new OscMessage("/hat/off");
+        terminateHat.add(i);
+        osc.send(terminateHat, oscLI);
+        OscMessage terminateSnare = new OscMessage("/snare/off");
+        terminateSnare.add(i);
+        osc.send(terminateSnare, oscLI);
+        OscMessage terminateKick = new OscMessage("/kick/off");
+        terminateKick.add(i);
+        osc.send(terminateKick, oscLI);
         bHat.remove(i);
         bSnr.remove(i);
         bKik.remove(i);

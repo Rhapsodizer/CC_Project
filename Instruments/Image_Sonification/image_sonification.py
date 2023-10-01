@@ -6,7 +6,8 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import random
 from numpy import interp
-import simpleaudio as sa
+# import simpleaudio as sa
+import Utils.osc_bridge as osc
 import numpy as np
 from Utils.error_manager import ErrorWindow
 
@@ -118,7 +119,7 @@ class ImageSonification:
         self.draw_all_is()
 
     def image_on_setup(self):
-        self.pil = Image.open("Instruments/Image_Sonification/elvispic.jpeg")
+        self.pil = Image.open("H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\Image_Sonification\elvispic.jpeg")
         self.pil = self.pil.resize((self.img_sides, self.img_sides))
         self.image = ImageTk.PhotoImage(self.pil)
         self.ton_is_valid = True
@@ -149,6 +150,7 @@ class ImageSonification:
         if self.image and self.is_playing:
             random_x = random.randint(0, self.img_sides - 1)
             random_y = random.randint(0, self.img_sides - 1)
+            osc.oscLI.send_message("/notePixelCoord", random_x, random_y)
             self.extracted.append((self.img_pos_x + random_x, self.img_pos_y + random_y))
             self.draw_all_is()
 
@@ -161,8 +163,10 @@ class ImageSonification:
             if note_offset in self.major_scale_2oct:
                 # print("ok")
                 self.base_freq = self.fund_freq * pow(2, note_offset/12)
-                self.play_note_thread = Thread(target=self.play_note_given_value)
-                self.play_note_thread.start()
+                osc.oscSC.send_message("/notePixel", self.base_freq)
+                print(self.base_freq)
+                #self.play_note_thread = Thread(target=self.play_note_given_value)
+                #self.play_note_thread.start()
             else:
                 # print("out")
                 self.play_note_thread = None
