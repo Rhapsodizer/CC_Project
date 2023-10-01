@@ -70,6 +70,22 @@ class Ball {
           lastCollided[i] = false;
         }
       }
+      // Collision with void
+      if (agentVoid.isActive == true){
+        de = new PVector(agentVoid.x - pos.x, agentVoid.y - pos.y);
+        float distance = sqrt(de.x*de.x + de.y*de.y);
+        if (distance < (r+agentVoid.r)) {
+          status = false;
+          // Make event non-repetitive
+          collided[i] = true;
+          if (lastCollided[i]==false && collided[i]==true) {
+            lastCollided[i] = true;
+          }
+        } else {
+          collided[i] = false;
+          lastCollided[i] = false;
+        }
+      }
     }
   }
   

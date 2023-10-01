@@ -19,6 +19,7 @@ float gravity = 0.0;
 float friction = -0.7;
 Ball[] balls;
 Agent ship;
+PixelVoid agentVoid;
 int time;
 
 String[] noteNames;
@@ -42,6 +43,7 @@ void setup(){
   // Create objects
   balls = new Ball[numBalls];
   ship = new Agent();
+  agentVoid = new PixelVoid(0,0);
   
   // Initialize ball object array
   for (int i=0; i<nSteps; i++) {
@@ -67,6 +69,11 @@ void draw() {
   // Update variables
   time = millis();
   background(220);
+  
+  // Pixel sonification update
+  if (agentVoid.isActive){
+    agentVoid.display();
+  }
   
   // Display link
   for (Ball ball : balls) {
@@ -212,6 +219,15 @@ void oscEvent(OscMessage theOscMessage) {
     } else {
       ship.isActive = true;
     }
+  }
+  // Receive pixel coordinate from image sonification
+  if(theOscMessage.checkAddrPattern("/notePixelCoord")) {
+    agentVoid.isActive = true;
+    agentVoid.x = theOscMessage.get(0).intValue();
+    agentVoid.y = theOscMessage.get(1).intValue();
+  }
+  if(theOscMessage.checkAddrPattern("/notePixelCoord/off")) {
+    agentVoid.isActive = false;
   }
   // Move agent
   if (theOscMessage.checkAddrPattern("/right")){
