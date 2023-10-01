@@ -84,12 +84,16 @@ def draw_all_ls(ls_obj):
      bpm_valid_rect, steps_valid_rect] = draw_bpm_steps_ls(ls_obj)
     draw_all_tracks_ls(ls_obj)
     plus_add_track = draw_plus_ls(ls_obj)
-    [play, stop] = draw_play_stop_ls(ls_obj)
+    [play, p, stop] = draw_play_stop_ls(ls_obj)
     [safe_close_button, close_x1, close_x2] = safe_close_ls(ls_obj)
+    if ls_obj.tracks:
+        book_all = book_all_ls(ls_obj)
+    else:
+        book_all = None
     ls_obj.canvas.update()
     return [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-            bpm_valid_rect, steps_valid_rect, plus_add_track, play, stop,
-            safe_close_button, close_x1, close_x2]
+            bpm_valid_rect, steps_valid_rect, plus_add_track, play, p, stop,
+            safe_close_button, close_x1, close_x2, book_all]
 
 
 def draw_spaceship_ls(ls_obj):
@@ -114,7 +118,7 @@ def draw_bpm_steps_ls(ls_obj):
 
     # BPM
     draw_bpm_ls(ls_obj)
-    x_set_bpm = ls_obj.c_width/2 - 65
+    x_set_bpm = ls_obj.c_width/2 - 85
     y_set_bpm = 70
     up_bpm_triangle = ls_obj.canvas.create_polygon(
         x_set_bpm, y_set_bpm - 2,
@@ -137,7 +141,7 @@ def draw_bpm_steps_ls(ls_obj):
         fill=fill_bpm, outline="#000000")
 
     # Steps
-    x_set_steps = ls_obj.c_width / 2 + 130
+    x_set_steps = ls_obj.c_width / 2 + 150
     y_set_steps = 70
     draw_steps_ls(ls_obj)
     up_steps_triangle = ls_obj.canvas.create_polygon(
@@ -165,12 +169,12 @@ def draw_bpm_steps_ls(ls_obj):
 
 
 def draw_bpm_ls(ls_obj):
-    ls_obj.canvas.create_text(ls_obj.c_width / 2 - 180, 70,
+    ls_obj.canvas.create_text(ls_obj.c_width / 2 - 200, 70,
                               text="BPM: " + str(ls_obj.bpm), font=("Arial", 12), anchor=tk.W)
 
 
 def draw_steps_ls(ls_obj):
-    ls_obj.canvas.create_text(ls_obj.c_width / 2 + 20, 70,
+    ls_obj.canvas.create_text(ls_obj.c_width / 2 + 40, 70,
                               text="Steps: " + str(ls_obj.steps), font=("Arial", 12), anchor=tk.W)
 
 
@@ -204,9 +208,35 @@ def draw_plus_ls(ls_obj):
     return plus_add_track
 
 
+def book_all_ls(ls_obj):
+    # Draw book all icon
+    x_offset = 170
+    track_height = 50
+    track_distance = 10
+    side = 20
+    y_offset = 105 + len(ls_obj.tracks) * (track_height + track_distance)
+    if ls_obj.book_all_is_active:
+        book_all_c = "#DE970B"
+    else:
+        book_all_c = "#606060"
+    book_all = ls_obj.canvas.create_polygon(
+        x_offset, y_offset + side,
+        x_offset + side / 3, y_offset + side / 3,
+        x_offset + side, y_offset,
+        x_offset + side + side * 2 / 3, y_offset + side / 3,
+        x_offset + side * 2, y_offset + side,
+        x_offset + side + side * 2 / 3, y_offset + side + side * 2 / 3,
+        x_offset + side, y_offset + side * 2,
+        x_offset + side / 3, y_offset + side + side * 2 / 3,
+        fill=book_all_c, outline="#000000"
+    )
+
+    return book_all
+
+
 def draw_play_stop_ls(ls_obj):
     side = 50
-    x_offset = 30
+    x_offset = 50
     y_offset = 30
     canvas = ls_obj.canvas
     width = ls_obj.c_width
@@ -228,6 +258,22 @@ def draw_play_stop_ls(ls_obj):
                                           width / 2 - side - x_offset * 0.866, height - y_offset,
                                           fill=play_c, outline="#000000")
 
+    # Draw pause icon
+    if ls_obj.pause_is_able:
+        pause_c = "#606060"
+    else:
+        pause_c = "#8F0000"
+    pr1 = canvas.create_rectangle(width / 2 - 20, height - side - y_offset,
+                                  width / 2 - 5, height - y_offset,
+                                  fill=pause_c, outline="#000000")
+    pr2 = canvas.create_rectangle(width / 2 - 4, height - side - y_offset,
+                                  width / 2 + 5, height - y_offset,
+                                  fill="#808080", outline="#808080")
+    pr3 = canvas.create_rectangle(width / 2 + 5, height - side - y_offset,
+                                  width / 2 + 20, height - y_offset,
+                                  fill=pause_c, outline="#000000")
+    p = [pr1, pr2, pr3]
+
     # Draw stop icon
     if ls_obj.stop_is_able:
         stop_c = "#606060"
@@ -237,7 +283,7 @@ def draw_play_stop_ls(ls_obj):
                                              width / 2 + side + x_offset, height - y_offset,
                                              fill=stop_c, outline="#000000")
 
-    return [play_triangle, stop_rectangle]
+    return [play_triangle, p, stop_rectangle]
 
 
 def safe_close_ls(ls_obj):
@@ -527,7 +573,7 @@ def draw_all_is(img_son_obj):
         fill="#606060", outline="#000000")
 
     img_son_obj.canvas.create_text(img_son_obj.c_width / 2 + 20, 40,
-                                   text="Tonality: " + str(img_son_obj.ton), font=("Arial", 12), anchor=tk.W)
+                                   text="Tonic: " + str(img_son_obj.ton), font=("Arial", 12), anchor=tk.W)
 
     side = 20
     x_set_ton = img_son_obj.c_width / 2 - 5
@@ -565,6 +611,6 @@ def draw_all_is(img_son_obj):
         for r in img_son_obj.extracted:
             img_son_obj.canvas.create_rectangle(r[0] - 5, r[1] - 5,
                                                 r[0] + 5, r[1] + 5,
-                                                fill="#000000", outline="#000000")
+                                                fill="#000000", outline="#FFFFFF", width=2)
 
     return [plus, up_ton_triangle, down_ton_triangle, ton_valid_rect]

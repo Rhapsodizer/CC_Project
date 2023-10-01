@@ -52,7 +52,7 @@ class RecorderAndPlayer:
         self.canvas.place(x=0, y=254)
         self.bpm = self.track_parent.ls_parent.bpm
         self.steps = self.track_parent.ls_parent.steps
-        self.loop_duration = 60/self.bpm * self.steps  # in seconds
+        self.loop_duration = tr_parent.ls_parent.calculate_loop_duration()
         self.loaded = False
         self.toolbar_pos_x = 20
         self.toolbar_pos_y = 20
@@ -335,6 +335,19 @@ class RecorderAndPlayer:
         self.zero_time = time.time()
         self.draw_time_bar()
 
+    def update_loop_dur(self):
+        self.loop_duration = self.track_parent.ls_parent.calculate_loop_duration()
+        self.reset_time()
+        self.audio_data = []
+        self.show_audio_data = []
+        if self.audio_file:
+            audio_segment = AudioSegment.from_mp3(self.audio_file)
+            self.values_of_audio_segment = audio_segment.get_array_of_samples()
+            self.file_title = os.path.basename(self.audio_file)
+            self.loaded = True
+            self.track_parent.instrument_is_ready = True
+            self.draw_all()
+
 
 def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
     if address == '/action':
@@ -347,5 +360,7 @@ def handle_osc_message(address: str, args: tuple, rap: RecorderAndPlayer):
                 rap.has_received_stop = True
                 rap.is_playing = False
                 rap.stop_file()
+            elif args[0] == 'update':
+                rap.update_loop_dur()
             elif args[0] == 'destroy':
                 rap.window.destroy()

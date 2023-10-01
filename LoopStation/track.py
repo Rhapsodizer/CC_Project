@@ -184,6 +184,10 @@ class Track:
 
         self.this_is_booked = False
 
+    def update_loop_duration(self):
+        if self.instr_name == "Rec & Play":
+            self.postman.send_message('/action', 'update')
+
     def destroy(self):
         # Send trigger to exit target applet
         if self.instr_name == "Drum Machine":
