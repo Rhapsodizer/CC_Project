@@ -27,12 +27,13 @@
 
 ## 1. Description <a name="description"></a>
 (A description of what the project is about, what you want to convey, how do you envision it (an artistic installation? a webapp?) and what it actually does, so what is the user experience)
+
 This project aims to create a simple and user-friendly Loop Station. This application has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
-It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able
-to express themselves and enjoy the music they create.
+It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able to express themselves and enjoy the music they create.
 
 ### 1.1. Challenges, accomplishment and lessons learned <a name="cal"></a>
 (What kind of challenges did you run into for this projects, what kind of accomplishment are you proud of and and what did you learn during the project? Few lines for each question.)
+
 The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
 in which the **Loop Station Manager** dictates all the actions to perform.
 We have worked autonomously on the various instrument and together on the foundation of the looper.
@@ -42,8 +43,8 @@ We learnt how to deal with threading problems, connections issues and local mess
 (just a plain list of the main technology you used, which include libraries, coding languages, concepts, etc.)
 The project is a combination of *Python*, *Processing* and *Supercollider* languages. It has been optimized for Windows, Linux and MacOS operating system.
 - As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages are the main mean of communication among the parts.
-- As for Processing...
-- As For Supercollider...
+- As for Processing, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
+- As For Supercollider, it has been chosen for its real-time sound generation power. Sounds can be created and modified during play.
 
 ## 3. Loop Station Manager <a name="loop-station"></a>
 
