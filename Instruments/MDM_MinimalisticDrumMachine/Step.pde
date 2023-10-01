@@ -2,7 +2,7 @@ class Step
 {
   int x,y,d;
   int id;
-  float pitchKick;
+  float pitch;
   String type;
   boolean[] isActive;
   
@@ -14,7 +14,8 @@ class Step
     id = _id;
     type = _type;
     isActive = _isActive;
-    pitchKick = 800;
+    
+    pitch = 800;
   }
   
   public void draw()
@@ -59,7 +60,7 @@ class Step
     if (isActive[id]){
       // Trigger sound
       OscMessage msg0 = new OscMessage("/" + type);
-      msg0.add(pitchKick);
+      msg0.add(pitch);
       osc.send(msg0, oscSC);
     }
   }

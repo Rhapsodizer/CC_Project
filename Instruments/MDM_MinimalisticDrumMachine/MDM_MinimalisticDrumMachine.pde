@@ -15,26 +15,22 @@ ArrayList<Step> bHat = new ArrayList<Step>();
 ArrayList<Step> bSnr = new ArrayList<Step>();
 ArrayList<Step> bKik = new ArrayList<Step>();
 
-PImage img;
+boolean[] hatRow = new boolean[16];
+boolean[] snrRow = new boolean[16];
+boolean[] kikRow = new boolean[16];
+
+PImage img; // backgroung image
 
 
 void setup()
 {
   size(900, 200);
-  nSteps = int(args[0]);
-  
-  boolean[] hatRow = new boolean[nSteps];
-  boolean[] snrRow = new boolean[nSteps];
-  boolean[] kikRow = new boolean[nSteps];
+  nSteps = int(args[0]); // Get number of steps at startup
   
   // OSC
   osc = new OscP5(this,12001);
   oscSC = new NetAddress("127.0.0.1",57120);
   oscLI = new NetAddress("127.0.0.1",12000);
-  
-  OscMessage numSteps = new OscMessage("/nStep");
-  numSteps.add(nSteps);
-  osc.send(numSteps, oscLI);
   
   // construct grid
   for (int i = 0; i < nSteps; i++)
@@ -98,7 +94,7 @@ void oscEvent(OscMessage trigger)
     curr = 0;
     pos = curr;
   }
-  else if(trigger.checkAddrPattern("/playStep")) {
+  if(trigger.checkAddrPattern("/playStep")) {
     // Sync marker
     pos = curr;
     // Play Sound
@@ -113,16 +109,46 @@ void oscEvent(OscMessage trigger)
     }
     
   }
-  else if(trigger.checkAddrPattern("/setSteps")) {
+  
+  // Set number of Steps dinamically
+  if(trigger.checkAddrPattern("/setSteps")) {
     nSteps = trigger.get(0).intValue();
+    int diff = nSteps - bHat.size();
+    if (diff > 0) {
+      for (int i = nSteps; i <= nSteps + diff; i++) {
+        bHat.add( new Step(100+i*50, 50, i, "hat", hatRow) );
+        bSnr.add( new Step(100+i*50, 100, i, "snare", snrRow ) );
+        bKik.add( new Step(100+i*50, 150, i, "kick", kikRow ) );
+      }
+    }
+    else if (diff < 0) {
+      for (int i = nSteps-1; i > nSteps-diff; i--) {
+        hatRow[i] = false;
+        snrRow[i] = false;
+        kikRow[i] = false;
+        bHat.remove(i);
+        bSnr.remove(i);
+        bKik.remove(i);
+      }
+    }
   }
-  // Collisions
-  else if(trigger.checkAddrPattern("/collision/kk")) {
-    bKik.get(trigger.get(0).intValue()).pitchKick = trigger.get(2).floatValue();
-    bKik.get(trigger.get(1).intValue()).pitchKick = trigger.get(2).floatValue();
+  // Collisions signals
+  if(trigger.checkAddrPattern("/collision/kk")) {
+    bKik.get(trigger.get(0).intValue()).pitch = trigger.get(2).floatValue();
+    bKik.get(trigger.get(1).intValue()).pitch = trigger.get(2).floatValue();
   }
+  if(trigger.checkAddrPattern("/collision/hh")) {
+    bHat.get(trigger.get(0).intValue()).pitch = trigger.get(2).floatValue();
+    bHat.get(trigger.get(1).intValue()).pitch = trigger.get(2).floatValue();
+  }
+  if(trigger.checkAddrPattern("/collision/ss")) {
+    bSnr.get(trigger.get(0).intValue()).pitch = trigger.get(2).floatValue();
+    bSnr.get(trigger.get(1).intValue()).pitch = trigger.get(2).floatValue();
+  }
+  
+
   // Exit applet
-  else if(trigger.checkAddrPattern("/terminate")) {
+  if(trigger.checkAddrPattern("/terminate")) {
     for (int i=0; i<nSteps; i++){
         // Manage balls [off]
         OscMessage terminateHat = new OscMessage("/hat/off");

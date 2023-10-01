@@ -139,6 +139,5 @@ class Ball {
     stroke(180);
     line(pos.x, pos.y, width-120, 220);
   }
-  
-  
+
 }

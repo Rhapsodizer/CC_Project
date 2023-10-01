@@ -125,15 +125,32 @@ void mouseClicked(){
 }
       
 // Collision triggers
-void collision_event(int id, int other_id, String type, String other_type) {
-  //oscP5.send(collision, addressSC);
+void collision_event(int self_id, int other_id, String self_type, String other_type) {
+  //oscP5.send(collision, addressSC); //for debugging
+  
   // Collision kick-kick
-  if (type == "kick" && other_type == "kick") {
+  if (self_type == "kick" && other_type == "kick") {
     OscMessage collisionKK = new OscMessage("/collision/kk");
-    collisionKK.add(id);
+    collisionKK.add(self_id);
     collisionKK.add(other_id);
-    collisionKK.add(random(500, 8000));
+    collisionKK.add(random(100, 4000));
     oscP5.send(collisionKK, addressDM);
+  }
+  // Collision hat-hat
+  if (self_type == "hat" && other_type == "hat") {
+    OscMessage collisionHH = new OscMessage("/collision/hh");
+    collisionHH.add(self_id);
+    collisionHH.add(other_id);
+    collisionHH.add(random(1000, 10000));
+    oscP5.send(collisionHH, addressDM);
+  }
+  // Collision snare-snare
+  if (self_type == "snare" && other_type == "snare") {
+    OscMessage collisionSS = new OscMessage("/collision/ss");
+    collisionSS.add(self_id);
+    collisionSS.add(other_id);
+    collisionSS.add(random(1, 100));
+    oscP5.send(collisionSS, addressDM);
   }
     
 }
