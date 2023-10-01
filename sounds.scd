@@ -132,7 +132,7 @@ Synth(\snare, [amp: 1, pitch: 15]);
 //---------------------------------------------------------------------
 
 (
-OSCdef('playTrigger', {~playSound.value; ~playPixel.value;}, "/playStep");
+OSCdef('playTrigger', {~playSound.value;}, "/playStep");
 OSCdef('pixel',{arg msg; Synth(\melody, [\freq, msg[1], \release, ~release, \amp, ~amp, \tremoloFreq, ~tremoloFreq, \tremoloDepth, ~tremoloDepth]);}, "/notePixel");
 OSCdef('kick',{arg msg; Synth(\kick1, [pitch: msg[1]]);}, "/kick");
 OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
