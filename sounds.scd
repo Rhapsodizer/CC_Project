@@ -95,16 +95,6 @@ SynthDef(\kick3, {
 
 Synth(\kick3, [amp: 0.8]);
 
-/*
-contributors so far: nathan ho
-
-i use Hasher.ar(Sweep.ar) as a quick way to generate deterministic white noise, so i can get exactly the same kick each time for a precise digital sampler effect. you are free to replace it with WhiteNoise.ar.
-
-the DC.ar(0) does nothing, it's just so i can reorder all the "snd = snd +" lines and/or comment out parts of the synth.
-
-some of the attacks are so fast that Env:kr doesn't correctly handle them. that's why i always use Env:ar, so i don't have to think about ar/kr when i'm messing with sharp envelope attacks. i'm sure many of them could be refactored to kr for CPU, but idc
-*/
-
 (
 SynthDef(\hat, { arg amp = 1, startPan = -1, endPan = 1, pitch = 10000, release = 0.1;
   var whiteNoise = WhiteNoise.ar(mul: Env.perc(releaseTime: release, curve: -7).kr(doneAction: 2));
@@ -133,7 +123,7 @@ SynthDef(\snare, { arg pitch;
 	)
 }).add;
 )
-Synth(\snare, [amp: 1, pitch: 1]);
+Synth(\snare, [amp: 1, pitch: 15]);
 
 //---------------------------------------------------------------------
 //
@@ -142,10 +132,11 @@ Synth(\snare, [amp: 1, pitch: 1]);
 //---------------------------------------------------------------------
 
 (
-OSCdef('playTrigger', {~playSound.value;}, "/playStep");
+OSCdef('playTrigger', {~playSound.value; ~playPixel.value;}, "/playStep");
+OSCdef('pixel',{arg msg; Synth(\melody, [\freq, msg[1], \release, ~release, \amp, ~amp, \tremoloFreq, ~tremoloFreq, \tremoloDepth, ~tremoloDepth]);}, "/notePixel");
 OSCdef('kick',{arg msg; Synth(\kick1, [pitch: msg[1]]);}, "/kick");
 OSCdef('hat', {arg msg; Synth(\hat,   [pitch: msg[1]]);}, "/hat");
-OSCdef('snare',{Synth(\snare)},"/snare");
+OSCdef('snare', {arg msg; Synth(\snare,   [pitch: msg[1]]);}, "/snare");
 OSCdef('collision',{Synth(\kick3)},"/collision");
 OSCdef('melody',{arg msg; ~arrayFreq = Array.newClear(msg.size-1);
 	// Reassign melody modifiers values
