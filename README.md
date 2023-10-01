@@ -87,12 +87,15 @@ The **Melody modifier** modifies the melody created in this way. The sentence wr
 
 ### 4.4 Image Sonificator <a name="image-sonificator"></a>
 
+DA AAGGIUNGEREEEEEE
+
 ## 5. Layer Interaction <a name="layer-interaction"></a>
 The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text, size and color.
 
 If two balls representing the same instrument of the drum machine collide, their pitch is modified randomly in a certain predefined range of values.
 
 ### 5.1 Control agent <a name="control-agent"></a>
+
 Balls inside Layer Interaction sketch reduce their speed because of the friction and finally stop. In order to make them collide again a new agent (class *Agent*) can be called inside the sketch. It's an image with a radius of interaction that can be moved by the user. The controls are coded in the sketch named *controlAgent*. The controls are simple:
 + **Up** and **Down** are controlled via microphone by the pitch computed
 + **Left** and **Right** are controlled by the averaged optical flow amount computed from the left and region of the webcam stream
