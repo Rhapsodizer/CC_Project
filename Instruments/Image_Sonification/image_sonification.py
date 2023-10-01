@@ -6,9 +6,7 @@ from tkinter import filedialog
 from PIL import Image, ImageTk
 import random
 from numpy import interp
-# import simpleaudio as sa
 import Utils.osc_bridge as osc
-import numpy as np
 from Utils.error_manager import ErrorWindow
 
 
@@ -119,7 +117,7 @@ class ImageSonification:
         self.draw_all_is()
 
     def image_on_setup(self):
-        self.pil = Image.open("H:\Documenti\POLIMI\\2_1\CC\Project\GitHub\CC_Project\Instruments\Image_Sonification\elvispic.jpeg")
+        self.pil = Image.open(self.track_parent.ls_parent.user_paths[7])
         self.pil = self.pil.resize((self.img_sides, self.img_sides))
         self.image = ImageTk.PhotoImage(self.pil)
         self.ton_is_valid = True
@@ -150,54 +148,26 @@ class ImageSonification:
         if self.image and self.is_playing:
             random_x = random.randint(0, self.img_sides - 1)
             random_y = random.randint(0, self.img_sides - 1)
-            osc.oscLI.send_message("/notePixelCoord", random_x, random_y)
+            osc.oscLI.send_message("/notePixelCoord", [random_x, random_y])
             self.extracted.append((self.img_pos_x + random_x, self.img_pos_y + random_y))
             self.draw_all_is()
 
             rgb_color = self.pil.getpixel((random_x, random_y))
-            # print(f"Random Pixel at ({random_x}, {random_y}) - RGB: {rgb_color}")
             grey = int((rgb_color[0]+rgb_color[1]+rgb_color[2])/3)
-            # print(grey)
             note_offset = int(interp(grey, [0, 255], [0, 24]))
-            # print(note_offset)
+
             if note_offset in self.major_scale_2oct:
-                # print("ok")
                 self.base_freq = self.fund_freq * pow(2, note_offset/12)
                 osc.oscSC.send_message("/notePixel", self.base_freq)
-                print(self.base_freq)
-                #self.play_note_thread = Thread(target=self.play_note_given_value)
-                #self.play_note_thread.start()
             else:
-                # print("out")
                 self.play_note_thread = None
 
             self.curStep += 1
 
-        if self.curStep == self.track_parent.ls_parent.steps - 1:
-            self.curStep = 0
-            self.extracted = []
-            self.draw_all_is()
-
-    def play_note_given_value(self):
-        waveform = self.generate_harmonic_wave()
-        waveform *= 32767  # Scale to 16-bit PCM format
-        waveform = waveform.astype(np.int16)
-        play_obj = sa.play_buffer(waveform, 1, 2, 44100)
-        play_obj.wait_done()
-
-    def generate_harmonic_wave(self):
-        framerate = 44100
-        t = np.linspace(0, self.duration, int(framerate * self.duration), endpoint=False)  # Time array
-
-        # Generate the harmonic wave by summing sine waves for each harmonic
-        harmonic_wave = np.zeros(len(t))
-        for harmonic in range(1, self.harmonics_count + 1):
-            harmonic_wave += (1 / harmonic) * np.sin(2 * np.pi * self.base_freq * harmonic * t)
-        # Normalize the waveform to be in the range [-1, 1]
-        harmonic_wave /= np.max(np.abs(harmonic_wave))
-        harmonic_wave /= 5
-
-        return harmonic_wave
+            if self.curStep == self.track_parent.ls_parent.steps:
+                self.curStep = 0
+                self.draw_all_is()
+                self.extracted = []
 
 
 def handle_osc_message(address: str, args: tuple, img_son):
