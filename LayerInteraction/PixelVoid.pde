@@ -7,7 +7,7 @@ class PixelVoid {
     x = _x;
     y = _y;
     
-    r = 20;
+    r = 25;
     isActive = false;
   } 
   

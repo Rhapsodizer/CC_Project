@@ -15,7 +15,10 @@ class Step
     type = _type;
     isActive = _isActive;
     
-    pitch = 800;
+    if (type == "hat") {pitch = 1200;}
+    else if  (type == "kick") {pitch = 200;}
+    else if (type == "snare") {pitch = 5;}
+    
   }
   
   public void draw()

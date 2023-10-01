@@ -180,4 +180,6 @@ def handle_osc_message(address: str, args: tuple, img_son):
                 img_son.is_playing = False
                 img_son.restore_picture()
             elif args[0] == 'destroy':
+                osc.oscLI.send_message("/notePixelCoord/off", 0)
                 img_son.window.destroy()
+

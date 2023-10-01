@@ -223,8 +223,8 @@ void oscEvent(OscMessage theOscMessage) {
   // Receive pixel coordinate from image sonification
   if(theOscMessage.checkAddrPattern("/notePixelCoord")) {
     agentVoid.isActive = true;
-    agentVoid.x = theOscMessage.get(0).intValue();
-    agentVoid.y = theOscMessage.get(1).intValue();
+    agentVoid.x = theOscMessage.get(0).intValue()*8/3;
+    agentVoid.y = theOscMessage.get(1).intValue()*8/3;
   }
   if(theOscMessage.checkAddrPattern("/notePixelCoord/off")) {
     agentVoid.isActive = false;
