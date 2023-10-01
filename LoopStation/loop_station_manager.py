@@ -45,19 +45,17 @@ class LoopStationManager:
         self.booked_tracks = []
         self.stop_is_able = False
         self.play_is_able = False
-        self.pause_is_able = False
         self.play_thread = None
         self.stop_thread = None
         self.play_all_booked_thread = None
         self.play_all_booked_thread_is_running = False
         self.stop_has_been_pressed = False
-        self.pause_has_been_pressed = False
         self.book_all_is_active = False
         self.track_currently_playing = []
 
     def draw_all(self):
         [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-         bpm_valid_rect, steps_valid_rect, plus_add_track, play, p, stop,
+         bpm_valid_rect, steps_valid_rect, plus_add_track, play, stop,
          safe_close, close_x1, close_x2, book_all] = utils.draw_all_ls(self)
         self.canvas.tag_bind(spaceship, "<Button-1>", self.takeoff_land_spaceship)
         self.canvas.tag_bind(up_bpm_triangle, "<Button-1>", self.up_bpm)
@@ -68,9 +66,6 @@ class LoopStationManager:
         self.canvas.tag_bind(steps_valid_rect, "<Button-1>", self.on_steps_set)
         self.canvas.tag_bind(plus_add_track, "<Button-1>", self.add_track_clicked)
         self.canvas.tag_bind(play, "<Button-1>", self.play_clicked)
-        self.canvas.tag_bind(p[0], "<Button-1>", self.pause_clicked)
-        self.canvas.tag_bind(p[1], "<Button-1>", self.pause_clicked)
-        self.canvas.tag_bind(p[2], "<Button-1>", self.pause_clicked)
         self.canvas.tag_bind(stop, "<Button-1>", self.stop_clicked)
         self.canvas.tag_bind(safe_close, "<Button-1>", self.safe_close_clicked)
         self.canvas.tag_bind(close_x1, "<Button-1>", self.safe_close_clicked)
@@ -171,6 +166,7 @@ class LoopStationManager:
                 print("play thread is running...")
                 self.track_currently_playing = self.booked_tracks
                 print(self.booked_tracks)
+                self.play_is_able = False
                 self.play_all_booked_thread_is_running = True
                 # if not self.play_all_booked_thread:
                 self.play_all_booked_thread = threading.Thread(target=self.play_all_booked_tracks)
@@ -180,9 +176,6 @@ class LoopStationManager:
         print("in play all booked")
         self.stop_is_able = True
         self.stop_has_been_pressed = False
-        self.pause_is_able = True
-        self.pause_has_been_pressed = False
-        self.play_is_able = False
         self.draw_all()
         if self.play_all_booked_thread_is_running and not self.stop_has_been_pressed:
             self.loop()
@@ -195,11 +188,8 @@ class LoopStationManager:
                 self.play_thread.start()
                 self.play_thread = None
             if self.play_all_booked_thread_is_running and not self.stop_has_been_pressed:
-                if self.pause_has_been_pressed:
-                    self.pause_wait_for_input()
-                else:
-                    time.sleep(self.time_chunk)  # wait 60/bpm to send the next step message
-                    self.loop()
+                time.sleep(self.time_chunk)  # wait 60/bpm to send the next step message
+                self.loop()
 
     def stop_clicked(self, event):
         _ = event
@@ -219,7 +209,6 @@ class LoopStationManager:
                 print("stopping track " + str(t))
                 self.stop_thread = threading.Thread(target=t.stop_this)
                 self.stop_thread.start()
-                # time.sleep(0.001)
                 self.stop_thread = None
                 self.booked_tracks = self.booked_tracks[1:]
             self.book_all_is_active = False
@@ -227,21 +216,7 @@ class LoopStationManager:
             self.booked_tracks = []
             self.track_currently_playing = []
             self.stop_is_able = False
-            self.pause_is_able = False
-            self.pause_has_been_pressed = False
             self.draw_all()
-
-    def pause_clicked(self, event):
-        _ = event
-        if self.pause_is_able:
-            self.pause_has_been_pressed = True
-
-    def pause_wait_for_input(self):
-        print("in pause")
-        self.play_is_able = True
-        self.pause_is_able = False
-        self.stop_is_able = True
-        self.draw_all()
 
     def takeoff_land_spaceship(self, event):
         _ = event

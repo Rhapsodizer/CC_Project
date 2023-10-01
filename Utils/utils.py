@@ -38,7 +38,7 @@ def round_rectangle(canvas, x1, y1, x2, y2, radius, fill_color, outline_color):
 
 
 def create_hexagon(canvas, center_x, center_y, radius):
-    # Calculate coordinates of hexagon vertices
+
     hexagon_vertices = []
     for i in range(6):
         angle_deg = 60 * i
@@ -47,19 +47,17 @@ def create_hexagon(canvas, center_x, center_y, radius):
         y = center_y + radius * math.sin(angle_rad)
         hexagon_vertices.extend([x, y])
     hexagon = canvas.create_polygon(hexagon_vertices, fill='#606060', outline='black')
-    # Draw the hexagon
+
     return hexagon
 
 
 def create_circle(canvas, center_x, center_y, radius):
-    # Calculate coordinates of the circle bounding box
+
     x1 = center_x - radius
     y1 = center_y - radius
     x2 = center_x + radius
     y2 = center_y + radius
-
-    # Draw the circle
-    circle = canvas.create_oval(x1, y1, x2, y2, fill='#B4B4B4', outline='black')
+    circle = canvas.create_oval(x1, y1, x2, y2, fill='#B4B4B4', outline='#000000')
 
     return circle
 
@@ -70,6 +68,7 @@ Loop_station-related functions:
 
 
 def draw_all_ls(ls_obj):
+
     ls_obj.canvas.delete("all")
     if ls_obj.image:
         ls_obj.canvas.create_image(ls_obj.c_width/2, ls_obj.c_height/2 + 10,
@@ -84,7 +83,7 @@ def draw_all_ls(ls_obj):
      bpm_valid_rect, steps_valid_rect] = draw_bpm_steps_ls(ls_obj)
     draw_all_tracks_ls(ls_obj)
     plus_add_track = draw_plus_ls(ls_obj)
-    [play, p, stop] = draw_play_stop_ls(ls_obj)
+    [play, stop] = draw_play_stop_ls(ls_obj)
     [safe_close_button, close_x1, close_x2] = safe_close_ls(ls_obj)
     if ls_obj.tracks:
         book_all = book_all_ls(ls_obj)
@@ -92,11 +91,12 @@ def draw_all_ls(ls_obj):
         book_all = None
     ls_obj.canvas.update()
     return [spaceship, up_bpm_triangle, down_bpm_triangle, up_steps_triangle, down_steps_triangle,
-            bpm_valid_rect, steps_valid_rect, plus_add_track, play, p, stop,
+            bpm_valid_rect, steps_valid_rect, plus_add_track, play, stop,
             safe_close_button, close_x1, close_x2, book_all]
 
 
 def draw_spaceship_ls(ls_obj):
+
     # Draw spaceship icon
     offset_x = 40
     offset_y = 40
@@ -258,22 +258,6 @@ def draw_play_stop_ls(ls_obj):
                                           width / 2 - side - x_offset * 0.866, height - y_offset,
                                           fill=play_c, outline="#000000")
 
-    # Draw pause icon
-    if ls_obj.pause_is_able:
-        pause_c = "#606060"
-    else:
-        pause_c = "#8F0000"
-    pr1 = canvas.create_rectangle(width / 2 - 20, height - side - y_offset,
-                                  width / 2 - 5, height - y_offset,
-                                  fill=pause_c, outline="#000000")
-    pr2 = canvas.create_rectangle(width / 2 - 4, height - side - y_offset,
-                                  width / 2 + 5, height - y_offset,
-                                  fill="#808080", outline="#808080")
-    pr3 = canvas.create_rectangle(width / 2 + 5, height - side - y_offset,
-                                  width / 2 + 20, height - y_offset,
-                                  fill=pause_c, outline="#000000")
-    p = [pr1, pr2, pr3]
-
     # Draw stop icon
     if ls_obj.stop_is_able:
         stop_c = "#606060"
@@ -283,10 +267,11 @@ def draw_play_stop_ls(ls_obj):
                                              width / 2 + side + x_offset, height - y_offset,
                                              fill=stop_c, outline="#000000")
 
-    return [play_triangle, p, stop_rectangle]
+    return [play_triangle, stop_rectangle]
 
 
 def safe_close_ls(ls_obj):
+
     x_offset = 40
     y_offset = 40
     half_diagonal = 30
@@ -319,6 +304,7 @@ def safe_close_ls(ls_obj):
 
 
 def draw_shutdown_ls(ls_obj):
+
     ls_obj.stop_all_booked_tracks()
     time.sleep(0.001)
     osc.oscLI.send_message("/terminate", 0)
@@ -405,6 +391,7 @@ def draw_track_elements_tr(track_obj):
     y_offset = track_obj.pos_y + track_obj.height/2
     half_diagonal = 20
     width = track_obj.canvas.winfo_width()
+
     # Draw close icon
     remove_button = track_obj.canvas.create_polygon(
         width - x_offset - half_diagonal, y_offset,
@@ -434,12 +421,6 @@ def draw_track_elements_tr(track_obj):
 """
 R&P-related functions:
 """
-
-
-def handle_osc_message_rap(unused_addr, args):
-    _ = unused_addr
-    print(args)
-    return args
 
 
 def draw_toolbar_rap(rap_obj):

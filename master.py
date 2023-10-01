@@ -14,19 +14,6 @@ import tkinter as tk
 from LoopStation.loop_station_manager import create_loop_station_manager_window
 from Utils.user import User
 
-
-"""
-Launch this script to open the main screen
-"""
-
-
-if __name__ == "__main__":
-    root = tk.Tk()
-    user = User("AG")  # SA, AG, RM
-    create_loop_station_manager_window(root, user.get_user_paths())
-    root.mainloop()
-
-
 """
 Structure:
     |----------------|                |-------|
@@ -44,6 +31,18 @@ Structure:
 
 
 """
+Launch this script to open the main screen
+"""
+
+
+if __name__ == "__main__":
+    root = tk.Tk()
+    user = User("SA")  # SA, AG, RM
+    create_loop_station_manager_window(root, user.get_user_paths())
+    root.mainloop()
+
+
+"""
 to install tkinter:
 https://www.tcl.tk/software/tcltk/
 (you may need to use admin privileges)
@@ -55,13 +54,4 @@ ERROR: Could not build wheels for simpleaudio, which is required to install pypr
 do:
 sudo apt install portaudio19-dev
 then, pip install simpleaudio
-"""
-
-"""
-colors: 0   - #000000 - "black"
-        80  - #505050
-        140 - #8C8C8C
-        180 - #B4B4B4
-        220 - #DCDCDC
-        255 - #FFFFFF - "white"
 """

@@ -182,4 +182,3 @@ def handle_osc_message(address: str, args: tuple, img_son):
             elif args[0] == 'destroy':
                 osc.oscLI.send_message("/notePixelCoord/off", 0)
                 img_son.window.destroy()
-
