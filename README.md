@@ -13,10 +13,11 @@
       <li><a href="#loop-station">Loop Station Manager</a></li>
       <li><a href="#instruments">Instruments</a></li>
       <ul>
-        <li><a href="#RP">Recorder and Player</a></li>
         <li><a href="#DM">Drum Machine</a></li>
         <li><a href="#MC">Melody Chat</a></li>
-        <li><a href="#image-sonificator">Image Sonificator</a></li>
+        <li><a href="#RP">Recorder and Player</a></li>
+        <li><a href="#IS">Image Sonification</a></li>
+        <li><a href="#ship">Ship agent</a></li>
       </ul>
       <li><a href="#layer-interaction">Layer Interaction</a></li>
     <ul>

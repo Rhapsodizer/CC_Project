@@ -89,11 +89,18 @@ class LoopStationManager:
                 ErrorWindow("Track Error", "Error: Maximum number of track reached")
 
     def book_all_clicked(self, event):
-        if not self.track_currently_playing and not self.book_all_is_active:
-            self.book_all_is_active = True
-            for t in self.tracks:
-                if t not in self.booked_tracks:
+        if not self.track_currently_playing:
+            if not self.book_all_is_active:
+                self.book_all_is_active = True
+                self.booked_tracks = []
+                for t in self.tracks:
+                    t.this_is_booked = False
+                self.draw_all()
+                for t in self.tracks:
                     t.book_this_clicked(event)
+            else:
+                self.book_all_is_active = False
+                self.booked_tracks = []
             self.draw_all()
 
     def up_bpm(self, event):

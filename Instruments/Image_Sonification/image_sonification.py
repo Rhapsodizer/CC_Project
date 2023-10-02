@@ -30,7 +30,7 @@ class ImageSonification:
         self.window = tk.Toplevel(self.track_parent.window)
         self.window.geometry("512x512")
         self.window.config(bg="#DCDCDC")
-        self.window.title("Image Sonification")
+        self.window.title("Image Sonificator")
         self.window.resizable(width=False, height=False)
         self.c_width = 512
         self.c_height = 512

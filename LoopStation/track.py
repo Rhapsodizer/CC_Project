@@ -40,6 +40,8 @@ class Track:
         self.color = "#B4B4B4"
         self.instr_name = None
         self.this_is_booked = False
+        self.this_plus_is_able = True
+        self.this_settings_is_able = True
         self.port = random.randint(4000, 5000)
         self.postman = udp_client.SimpleUDPClient("127.0.0.1", self.port)
         self.port2 = random.randint(3000, 4000)
@@ -87,14 +89,21 @@ class Track:
                 ErrorWindow("No Instrument", "Error: No Instrument")
 
     def plus_clicked(self, event):
-        if not self.ls_parent.track_currently_playing:
-            if not self.instr_name:
-                self.choose_instrument(event)
+        if self.this_plus_is_able:
+            if not self.ls_parent.track_currently_playing:
+                if not self.instr_name:
+                    self.choose_instrument(event)
+        else:
+            ErrorWindow("Instrument Already Exists", "This instrument has already been set up")
 
     def settings_clicked(self, event):
         _ = event
-        if not self.ls_parent.track_currently_playing:
-            self.setup_instrument()
+        if self.this_settings_is_able:
+            if not self.ls_parent.track_currently_playing:
+                if not self.instr_name:
+                    self.setup_instrument()
+        else:
+            ErrorWindow("Instrument Already Exists", "This instrument has already been set up")
 
     def remove_clicked(self, event):
         _ = event
@@ -103,6 +112,8 @@ class Track:
 
     def choose_instrument(self, event):
         _ = event
+
+        self.this_plus_is_able = False
         listbox_window = tk.Toplevel()
         listbox_window.title("Instrument Selection")
         listbox_window.geometry("300x150")
@@ -129,7 +140,7 @@ class Track:
 
     def setup_instrument(self):
         current_paths = self.ls_parent.user_paths
-
+        self.this_settings_is_able = False
         if self.instr_name is None:
             ErrorWindow("Track Error", "No instrument selected")
         else:
