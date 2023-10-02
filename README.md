@@ -53,7 +53,8 @@ The project is a combination of *Python*, *Processing*, *Supercollider* and *htm
 - As for *Processing*, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
 - As for *Supercollider*, it has been chosen for its real-time sound generation power. Sounds can be created and modified during play.
 
-![Structure](https://github.com/Rhapsodizer/CC_Project/assets/93535281/832a2135-5bc5-4775-b8a0-fb6eb84752f1)
+<img width="543" alt="Screenshot 2023-10-02 alle 11 58 28" src="https://github.com/Rhapsodizer/CC_Project/assets/93535281/8388aa6a-00f9-4ec1-8ff6-9d46638407d7">
+
 
 ### 2.1 Launch procedure <a name="PR"></a>
 - Open the file "Utils/users.py" and add your profile with your local paths.
