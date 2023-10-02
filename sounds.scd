@@ -9,7 +9,7 @@ NetAddr("127.0.0.1", 57120);
 
 (
 SynthDef(\melody, {
-    arg freq = 440, amp = 1, tremoloFreq = 0, tremoloDepth = 0, release = 1;
+    arg freq = 440, amp = 0.2, tremoloFreq = 0, tremoloDepth = 0, release = 1;
     var triangle, env, mod, sig, tremolo, source, freqOctaveHigher, sigOctaveHigher;
 
     tremolo = SinOsc.kr(tremoloFreq).range(1 - tremoloDepth, 1 + tremoloDepth);
@@ -25,7 +25,7 @@ SynthDef(\melody, {
 }).add;
 )
 
-Synth(\melody, [freq: 220, amp: 1, tremoloFreq: 10, tremoloDepth: 0.5, release: 0.5]);
+Synth(\melody, [freq: 220, amp: 0.2, tremoloFreq: 10, tremoloDepth: 0.5, release: 0.5]);
 
 (
 ~reassignMod = {
@@ -158,4 +158,4 @@ OSCdef('modifier', {arg msg;
 //release: varia da 0.1 a 1
 //tremoloFreq: varia da 2 a 20
 //tremoloDepth: varia da 0.5 a 1
-//amp: random tra 0.1 a 1
+//amp: random tra 0.2 a 0.5
