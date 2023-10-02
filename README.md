@@ -32,7 +32,7 @@
 ## 1. Description <a name="description"></a>
 
 This project aims to create a simple and user-friendly Loop Station. This application has been built with the idea to be used as an artistic installation, in which one or more users can interact with it in a few clicks.
-It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able to express themselves and enjoy the music they create.
+It allows to create simple intstruments that require little-to-no musical knowledge or IT skills, so that anybody is able to express themselves and enjoy the music they create, with a certain degree of chaotic behavior.
 
 ### 1.1. Challenges, accomplishment and lessons learned <a name="cal"></a>
 
@@ -43,7 +43,7 @@ We learnt how to deal with threading problems, connections issues and local mess
 
 ## 2. Technology <a name="technology"></a>
 
-The project is a combination of *Python*, *Processing*, *Supercollider* and *html* languages. It has been optimized for Windows, Linux and MacOS operating system.
+The project is a combination of *Python*, *Processing*, *Supercollider* and *html* languages. It relays on a real time database (*Firebase*) to exchange some data. It has been optimized for Windows, Linux and MacOS operating system.
 - As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages are the main mean of communication among the parts.
 - As for *Processing*, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
 - As for *Supercollider*, it has been chosen for its real-time sound generation power. Sounds can be created and modified during play.
