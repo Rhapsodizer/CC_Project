@@ -121,7 +121,7 @@ The Drum Machine, Melody Chat and Image Sonification sounds are created using *S
 
 ## 8. Future improvements <a name="future"></a>
 
-The richness of a loop station is given by the user's artistic-musical freedom. For this reason, the addition of different methods of interaction with the machine is the first step, as well as the interaction itself between the various graphic-sound layers. Even a modification of the real-time traces can be a direction for improvement.
+The richness of a loop station is given by the user's artistic-musical freedom. For this reason, the addition of different methods of interaction with the machine is the first step, as well as the interaction itself between the various graphic-sound layers. Even a modification of the real-time tracks can be a direction for improvement.
 
 ## 9. Contacts and contributions <a name="contact"></a>
 
