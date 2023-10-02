@@ -100,6 +100,8 @@ The creative visualization of the Interaction Layer is created in *Processing* a
 
 <img width="440" alt="LI" src="https://github.com/Rhapsodizer/CC_Project/assets/93535281/dbb8df8d-dc0d-4336-b381-bcb19c42acd4">
 
+Each ball can be selected clicked at it. A popup appears showing some informations, like the type of instrument, id, position and speed.
+
 ### 5.1 Control agent <a name="control-agent"></a>
 
 Balls inside Layer Interaction sketch reduce their speed because of the friction and finally stop. In order to make them collide again a new agent (class *Agent*) can be called inside the sketch. It's an image with a radius of interaction that can be moved by the user. The controls are coded in the sketch named *controlAgent*. The controls are simple:
