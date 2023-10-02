@@ -131,7 +131,7 @@ The richness of a loop station is given by the user's artistic-musical freedom. 
 
 Project link: https: //github.com/Rhapsodizer/CC_Project
 
-Youtube video demo: 
+Youtube video demo: https://youtu.be/iicaeMra-OA
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
