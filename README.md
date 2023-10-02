@@ -13,11 +13,10 @@
       <li><a href="#loop-station">Loop Station Manager</a></li>
       <li><a href="#instruments">Instruments</a></li>
       <ul>
+        <li><a href="#RP">Recorder and Player</a></li>
         <li><a href="#DM">Drum Machine</a></li>
         <li><a href="#MC">Melody Chat</a></li>
-        <li><a href="#RP">Recorder and Player</a></li>
-        <li><a href="#IS">Image Sonification</a></li>
-        <li><a href="#ship">Ship agent</a></li>
+        <li><a href="#image-sonificator">Image Sonificator</a></li>
       </ul>
       <li><a href="#layer-interaction">Layer Interaction</a></li>
     <ul>
@@ -46,20 +45,19 @@ We learnt how to deal with threading problems, connections issues and local mess
 
 The project is a combination of *Python*, *Processing* and *Supercollider* languages. It has been optimized for Windows, Linux and MacOS operating system.
 - As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages are the main mean of communication among the parts.
-- As for Processing, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
-- As For Supercollider, it has been chosen for its real-time sound generation power. Sounds can be created and modified during play.
+- As for *Processing*, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
+- As for *Supercollider*, it has been chosen for its real-time sound generation power. Sounds can be created and modified during play.
 
 ## 3. Loop Station Manager <a name="loop-station"></a>
 
-In the main page, we can choose many options and actions. We can set the number of beats of the loop and the bpm velocity. These parameters allow you to change the loop size for each instrument. On this main page you can choose the instruments, open them and create a track. Finally, all instruments can be played simultaneously.
+In the main page, the user can choose many options and actions. He/She can set the number of beats of the loop and the bpm velocity. These parameters allow you to change the loop size for each instrument. On this main page you can choose the instruments, open them and create a track. Finally, all instruments can be played simultaneously. From this page you can also activate or deactivate the *Control Agent*.
 
 ## 4. Instruments <a name="instruments"></a>
 ### 4.1 Recorder and Player <a name="RP"></a>
 
 Recorder and Player is a simple instrument. It allows the user to create a recording to use later in the loop as well as
 to load an *mp3* or *wav* file to be played during the exhibition.
-In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above
-mentioned actions, while in the lower section a real-time amplitude envelope is shown.
+In the upper section of the instrument's interface, the user can use the buttons REC and OPEN to execute the above mentioned actions, while in the lower section a real-time amplitude envelope is shown.
 
 ### 4.2 Drum Machine <a name="DM"></a>
 
@@ -73,12 +71,10 @@ Melody Chat represents the writing of sentences by two users (Melody maker and M
 
 ### 4.4 Image Sonificator <a name="image-sonificator"></a>
 
-Permette aall'utente di caricare un'immagine , dalla quale verranno estratti i pixel in maniera casuale, che verraanno trasformati in valori numerici per daare origine alle note da riprodurre della tonalità scelta.
+It allows the user to load an image, from which the pixels will be randomly extracted when the loop plays. Pixels will be transformed into numerical values and will reproduce notes in the choosen key. When loop is played the pixels are visualized also in the Interaction Layer in the same position as a black hole, that erases balls that collide with it.
 
 ## 5. Layer Interaction <a name="layer-interaction"></a>
-The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text, size and color.
-
-If two balls representing the same instrument of the drum machine collide, their pitch is modified randomly in a certain predefined range of values.
+The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text, size and color. If two balls representing the same instrument of the drum machine collide, their pitch is modified randomly in a certain predefined range of values.
 
 ### 5.1 Control agent <a name="control-agent"></a>
 
@@ -96,7 +92,7 @@ The Drum Machine, Melody Chat and Image Sonification sounds are created using *S
 
 ## 8. Future improvements <a name="future"></a>
 
-La ricchezza di una loop station è data dalla libertà artistica-musicale dell'utente. Per questo l'aggiunta di diversi metodi di interazione con la maacchina è il primo passo, nonchè l'interazione stessa tra i vari layer grafico-sonori. Anche una modifica delle tracce real-time può essere una direzione di miglioramento.
+The richness of a loop station is given by the user's artistic-musical freedom. For this reason, the addition of different methods of interaction with the machine is the first step, as well as the interaction itself between the various graphic-sound layers. Even a modification of the real-time traces can be a direction for improvement.
 
 ## 9. Contacts and contributions <a name="contact"></a>
 
@@ -108,10 +104,11 @@ Project link: https: //github.com/Rhapsodizer/CC_Project
 
 Youtube video demo: 
 
-
-
-
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+
 
 
 
