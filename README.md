@@ -39,18 +39,18 @@ It allows to create simple intstruments that require little-to-no musical knowle
 The main challenge was to create synchronism for the independent instruments. This lead us to establish a hierarchical structure
 in which the **Loop Station Manager** dictates all the actions to perform.
 We have worked autonomously on the various instrument and together on the foundation of the looper.
-We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there that will be useful in the future.
+We learnt how to deal with threading problems, connections issues and local message dispatching, along with coding tricks here and there that will be useful in the future. Humanly speaking, we remark how important it is to keep an open mind at all times.
 
 ## 2. Technology <a name="technology"></a>
 
-The project is a combination of *Python*, *Processing* and *Supercollider* languages. It has been optimized for Windows, Linux and MacOS operating system.
+The project is a combination of *Python*, *Processing*, *Supercollider* and *html* languages. It has been optimized for Windows, Linux and MacOS operating system.
 - As for *Python* *tkinter* and *threading* are the main libraries used to create the independent windows; *osc* messages are the main mean of communication among the parts.
 - As for *Processing*, it has been chosen for its versatility. Different libraries has been used, such *Osc* for communications between modules, *Minim* for audio analysis and *OpenCV* for video processing.
 - As for *Supercollider*, it has been chosen for its real-time sound generation power. Sounds can be created and modified during play.
 
 ## 3. Loop Station Manager <a name="loop-station"></a>
 
-In the main page, the user can choose many options and actions. He/She can set the number of beats of the loop and the bpm velocity. These parameters allow you to change the loop size for each instrument. On this main page you can choose the instruments, open them and create a track. Finally, all instruments can be played simultaneously. From this page you can also activate or deactivate the *Control Agent*.
+In the main page, we can choose among many options and perform different actions. We can set the number of beats of the loop and the bpms. These parameters allow you to change the loop size for each instrument. On this main page you can also create a track, choose the instruments and setting them up. Finally, all instruments can be played simultaneously or individually.
 
 ## 4. Instruments <a name="instruments"></a>
 ### 4.1 Recorder and Player <a name="RP"></a>
@@ -61,13 +61,13 @@ In the upper section of the instrument's interface, the user can use the buttons
 
 ### 4.2 Drum Machine <a name="DM"></a>
 
-The **Minimalistic Drum Machine** is made up of three rows of instruments: kick, hat and snare. Each pulse is characterized by a dot which, when selected, is colored and a ball is generated in the Layer Interaction, with the relative label of the instrument, together with the reproduction of the single sound. The columns are equal to the number of beats in a loop, which can be changed directly from the Loop Station Manager. If any space is deselected, the ball disappears from the Layer Interaction.
+The **Minimalistic Drum Machine** is made up of three rows of instruments: kick, hat and snare. Each pulse is characterized by a circle which, when selected, is colored and a ball is generated in the Layer Interaction, with the relative label of the instrument, together with the reproduction of the single sound. The columns are equal to the number of beats in a loop, which can be changed directly from the Loop Station Manager. If any space is deselected, the ball disappears from the Layer Interaction.
 
 ### 4.3 Melody Chat <a name="MC"></a>
 
 <img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="200">
 
-Melody Chat represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat themselfs. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
+Melody Chat represents the exchange of messages by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat themselfs. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. After that, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
 
 ### 4.4 Image Sonificator <a name="image-sonificator"></a>
 
