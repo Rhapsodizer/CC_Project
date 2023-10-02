@@ -56,13 +56,13 @@ The project is a combination of *Python*, *Processing*, *Supercollider* and *htm
 ![Structure](https://github.com/Rhapsodizer/CC_Project/assets/93535281/832a2135-5bc5-4775-b8a0-fb6eb84752f1)
 
 ### 2.1 Launch procedure <a name="PR"></a>
-- Open the file "Utils/users.py" and change all the paths.
+- Open the file "Utils/users.py" and add your profile with your local paths.
 - Start Supercollider, boot the server, open the file "sounds.osc" and evaluate all the Synthdef and functions.
 - Launch the python script "master.py" from the terminal or python ide after changed the user.
 
 ## 3. Loop Station Manager <a name="loop-station"></a>
 
-In the main page, we can choose among many options and perform different actions. We can set the number of beats of the loop and the bpms. These parameters allow you to change the loop size for each instrument. On this main page you can also create a track, choose the instruments and setting them up. Finally, all instruments can be played simultaneously or individually.
+In the main page, you can choose among many options and perform different actions. You can set the number of beats of the loop and the bpms. These parameters allow you to change the loop size for each instrument. On this main page you can also create a track, choose the instruments and setting them up. Finally, all instruments can be played simultaneously or individually.
 
 ![ELVIS](https://github.com/Rhapsodizer/CC_Project/assets/93535281/6eb364d7-2f44-4922-a256-1ed712767c69)
 
