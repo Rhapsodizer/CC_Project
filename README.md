@@ -126,7 +126,7 @@ The richness of a loop station is given by the user's artistic-musical freedom. 
 ## 9. Contacts and contributions <a name="contact"></a>
 
 - **Attolini Silvio** - silvio.attolini@mail.polimi.it: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer, Image Sonification
-- **Gorni Alessandro** - alessandro.gorni@mail.polimi.it: DM, MelodyChat, sounds.scd, LayerInteraction, Image sonification
+- **Gorni Alessandro** - alessandro.gorni@mail.polimi.it: DM, MelodyChat, sounds.scd, LayerInteraction
 - **Martinelli Riccardo** - riccardo.martineli@mail.polimi.it: MelodyChat, sounds.scd
 
 Project link: https: //github.com/Rhapsodizer/CC_Project
