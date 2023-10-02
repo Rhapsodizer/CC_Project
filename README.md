@@ -1,6 +1,8 @@
 # *E.L.V.I.S.* <a name="top"></a>
 *Enhanched Looper with Visual Interaction and Sonification*
 
+![elvis gif](https://github.com/Rhapsodizer/CC_Project/assets/93535281/bee54d25-f18e-47fe-9d20-7bf7123ff275)
+
 <!-- TABLE OF CONTENTS -->
 <details>
   <summary>Table of Contents</summary>
