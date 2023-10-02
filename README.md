@@ -10,6 +10,9 @@
       <li><a href="#cal">Challenges, accomplishment and lessons learned</a></li>
     </ul>
     <li><a href="#technology">Technology</a></li>
+    <ul>
+        <li><a href="#PR">Launch procedure</a></li>
+    </ul>
       <li><a href="#loop-station">Loop Station Manager</a></li>
       <li><a href="#instruments">Instruments</a></li>
       <ul>
@@ -50,7 +53,7 @@ The project is a combination of *Python*, *Processing*, *Supercollider* and *htm
 
 ![Structure](https://github.com/Rhapsodizer/CC_Project/assets/93535281/832a2135-5bc5-4775-b8a0-fb6eb84752f1)
 
-### 2.1 Procedure <a name="PR"></a>
+### 2.1 Launch procedure <a name="PR"></a>
 - Open the file "Utils/users.py" and change all the paths.
 - Start Supercollider, boot the server, open the file "sounds.osc" and evaluate all the Synthdef and functions.
 - Launch the python script "master.py" from the terminal or python ide after changed the user.
