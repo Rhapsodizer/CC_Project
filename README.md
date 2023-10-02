@@ -24,6 +24,7 @@
       </ul>
       <li><a href="#sounds">Sounds</a></li>
       <li><a href="#osc">Osc Structures</a></li>
+    <li><a href="#future">Future improvements</a></li>
     <li><a href="#contact">Contacts and contributions</a></li>
   </ol>
 </details>
@@ -67,27 +68,11 @@ The **Minimalistic Drum Machine** is made up of three rows of instruments: kick,
 
 <img src="https://github.com/Rhapsodizer/CC_Project/assets/92687497/a85810c9-faeb-40e4-9280-8dd1debf53e2" width="200">
 
-Melody Chat consists of a canvas created with *Processing* that represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
-
-The chat will simply be displayed on each user's device. On the canvas, however, the writing of each character, the memorization of each word (separated by SPACE) and the sentence (after sending ENTER) will be displayed in real time. Each sentence of the **Melody maker** corresponds to a melody created in this way:
-- Each character corresponds to a numerical value (a/A = 1, b/B = 2, ...). Only letters are included in the count (no symbols or other characters).
-- Each word corresponds to the sum of the numerical values of the characters, appropriately normalized.
-- The first word sets the major key on which the melody is created. The sum of the numerical values of the characters is normalized between 0 and 11. Therefore each number corresponds to the tonic of the key (0 = C, 1 = C#, ...).
-- All words are normalized in a range of values between 1 and 14, which correspond to the degree values of the corresponding major scale in two octaves 3 and 4 (1 = I degree, 2 = II degree, ... , 8 = I degree (high octave), 9 = II degree (high octave), ...). These values will be transformed into frequency and will correspond to the created melody.
-- The first note of the melody always corresponds to the first degree of the corresponding scale.
-- Each word corresponds to a note that plays at each beat of the loop, made up of n beats (nSteps). If the number of words is less than nSteps, the melody will continue from the beginning until the loop is completed. If the number of words is greater than nStep, the melody will be truncated.
-- If the number of characters (including other symbols or punctuation marks) in a word has a value less than or equal to 2, there will be a rest/pause (P) and the corresponding frequency value will be 0.0 (inaudible). This cannot happen for the first note of the melody.
-- The key and melody are displayed on the canvas below each time a new sentence is created.
-
-The **Melody modifier** modifies the melody created in this way. The sentence written by the second user modifies the melody (effects) through parameters created in this way:
-- The first parameter uses the key value (from 0 to 11) and maps the *\release* of the oscillator in a range between 0.1 and 1.0.
-- The second is an arithmetic mean between the numerical values of the melody (without counting any pauses). It maps the *\tremoloFreq* in a range between 2.0 and 20.0.
-- The third parameter concerns the length of the melody (nSteps) and maps the *\tremoloDepth* in a range between 0.5 and 1.0.
-- The fourth is instead a random number between 0.1 and 1.0 and modifies the *\amp* of the sound.
+Melody Chat represents the writing of sentences by two users (Melody maker and Melody modifier). Through *Firebase*, users can connect with their device, identify themselves with one of two roles, define their username and chat themselfs. The **Melody maker** "writes" a melody that will be stored and sent to *Super Collider* to be played during the loop. Furthermore, the melody will also be sent to the Interaction Layer (see corresponding paragraph). The **Melody modifier** instead has the possibility of modifying the previously written melody with effects and parameters such as vibrato, release or amplitude.
 
 ### 4.4 Image Sonificator <a name="image-sonificator"></a>
 
-DA AAGGIUNGEREEEEEE
+Permette aall'utente di caricare un'immagine , dalla quale verranno estratti i pixel in maniera casuale, che verraanno trasformati in valori numerici per daare origine alle note da riprodurre della tonalità scelta.
 
 ## 5. Layer Interaction <a name="layer-interaction"></a>
 The creative visualization of the Interaction Layer is created in *Processing* and it has the purpose of randomly modifying the state of the sounds created by the Drum Machine and Melody Chat. Each element of the Drum Machine and each note (or rest) of the Melody Chat appears on the canvas as a ball that moves and collides with the others. The balls have a minimalist display and differ from each other thanks to the text, size and color.
@@ -108,9 +93,13 @@ The Drum Machine, Melody Chat and Image Sonification sounds are created using *S
 ## 7. OSC structure <a name="osc"></a>
 ![immagine](https://github.com/Rhapsodizer/CC_Project/assets/92687497/d2911156-d38a-47f6-970b-1ecb26c28d9c)
 
-## 8. Contacts and contributions <a name="contact"></a>
+## 8. Future improvements <a name="future"></a>
 
-- **Attolini Silvio** - silvio.attolini@mail.polimi.it: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer
+La ricchezza di una loop station è data dalla libertà artistica-musicale dell'utente. Per questo l'aggiunta di diversi metodi di interazione con la maacchina è il primo passo, nonchè l'interazione stessa tra i vari layer grafico-sonori. Anche una modifica delle tracce real-time può essere una direzione di miglioramento.
+
+## 9. Contacts and contributions <a name="contact"></a>
+
+- **Attolini Silvio** - silvio.attolini@mail.polimi.it: UI, Master, LoopStationManager, Tracks, Utils, RecorderAndPlayer, Image Sonification, Users
 - **Gorni Alessandro** - alessandro.gorni@mail.polimi.it: DM, MelodyChat, sounds.scd, LayerInteraction
 - **Martinelli Riccardo** - riccardo.martineli@mail.polimi.it: MelodyChat, sounds.scd
 
